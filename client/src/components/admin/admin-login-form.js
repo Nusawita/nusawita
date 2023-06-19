@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Box, Typography, useTheme } from "@mui/material";
+import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle } from "../../styles/shared-styles";
 
 export const AdminLoginForm = () => {
@@ -22,10 +22,12 @@ export const AdminLoginForm = () => {
         sx={{ ...ContentMiddle, backgroundColor: lightColor }}
       >
         <Box>
-          <Typography variant="h5" component="h5" sx={{ fontWeight: "bold" }}>
+          <Typography variant="h4" component="h4">
             Admin Login
           </Typography>
         </Box>
+          <Button variant="secondary" size="small">Masuk</Button>
+          <Button variant="primary" size="small">Masuk</Button>
       </Grid>
       <Grid
         item
