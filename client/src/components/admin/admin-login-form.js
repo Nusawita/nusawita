@@ -22,20 +22,11 @@ export const AdminLoginForm = () => {
             Admin Login
           </Typography>
         </Box>
-        {/* <Button variant="secondary" size="small">Masuk</Button> */}
-
-        <Button
-          variant="contained"
-          size="small"
-          sx={{
-            color: "#fffff",
-            backgroundColor: "#0E404F",
-            textTransform: "none",
-            borderRadius: "10px",
-            padding: "20px 0px",
-          }}
-        >
-          Login
+        <Button variant="secondary" size="small" disabled>
+          Masuk
+        </Button>
+        <Button variant="primary" size="small">
+          Hello
         </Button>
       </Grid>
       <Grid

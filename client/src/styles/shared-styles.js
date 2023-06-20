@@ -101,7 +101,25 @@ export const customTheme = createTheme({
           props: { variant: "primary" },
           style: {
             backgroundColor: customGlobalTheme.palette.primary.main,
-            color:"white"
+            color: "white",
+            textTransform: "none",
+            borderRadius: "4px",
+            "&:hover": {
+              backgroundColor: customGlobalTheme.palette.primary.light,
+              color: "white",
+            },
+            "&:active": {
+              backgroundColor: customGlobalTheme.palette.primary.dark,
+            },
+            ":disabled": {
+              backgroundColor: customGlobalTheme.palette.primary.main,
+              opacity: 0.5,
+              color: "white",
+            },
+            "&:focus": {
+              backgroundColor: customGlobalTheme.palette.primary.light,
+              color: "white",
+            },
           },
         },
         {
@@ -109,7 +127,25 @@ export const customTheme = createTheme({
           style: {
             backgroundColor: customGlobalTheme.palette.light.main,
             border: `1px solid ${customGlobalTheme.palette.primary.main}`,
-            color:customGlobalTheme.palette.primary.main
+            color: customGlobalTheme.palette.primary.main,
+            textTransform: "none",
+            borderRadius: "4px",
+            "&:hover": {
+              color: customGlobalTheme.palette.primary.dark,
+              backgroundColor: "white",
+            },
+            "&:focus": {
+              color: customGlobalTheme.palette.primary.dark,
+              backgroundColor: "white",
+            },
+            "&:active": {
+              color: customGlobalTheme.palette.primary.dark,
+              backgroundColor: "white",
+            },
+            ":disabled": {
+              opacity: 0.5,
+              color: customGlobalTheme.palette.primary.dark,
+            },
           },
         },
         //Button Size
