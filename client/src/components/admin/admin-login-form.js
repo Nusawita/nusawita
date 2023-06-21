@@ -22,11 +22,8 @@ export const AdminLoginForm = () => {
             Admin Login
           </Typography>
         </Box>
-        <Button variant="secondary" size="small" disabled>
-          Masuk
-        </Button>
-        <Button variant="primary" size="small">
-          Hello
+        <Button variant="primary" size="large">
+          Login
         </Button>
       </Grid>
       <Grid

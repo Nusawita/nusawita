@@ -164,7 +164,7 @@ export const customTheme = createTheme({
           },
         },
         {
-          props: { size: "Large" },
+          props: { size: "large" },
           style: {
             width: "315px",
             height: "48px",
