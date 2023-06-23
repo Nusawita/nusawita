@@ -1,8 +1,8 @@
-const { Sequelize, Model, DataTypes } = require("sequelize");
-const sequelize = new Sequelize('postgres://user:postgres:5432/nusawita')
+const { DataTypes } = require("sequelize");
+const sequelize = require("../connect-database")
 
-class User extends Model {}
-User.init({
+// class User extends Model {}
+const User = sequelize.define('user',{
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -38,7 +38,7 @@ User.init({
         type: DataTypes.INTEGER,
         allownull: true
     },
-}, { sequelize, modelName: 'user'});
+});
 
 sequelize.sync()
     .then(() => {
@@ -47,3 +47,5 @@ sequelize.sync()
     .catch((error) => {
         console.error('Error synchronizing model:', error);
     });
+
+module.exports = User;
