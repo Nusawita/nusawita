@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const router = require('./routes/v1/route.js');
+const router = require('./app/routes/v1/route.js');
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json())

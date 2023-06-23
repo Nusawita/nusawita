@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 // Create a Sequelize instance and establish the database connection
-const sequelize = new Sequelize('latihan_6', 'postgres', 'azerblaze195', {
+const sequelize = new Sequelize('nusawita', 'postgres', 'azerblaze195', {
   host: 'localhost',
   dialect: 'postgres',
 });

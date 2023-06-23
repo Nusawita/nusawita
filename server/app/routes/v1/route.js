@@ -1,6 +1,7 @@
 const express = require('express');
 
-const UserController = require('../../controllers/userController.js');
+const newLocal = '../../controllers/userController';
+const UserController = require(newLocal);
 const UserRepository = require('../../repositories/userRepository');
 const UserService = require('../../services/userService');
 
