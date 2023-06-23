@@ -21,6 +21,10 @@ const User = sequelize.define('user',{
             isEmail: true
         }
     },
+    password: {
+        type: DataTypes.STRING,
+        allownull: false
+    },
     no_telp: {
         type: DataTypes.STRING,
         allownull: true // atur entar supaya admin wajib memasukan no telp
