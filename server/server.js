@@ -5,8 +5,9 @@ require('dotenv').config();
 
 const router = require('./app/routes/v1/route.js');
 
-const { API_PORT } = process.env;
-const port = process.env.PORT || API_PORT
+// const { API_PORT } = process.env.PORT;
+// const port = process.env.PORT || API_PORT
+const port = process.env.PORT
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json())

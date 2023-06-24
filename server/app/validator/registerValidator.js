@@ -10,10 +10,14 @@ exports.validateRegister = [
     body('password')
         .notEmpty().withMessage('Password required')
         .isLength({min:8}).withMessage('Password mus be at least 8 character long'),
-    body('no_telp')
-        .custom(value => {
-            if (!(Number(value))) {
-                throw new Error('must be number')
-            }
-        }),
+    //create validation for no_telp in another day
+    // body('no_telp')  
+    //     .custom(value => {
+    //         if (Number(value).isNumeric()) {
+    //             // console.log(typeof value)
+    //             // console.log(typeof Number(value))
+    //             // console.log(Number(value))
+    //             throw new Error('must be number')
+    //         }
+    //     }),
 ];
