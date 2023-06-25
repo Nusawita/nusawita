@@ -10,7 +10,7 @@ export const AdminLoginPage = () => {
         ...ContentMiddle,
         width: '100vw',
         height: '100vh',
-        backgroundImage: "url(images/dark_mountain_bg.jpg)",
+        backgroundImage: "url(images/dark_mountain_bg_blur.png)",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

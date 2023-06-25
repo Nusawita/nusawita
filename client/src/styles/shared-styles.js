@@ -200,3 +200,9 @@ export const ContentMiddle = {
   alignItems: "center",
   justifyContent: "center",
 };
+
+export const ContentEnd = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-end",
+};
