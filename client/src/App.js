@@ -1,10 +1,10 @@
 import './App.css';
-import { AdminLoginPage } from './pages/admin/admin-login-page';
+import { TestUI } from './components/UI/test_UI';
 
 function App() {
   return (
     <>
-    <AdminLoginPage/>
+    <TestUI/>
     </>
   );
 }

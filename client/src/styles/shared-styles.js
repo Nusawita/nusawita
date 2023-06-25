@@ -35,7 +35,7 @@ export const customGlobalTheme = createTheme({
       fontSize: "14px",
     },
     caption: {
-      fontSize: "cell",
+      fontSize: "12px",
     },
     overline: {
       fontSize: "12px",
@@ -94,6 +94,7 @@ export const customTheme = createTheme({
   ...customGlobalTheme,
   //Custom component
   components: {
+    // BUTTON COMPONENTS
     MuiButton: {
       variants: [
         //Button Variants
@@ -164,13 +165,31 @@ export const customTheme = createTheme({
           },
         },
         {
-          props: { size: "Large" },
+          props: { size: "large" },
           style: {
             width: "315px",
             height: "48px",
           },
         },
       ],
+    },
+    // TEXT FIELD
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiInput-underline": {
+            "&:before": {
+              borderBottom: "none", // Remove the underline
+            },
+            "&:after": {
+              borderBottom: "none", // Remove the underline after interaction
+            },
+            "&:hover:not(.Mui-disabled):before": {
+              borderBottom: "none", // Remove the underline on hover
+            },
+          },
+        },
+      },
     },
   },
 });
