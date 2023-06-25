@@ -18,14 +18,15 @@ class UserController {
         }
     }
 
-    async createUser(req, res) {
-        try {
-            const userData = req.body;
-            const newUser = await this.userService.createUser(userData);
-            res.status(201).json(newUser);
-        } catch (error) {
-            res.status(500).json({ error: 'Internal Server Error' });
+    async register(req, res) {
+        const userData = req.body;
+        const errRegister = await this.userService.register(userData);
+        if (errRegister != null) {
+            return res.send(errRegister)
         }
+
+        //json message
+        res.status(201).json({message: 'User created'});
     }
 }
 

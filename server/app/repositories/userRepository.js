@@ -2,13 +2,12 @@
 const User = require('../models/User');
 
 class UserRepository {
-    async create(userData) {
+    async createUser(userData) {
         try {
             const createdUser = await User.create(userData);
-            return createdUser;
+            return null;
         } catch (error) {
-            console.log(error);
-            throw error;
+            return error
         }
     }
 
@@ -17,8 +16,17 @@ class UserRepository {
             const user = await User.findOne({where: {username: `${username}`}});
             return user;
         } catch (error) {
-            console.log(error);
-            throw error;
+            // console.log(error);
+            return error;
+        }
+    }
+
+    async getUserByEmail(email) {
+        try{
+            const user = await User.findOne({where: {email: `${email}`}});
+            return user;
+        } catch (error) {
+            return error;
         }
     }
 }

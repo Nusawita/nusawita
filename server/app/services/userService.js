@@ -1,3 +1,4 @@
+const { check } = require('express-validator');
 const userRepository = require('../repositories/userRepository');
 const jwt = require('jsonwebtoken');
 
@@ -6,10 +7,43 @@ class UserService {
         this.userRepository = userRepository;
     }
 
-    async createUser(userData) {
-        //send data to user repository
-        const newUser = await this.userRepository.create(userData);
-        return newUser;
+    async register(userData) {
+        //check if username already exist
+        const userCheckUsername = await this.userRepository.getUserByUsername(userData.username);
+        if (userCheckUsername.username) { //if username already exist
+            const error = { //create error message
+                status: 409,
+                message: 'Username already been taken'
+            }
+            const jsonData = JSON.stringify(error)
+            return jsonData //return error
+        } else {
+            //check if email already exist
+            const userCheckEmail = await this.userRepository.getUserByEmail(userData.email);
+            if (userCheckEmail.email) { //if email already exist
+                const error = {
+                    status: 409,
+                    message: 'Email already been taken'
+                }
+                const jsonData = JSON.stringify(error)
+                return jsonData
+            } else {
+                //send data to repsitory
+                const err = await this.userRepository.createUser(userData)
+                if (err != null){   // check if error occured when registering new user
+                    const error = {
+                        status: 500,
+                        message: 'Internal server error',
+                        err: err
+                    }
+        
+                    const jsonData = JSON.stringify(error)
+        
+                    return jsonData
+                }
+            }
+        }
+        return null;
     }
 
     async login(loginData) {

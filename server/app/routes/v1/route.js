@@ -15,7 +15,7 @@ const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const userController = new UserController(userService);
 
-router.post('/register', validateRegister, handleValidationErrors, (req, res) => userController.createUser(req, res));
+router.post('/register', validateRegister, handleValidationErrors, (req, res) => userController.register(req, res));
 router.post('/login', validateLogin, handleValidationErrors, (req, res) => userController.login(req,res)), 
 
 module.exports = router
