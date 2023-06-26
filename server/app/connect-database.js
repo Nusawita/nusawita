@@ -16,6 +16,7 @@ sequelize.authenticate()
     console.error('Unable to connect to the database:', error);
   });
 
+//create table in database
 sequelize.sync()
   .then(() => {
       console.log('Model synchronized successfuly');

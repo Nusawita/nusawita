@@ -1,5 +1,6 @@
 const {body} = require('express-validator');
 
+//to validate register request
 exports.validateRegister = [
     body('username')
         .notEmpty().withMessage('Username required')
@@ -11,7 +12,7 @@ exports.validateRegister = [
         .notEmpty().withMessage('Password required')
         .isLength({min:8}).withMessage('Password mus be at least 8 character long'),
     //create validation for no_telp in another day
-    // body('no_telp')  
+    // body('noTelp')  
     //     .custom(value => {
     //         if (Number(value).isNumeric()) {
     //             // console.log(typeof value)

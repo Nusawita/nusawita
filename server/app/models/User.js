@@ -1,4 +1,4 @@
-const {DataTypes } = require("sequelize");
+const {DataTypes} = require("sequelize");
 const sequelize = require("../connect-database")
 
 // class User extends Model {}
@@ -25,10 +25,9 @@ const User = sequelize.define('user',{
         type: DataTypes.STRING,
         allowNull: false
     },
-    no_telp: {
+    noTelp: {
         type: DataTypes.STRING,
         allowNull: true // atur entar supaya admin wajib memasukan no telp
-        //entar tambah validate hanya angka
     },
     dob: {
         type: DataTypes.DATE,

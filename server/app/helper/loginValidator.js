@@ -1,5 +1,6 @@
 const {body} = require('express-validator');
 
+//to validate login request
 exports.validateLogin = [
     body('username')
         .notEmpty().withMessage('Username required')

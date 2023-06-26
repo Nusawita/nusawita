@@ -13,19 +13,18 @@ class UserRepository {
     async getUserByUsername(username) {
         try{
             const user = await User.findOne({where: {username: `${username}`}});
-            return user;
+            return [user, null];
         } catch (error) {
-            // console.log(error);
-            return error;
+            return [null, error];
         }
     }
 
     async getUserByEmail(email) {
         try{
             const user = await User.findOne({where: {email: `${email}`}});
-            return user;
+            return [user, null];
         } catch (error) {
-            return error;
+            return [null, error];
         }
     }
 }
