@@ -4,9 +4,8 @@ const dtoError = (status, message, err) => {
         message: message,
         err: err,
     }
-    const jsonData = JSON.stringify(error);
 
-    return jsonData;
+    return error;
 }
 
 exports.dtoError = dtoError;
