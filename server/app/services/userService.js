@@ -1,6 +1,7 @@
 const userRepository = require('../repositories/userRepository');
 const sessionRepository = require('../repositories/sessionRepository');
 const uuid = require('uuid');
+const bcrypt = require('bcryptjs');
 
 class UserService {
     constructor(userRepository, sessionRepository) {
@@ -29,6 +30,9 @@ class UserService {
                 const jsonData = JSON.stringify(error)
                 return jsonData
             } else {
+                //encrypt user password
+                userData.password = await bcrypt.hash(userData.password, 10);
+
                 //send data to repsitory
                 const err = await this.userRepository.createUser(userData)
                 if (err != null){   // check if error occured when registering new user
@@ -61,7 +65,7 @@ class UserService {
         }
 
         //check password
-        if (user.password === loginData.password) {     //if password correct
+        if (await bcrypt.compare(loginData.password, user.password)) {     //if password correct
             const sessionToken = uuid.v4(); //create session token
             
             //create session expire date
