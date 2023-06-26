@@ -16,4 +16,12 @@ sequelize.authenticate()
     console.error('Unable to connect to the database:', error);
   });
 
+sequelize.sync()
+  .then(() => {
+      console.log('Model synchronized successfuly');
+  })
+  .catch((error) => {
+      console.error('Error synchronizing model:', error);
+  });
+
 module.exports = sequelize

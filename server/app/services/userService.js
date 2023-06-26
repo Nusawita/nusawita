@@ -1,16 +1,17 @@
-const { check } = require('express-validator');
 const userRepository = require('../repositories/userRepository');
-const jwt = require('jsonwebtoken');
+const sessionRepository = require('../repositories/sessionRepository');
+const uuid = require('uuid');
 
 class UserService {
-    constructor(userRepository) {
+    constructor(userRepository, sessionRepository) {
         this.userRepository = userRepository;
+        this.sessionRepository = sessionRepository
     }
 
     async register(userData) {
         //check if username already exist
         const userCheckUsername = await this.userRepository.getUserByUsername(userData.username);
-        if (userCheckUsername.username) { //if username already exist
+        if (userCheckUsername != null) { //if username already exist
             const error = { //create error message
                 status: 409,
                 message: 'Username already been taken'
@@ -20,7 +21,7 @@ class UserService {
         } else {
             //check if email already exist
             const userCheckEmail = await this.userRepository.getUserByEmail(userData.email);
-            if (userCheckEmail.email) { //if email already exist
+            if (userCheckEmail != null) { //if email already exist
                 const error = {
                     status: 409,
                     message: 'Email already been taken'
@@ -48,31 +49,83 @@ class UserService {
 
     async login(loginData) {
         const user = await this.userRepository.getUserByUsername(loginData.username);
-        if (user.password === loginData.password) {
-            //create token
-            //remmember to refactor token generator
-            const payload = {
-                userId: user.id,
-                username: user.username,
-            };
+        
+        //check if user exist or not
+        if (user === null) {
+            const error = { //create error message
+                status: 401,
+                message: 'Username or Password are incorrect'
+            }
+            const jsonData = JSON.stringify(error)
+            return [null, null, jsonData] //return error
+        }
 
-            const token = jwt.sign(payload, process.env.TOKEN_KEY, {expiresIn: '2h'});
+        //check password
+        if (user.password === loginData.password) {     //if password correct
+            const sessionToken = uuid.v4(); //create session token
+            
+            //create session expire date
+            const now = new Date()
+            const expireAt = new Date(+now + 86400000) //86400000 equal to one day
+            
+            //add session token to session table
+            //remember to create dto
+            const sessionData = {
+                id: sessionToken,
+                userId: user.id,
+                loginStatus: true,
+                expirationTime: expireAt
+            }
+
+            //send session to repository
+            const [session, errSession] = await this.sessionRepository.createSession(sessionData);
+            
+            //check if session succesfully created at database
+            if (errSession != null) {
+                const error = {
+                    status: 500,
+                    message: 'Internal server error',
+                    err: errSession
+                }
+    
+                const jsonData = JSON.stringify(error)
+    
+                return [null, null, jsonData]
+            }
 
             const loggedUser = {
                 id: user.id,
                 username: user.username,
+                email: user.email,
                 no_telp: user.no_telp,
                 dob: user.dob,
                 isAdmin: user.isAdmin,
-                ban: user.ban,
-                token: token
+                ban: user.ban
             }
-            //user.token = token;
-            
-            return loggedUser;
-        } else {
-            return null
+
+            return [loggedUser, session, null] //if success
+        } else {    //if password are incorrect
+            const error = { //create error message
+                status: 401,
+                message: 'Username or Password are incorrect'
+            }
+            const jsonData = JSON.stringify(error)
+            return [null, null, jsonData] //return error
         }
+    }
+
+    async logout(sessionToken) {
+        const errLogout = await this.sessionRepository.deleteSession(sessionToken);
+        if (errLogout != null) {
+            const error = { //create error message
+                status: 500,
+                message: 'Internal Server Error'
+            }
+            const jsonData = JSON.stringify(error);
+            return jsonData;
+        }
+
+        return null;
     }
 }
 

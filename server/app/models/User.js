@@ -10,12 +10,12 @@ const User = sequelize.define('user',{
     },
     username: {
         type: DataTypes.STRING,
-        allownull: false,
+        allowNull: false,
         unique: true
     },
     email: {
         type: DataTypes.STRING,
-        allownull: false,
+        allowNull: false,
         unique: true,
         validate: {
             isEmail: true
@@ -23,33 +23,25 @@ const User = sequelize.define('user',{
     },
     password: {
         type: DataTypes.STRING,
-        allownull: false
+        allowNull: false
     },
     no_telp: {
         type: DataTypes.STRING,
-        allownull: true // atur entar supaya admin wajib memasukan no telp
+        allowNull: true // atur entar supaya admin wajib memasukan no telp
         //entar tambah validate hanya angka
     },
     dob: {
         type: DataTypes.DATE,
-        allownull: false,
+        allowNull: false,
     },
     isAdmin: {
         type: DataTypes.BOOLEAN,
-        allownull: false
+        allowNull: false
     },
     ban: {
         type: DataTypes.INTEGER,
-        allownull: true
+        allowNull: true
     },
 });
-
-sequelize.sync()
-    .then(() => {
-        console.log('Model synchronized successfuly');
-    })
-    .catch((error) => {
-        console.error('Error synchronizing model:', error);
-    });
 
 module.exports = User;
