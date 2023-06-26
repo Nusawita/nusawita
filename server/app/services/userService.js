@@ -34,7 +34,7 @@ class UserService {
                 //send data to repsitory
                 const errCreateUser = await this.userRepository.createUser(userData)
                 if (errCreateUser != null){   // check if error occured when registering new user
-                    const jsonData = dtoError(500, 'Internal server error', err);
+                    const jsonData = dtoError(500, 'Internal server error', errCreateUser);
         
                     return jsonData
                 }
