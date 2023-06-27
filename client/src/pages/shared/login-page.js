@@ -1,9 +1,9 @@
-import { AdminLoginForm } from "../../components/admin/admin-login-form";
+import { LoginForm } from "../../components/shared/login-form";
 import React from "react";
 import { ContentMiddle } from "../../styles/shared-styles";
 import { Box } from "@mui/material";
 
-export const AdminLoginPage = () => {
+export const LoginPage = () => {
   return (
     <Box
       sx={{
@@ -15,7 +15,7 @@ export const AdminLoginPage = () => {
         backgroundPosition: "center",
       }}
     >
-      <AdminLoginForm />
+      <LoginForm />
     </Box>
   );
 };

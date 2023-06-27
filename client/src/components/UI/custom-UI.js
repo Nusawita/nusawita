@@ -7,8 +7,13 @@ export const TextFieldFilled = (props) => {
   const successColor = theme.palette.primary.main;
 
   const [isFocused, setIsFocused] = useState(false);
-  const [showEmptyError, setShowIsEmptyError] = useState(false);
 
+  const handleFocus = () =>{
+    setIsFocused(true)
+  }
+  const handleBlur = () =>{
+    setIsFocused(false)
+  }
   ////ALL PROPS EXPLANATION
   //iconLeft = icon component from iconify to show at the start of the field
   //iconRight = icon component from iconify to show at the end of the field
@@ -25,6 +30,7 @@ export const TextFieldFilled = (props) => {
       <Box
         borderBottom={2}
         onFocus={props.onFocus} // this props receive a function that runs when the form is being focused
+        onBlur={props.onBlur} //function to run when the field is no longer focused
         sx={{
           px: 1,
           display: "flex",
@@ -44,8 +50,9 @@ export const TextFieldFilled = (props) => {
         {props.iconLeft}
         <TextField
           type={props.type} //type of the input
-          onBlur={props.onBlur} //function to run when the field is no longer focused
           onChange={props.onChange} //function to run when the value inside the field changed
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           value={props.value} //the field value
           label={
             <Typography

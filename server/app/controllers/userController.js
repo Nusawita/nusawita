@@ -26,6 +26,7 @@ class UserController {
     if (errLogin != null) {
       return res.status(errLogin.status).json(errLogin);
     }
+    await res.cookie("session_token", session.id, { maxAge: session.expirationTime, domain: 'localhost' });
 
     //return success
     res.status(200).json(user);
@@ -47,7 +48,10 @@ class UserController {
     }
 
     //delete cookies
-    res.cookie("session_token", "", { expires: new Date() });
+    res.cookie("session_token", {
+      expires: new Date(),
+      domain: "localhost",
+    });
 
     res.status(201).json({ message: "Log out success" });
   }

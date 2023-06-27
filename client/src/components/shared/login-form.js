@@ -1,12 +1,12 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useEffect, useReducer} from "react";
+import React, { useEffect, useReducer } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
 import { TextFieldFilled } from "../UI/custom-UI";
 import { Icon } from "@iconify/react";
 import axios from "axios";
 
-export const AdminLoginForm = () => {
+export const LoginForm = () => {
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -97,19 +97,21 @@ export const AdminLoginForm = () => {
   const handleUsernameChange = (event) => {
     dispatchUsername({ type: "INPUT_CHANGE", value: event.target.value });
   };
+//handle username focus
   const handleUsernameFocus = () => {
-    dispatchUsername({ type: "HANDLE_FOCUS", focus: true });
-    dispatchUsername({ type: "HANDLE_ERROR", showError: false });
+    dispatchUsername({ type: "HANDLE_FOCUS", focus: true }); //set focus is true
+    dispatchUsername({ type: "HANDLE_ERROR", showError: false }); //remove error when field is focused
   };
+  //handle usernmae blur
   const handleUsernameBlur = () => {
     if (usernameState.value.trim().length === 0) {
       dispatchUsername({
         type: "HANDLE_ERROR",
         showError: true,
-        errorMsg: "Password cannot be empty",
-      });
+        errorMsg: "Username cannot be empty",
+      }); //if user have clicked the field and left it empty an error shows
     }
-    dispatchUsername({ type: "HANDLE_FOCUS", focus: false });
+    dispatchUsername({ type: "HANDLE_FOCUS", focus: false }); //set focused to false
   };
   // Handle the password change
   const handlePasswordChange = (event) => {
@@ -190,41 +192,60 @@ export const AdminLoginForm = () => {
     };
   }, [usernameState.value]);
 
+  //function to fetch the login api
   const fetchLoginApi = async (loginData) => {
     try {
+      // call login api
       const res = await axios.post(
         "http://localhost:5000/api/login",
         loginData,
         { withCredentials: true }
       );
+      //if login success redirect to landing page
       if (res.status === 200) {
-        window.location.href = "/admin/dashboard";
+        window.location.href = "/";
       }
     } catch (error) {
+      // if unauthorized then show appropiate error in front
       if (error.response.status === 401) {
         dispatchUsername({
           type: "HANDLE_ERROR",
           showError: true,
-          errorMsg: error.response.data.errLogin.message,
+          errorMsg: error.response.data.message,
         });
         dispatchPassword({
           type: "HANDLE_ERROR",
           showError: true,
-          errorMsg: error.response.data.errLogin.message,
+          errorMsg: error.response.data.message,
         });
       }
     }
   };
 
+  //handle the form submission
   const handleFormSubmit = (event) => {
     event.preventDefault();
+    //get the login data
     const loginData = {
       username: usernameState.value,
       password: passwordState.value,
     };
+    //if username or password s not valid show error to fill form correctly
     if (!usernameState.isValid || !passwordState.isValid) {
+      dispatchUsername({
+        type: "HANDLE_ERROR",
+        showError: true,
+        errorMsg: "Please fill form correctly before submitting",
+      });
+
+      dispatchPassword({
+        type: "HANDLE_ERROR",
+        showError: true,
+        errorMsg: "Please fill form correctly before submitting",
+      });
       return;
     }
+    //if username and password valid fetch login api
     fetchLoginApi(loginData);
   };
 
@@ -274,8 +295,10 @@ export const AdminLoginForm = () => {
             onFocus={handleUsernameFocus}
             onBlur={handleUsernameBlur}
             iconLeft={<Icon icon="ic:round-person" width="32" />}
-            iconError={
-              <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
+            iconRight={
+              usernameState.showError && (
+                <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
+              )
             }
             sx={{ mb: 2 }}
           />
@@ -305,6 +328,7 @@ export const AdminLoginForm = () => {
               ) : (
                 <Icon
                   onClick={handleSetPassInvisible}
+                  style={{ cursor: "pointer" }}
                   icon="mdi:eye"
                   width="32"
                 />

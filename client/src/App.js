@@ -1,7 +1,7 @@
 import "./App.css";
-import { AdminLoginPage } from "./pages/admin/admin-login-page";
+import { LoginPage } from "./pages/shared/login-page";
 import AuthContext from "./context/auth-context";
-import { useContext } from "react";
+import { useContext} from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -9,46 +9,33 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AdminDashboard } from "./pages/admin/admin-dashboard";
+import { LandingPage } from "./pages/user/landing_page";
 
 function App() {
-  const ctx = useContext(AuthContext)
+  const ctx = useContext(AuthContext); //call auth context
+  // render loading page on loading
+  if (ctx.loading) {
+    return <></>;
+  }
   return (
     <>
       <Router>
         <Routes>
-          <Route
-            path="/"
-            element={
-              ctx.isLoggedIn ? (
-                <Navigate to="/admin/dashboard" replace />
-              ) : (
-                <Navigate to="/admin/login" replace />
-              )
-            }
-          />
+          <Route path="/" element={<LandingPage />} />
           <Route
             path="/admin/dashboard"
             element={
-              ctx.isLoggedIn ? (
-                <AdminDashboard/>
-              ) : (
-                <Navigate to="/admin/login" replace />
-              )
+              ctx.isAdmin ? <AdminDashboard /> : <Navigate to="/" replace />//If user is admin go to dashboard else back to landing page
             }
           />
           <Route
-            path="/admin/login"
+            path="/login"
             element={
-              ctx.isLoggedIn ? (
-                <Navigate to="/admin/dashboard" replace />
-              ) : (
-                <AdminLoginPage />
-              )
+              ctx.isLoggedIn ? <Navigate to="/" replace /> : <LoginPage />//If user is logged in, redirect to landing page
             }
           />
         </Routes>
       </Router>
-      {/* <AdminLoginPage /> */}
     </>
   );
 }

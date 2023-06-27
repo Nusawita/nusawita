@@ -48,7 +48,7 @@ class UserService {
 
         //check if user exist
         if (user === null) {
-            const jsonData = dtoError(401, 'Username or Password are invalid', null);
+            const jsonData = dtoError(401, 'Invalid Username or Password', null);
             return [null, null, jsonData] //return error
         }
 
