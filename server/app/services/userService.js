@@ -48,7 +48,7 @@ class UserService {
 
         //check if user exist
         if (user === null) {
-            const jsonData = dtoError(401, 'Username or Password are incorrect', null);
+            const jsonData = dtoError(401, 'Username or Password are invalid', null);
             return [null, null, jsonData] //return error
         }
 
@@ -82,7 +82,7 @@ class UserService {
 
             return [loggedUser, session, null] //if success
         } else {    //if user or password incorrect
-            const jsonData = dtoError(401, 'Username or Password are incorrect', null);
+            const jsonData = dtoError(401, 'Username or Password are invalid', null);
             return [null, null, jsonData] //return error
         }
     }
