@@ -34,7 +34,7 @@ class UserService {
                 //send data to repsitory
                 const errCreateUser = await this.userRepository.createUser(userData)
                 if (errCreateUser != null){   // check if error occured when registering new user
-                    const jsonData = dtoError(500, 'Internal server error', err);
+                    const jsonData = dtoError(500, 'Internal server error', errCreateUser);
         
                     return jsonData
                 }
@@ -48,7 +48,7 @@ class UserService {
 
         //check if user exist
         if (user === null) {
-            const jsonData = dtoError(401, 'Invalid Username or Password', null);
+            const jsonData = dtoError(401, 'Username or Password are invalid', null);
             return [null, null, jsonData] //return error
         }
 
@@ -82,7 +82,7 @@ class UserService {
 
             return [loggedUser, session, null] //if success
         } else {    //if user or password incorrect
-            const jsonData = dtoError(401, 'Username or Password are incorrect', null);
+            const jsonData = dtoError(401, 'Username or Password are invalid', null);
             return [null, null, jsonData] //return error
         }
     }
@@ -95,6 +95,32 @@ class UserService {
         }
 
         return null;
+    }
+
+    async profile(sessionToken) {
+        //get session
+        const [session, errSession] = await this.sessionRepository.getSession(sessionToken);
+        if (errSession != null) {
+            const jsonData = dtoError(401, 'Unauthorized user', null);
+            return [null, jsonData];
+        }
+
+        //get user
+        const [profile, errProfile] = await this.userRepository.getUserByUserId(session.userId)
+        if (errProfile != null) {
+            const jsonData = dtoError(500, 'Internal Server Error', null);
+            return [null, jsonData];
+        }
+
+        //check if user admin
+        //temporary check as long this used as quick dashboard
+        if (profile.isAdmin) {
+            const loggedUser = dtoLogin(profile);
+            return [loggedUser, null]
+        } else {
+            const jsonData = dtoError(401, 'Unauthorized user', null);
+            return [null, jsonData]
+        }
     }
 }
 

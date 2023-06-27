@@ -10,6 +10,15 @@ class SessionRepository {
         }
     }
 
+    async getSession(sessionToken) {
+        try {
+            const session = await Session.findOne({where: {id: `${sessionToken}`}});
+            return [session, null]
+        } catch (error) {
+            return [null, error]
+        }
+    }
+
     async deleteSession(sessionToken) {
         try {
             const deletedSession = await Session.destroy({where: {id: `${sessionToken}`}});
