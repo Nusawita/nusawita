@@ -7,15 +7,7 @@ export const TextFieldFilled = (props) => {
   const successColor = theme.palette.primary.main;
 
   const [isFocused, setIsFocused] = useState(false);
-  const [wasFocused, setWasFocused] = useState(false);
-
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-  const handleBlur = () => {
-    setIsFocused(false);
-    setWasFocused(true);
-  };
+  const [showEmptyError, setShowIsEmptyError] = useState(false);
 
   ////ALL PROPS EXPLANATION
   //iconLeft = icon component from iconify to show at the start of the field
@@ -32,19 +24,19 @@ export const TextFieldFilled = (props) => {
     <Box sx={{ ...props.sx }}>
       <Box
         borderBottom={2}
-        onFocus={handleFocus} // this props receive a function that runs when the form is being focused
+        onFocus={props.onFocus} // this props receive a function that runs when the form is being focused
         sx={{
           px: 1,
           display: "flex",
           alignItems: "center",
-          backgroundColor: `${
-            props.showError && wasFocused ? "#FFEDEA" : "#E9F2F4" //if already interacted and input is not valid background
-          }`,
           height: "56px",
           borderColor: `${isFocused && successColor}`, //border change to green on textfield focus
+          backgroundColor: `${
+            props.showError ? "#FFEDEA" : "#E9F2F4" //if already interacted and input is not valid background
+          }`,
           "&:hover": {
             backgroundColor: `${
-              props.showError && wasFocused ? "#FFEDEA" : "#DBE4E6" //if already interacted and input is error hover is red
+              props.showError ? "#FFEDEA" : "#DBE4E6" //if already interacted and input is error hover is red
             }`,
           },
         }}
@@ -52,7 +44,7 @@ export const TextFieldFilled = (props) => {
         {props.iconLeft}
         <TextField
           type={props.type} //type of the input
-          onBlur={handleBlur} //function to run when the field is no longer focused
+          onBlur={props.onBlur} //function to run when the field is no longer focused
           onChange={props.onChange} //function to run when the value inside the field changed
           value={props.value} //the field value
           label={
@@ -61,7 +53,7 @@ export const TextFieldFilled = (props) => {
             >
               {props.label}
             </Typography>
-          } 
+          }
           variant="standard"
           InputLabelProps={{
             style: {
@@ -70,7 +62,7 @@ export const TextFieldFilled = (props) => {
                 isFocused || props.value
                   ? "translateY(-20%)"
                   : "translateY(60%)"
-              }`, 
+              }`,
             },
           }}
           sx={{
@@ -79,9 +71,9 @@ export const TextFieldFilled = (props) => {
           }}
         />
         {/* If input is not valid and textfield was focused before, show the error icon, otherwise show the right icon  */}
-        {props.showError && wasFocused ? props.iconError : props.iconRight}
+        {props.iconRight}
       </Box>
-      {props.showError && wasFocused && (
+      {props.showError && (
         //if input is not valid and textfield was focused before, show the error message
         <Typography variant="caption" sx={{ color: errorColor }}>
           {props.errorMsg}
