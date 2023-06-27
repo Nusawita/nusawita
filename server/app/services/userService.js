@@ -96,6 +96,32 @@ class UserService {
 
         return null;
     }
+
+    async profile(sessionToken) {
+        //get session
+        const [session, errSession] = await this.sessionRepository.getSession(sessionToken);
+        if (errSession != null) {
+            const jsonData = dtoError(401, 'Unauthorized user', null);
+            return [null, jsonData];
+        }
+
+        //get user
+        const [profile, errProfile] = await this.userRepository.getUserByUserId(session.userId)
+        if (errProfile != null) {
+            const jsonData = dtoError(500, 'Internal Server Error', null);
+            return [null, jsonData];
+        }
+
+        //check if user admin
+        //temporary check as long this used as quick dashboard
+        if (profile.isAdmin) {
+            const loggedUser = dtoLogin(profile);
+            return [loggedUser, null]
+        } else {
+            const jsonData = dtoError(401, 'Unauthorized user', null);
+            return [null, jsonData]
+        }
+    }
 }
 
 module.exports = UserService;

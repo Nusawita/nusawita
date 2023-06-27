@@ -11,5 +11,6 @@ const router = express.Router();
 router.post('/register', validateRegister, handleValidationErrors, (req, res) => userController.register(req, res));
 router.post('/login', validateLogin, handleValidationErrors, (req, res) => userController.login(req,res))
 router.get('/logout', (req, res) => userController.logout(req,res));
+router.get('/dashboard', (req, res) => userController.profile(req,res)); //feature profile sebagai dashborad untuk sementara
 
 module.exports = router

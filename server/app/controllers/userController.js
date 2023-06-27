@@ -54,6 +54,22 @@ class UserController {
 
         res.status(201).json({message: 'Log out success'});
     }
+
+    async profile(req, res) {
+        const sessionToken = req.cookies["session_token"]
+        //if there is no session or cookies
+        if (!sessionToken) {
+            res.status(401).end()
+            return
+        }
+
+        const [profile, errProfile] = await this.userService.profile(sessionToken)
+        if (errProfile != null) {
+            return res.status(errProfile.status).json(errProfile)
+        }
+
+        res.status(200).json(profile)
+    }
 }
 
 module.exports = UserController;
