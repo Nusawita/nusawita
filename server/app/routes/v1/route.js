@@ -12,4 +12,6 @@ router.post('/register', validateRegister, handleValidationErrors, (req, res) =>
 router.post('/login', validateLogin, handleValidationErrors, (req, res) => userController.login(req,res))
 router.get('/logout', (req, res) => userController.logout(req,res));
 
+router.get('/admin/users', (req, res) => userController.getAllUser(req, res));
+
 module.exports = router

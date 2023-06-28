@@ -10,6 +10,15 @@ class UserRepository {
         }
     }
 
+    async getUserByUserId(userId) {
+        try{
+            const user = await User.findOne({where: {id: `${userId}`}});
+            return [user, null];
+        } catch (error) {
+            return [null, error];
+        }
+    }
+
     async getUserByUsername(username) {
         try{
             const user = await User.findOne({where: {username: `${username}`}});
@@ -25,6 +34,15 @@ class UserRepository {
             return [user, null];
         } catch (error) {
             return [null, error];
+        }
+    }
+
+    async getAllUser() {
+        try{
+            const allUser = await User.findAll({where: {isAdmin: false}});
+            return [allUser, null];
+        }catch (error) {
+            return [null, error]
         }
     }
 }

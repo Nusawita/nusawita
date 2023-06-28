@@ -96,6 +96,43 @@ class UserService {
 
         return null;
     }
+
+    async getAllUser(sessionToken) {
+        //check session
+        const [session, errSession] = await this.sessionRepository.getSession(sessionToken);
+        if (errSession != null) {
+            const jsonData = dtoError(500, 'Internal Server Error', null); //ask regarding error message later
+            return [null, jsonData];
+        }
+
+        //get user
+        const [user, errUser] = await this.userRepository.getUserByUserId(session.userId);
+        if (errUser != null) {
+            const jsonData = dtoError(500, 'Internal Server Error', null);
+            return [null, jsonData];
+        }
+
+        //check if user is admin
+        if (!user.isAdmin) {
+            const jsonData = dtoError(401, 'Unauthorized User', null);
+            return [null, jsonData];
+        }
+
+        //get all user
+        const [allUser, errAllUser] = await this.userRepository.getAllUser()
+        if (errAllUser != null) {
+            const jsonData = dtoError(500, 'Internal Server Error', null);
+            return [null, jsonData];
+        }
+
+        let allUsers = []
+
+        for(let i = 0; i < allUser.length; i++) {
+            allUsers.push(dtoLogin(allUser[i]))
+        }
+
+        return [allUsers, null];
+    }
 }
 
 module.exports = UserService;

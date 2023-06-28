@@ -54,6 +54,22 @@ class UserController {
 
         res.status(201).json({message: 'Log out success'});
     }
+
+    async getAllUser (req, res) {
+        const sessionToken = req.cookies["session_token"]
+        if(!sessionToken) {
+            res.status(400).end();
+            return;
+        }
+
+        //get all user
+        const [allUser, errAllUser] = await this.userService.getAllUser(sessionToken);
+        if (errAllUser != null) {
+            return res.status(errAllUser.status).json(errAllUser);
+        }
+
+        res.status(200).json(allUser);
+    }
 }
 
 module.exports = UserController;
