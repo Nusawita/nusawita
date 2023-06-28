@@ -362,7 +362,7 @@ export const LoginForm = () => {
               Dont have an account?
               <Typography
                 component="a"
-                sx={{ color: "#1273EB", fontWeight: "500", pl:1 }}
+                sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
               >
                 Sign up
               </Typography>

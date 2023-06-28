@@ -1,6 +1,6 @@
 import { LoginPage } from "../pages/shared/login-page";
 import AuthContext from "../context/auth-context";
-import { useContext} from "react";
+import { useContext } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import { AdminDashboard } from "../pages/admin/admin-dashboard";
 import { LandingPage } from "../pages/shared/landing_page";
-
+import { RegisterPages } from "../pages/shared/register-page";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading
@@ -31,6 +31,12 @@ export const Navigation = () => {
             path="/login"
             element={
               ctx.isLoggedIn ? <Navigate to="/" replace /> : <LoginPage /> //If user is logged in, redirect to landing page
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <RegisterPages /> //If user is logged in, redirect to landing page
             }
           />
         </Routes>
