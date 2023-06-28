@@ -2,7 +2,7 @@
 import React, { useEffect, useReducer } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
-import { TextFieldFilled } from "../UI/custom-UI";
+import { TextFieldOutlined, TextFieldFilled } from "../UI/custom-UI";
 import { Icon } from "@iconify/react";
 import axios from "axios";
 
@@ -97,7 +97,7 @@ export const LoginForm = () => {
   const handleUsernameChange = (event) => {
     dispatchUsername({ type: "INPUT_CHANGE", value: event.target.value });
   };
-//handle username focus
+  //handle username focus
   const handleUsernameFocus = () => {
     dispatchUsername({ type: "HANDLE_FOCUS", focus: true }); //set focus is true
     dispatchUsername({ type: "HANDLE_ERROR", showError: false }); //remove error when field is focused
@@ -253,14 +253,22 @@ export const LoginForm = () => {
     <Grid
       container
       sx={{
-        width: "970px",
-        height: "569px",
+        height: "100%",
         boxShadow: "0px 10px 15px 3px rgba(226, 226, 226, 0.25)",
         borderRadius: "10px",
         overflow: "hidden",
       }}
     >
-      <Grid item xs={6} sx={{ ...ContentMiddle, backgroundColor: lightColor }}>
+      <Grid
+        item
+        xs={8}
+        sx={{
+          backgroundImage: "url(/images/gapura.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+      <Grid item xs={4} sx={{ ...ContentMiddle, backgroundColor: lightColor }}>
         <Box
           component="form"
           onSubmit={handleFormSubmit}
@@ -286,7 +294,7 @@ export const LoginForm = () => {
           >
             Admin Login
           </Typography>
-          <TextFieldFilled
+          <TextFieldOutlined
             showError={usernameState.showError}
             errorMsg={usernameState.errorMsg}
             onChange={handleUsernameChange}
@@ -302,7 +310,7 @@ export const LoginForm = () => {
             }
             sx={{ mb: 2 }}
           />
-          <TextFieldFilled
+          <TextFieldOutlined
             type={`${passwordState.inputVisibility ? "text" : "password"}`}
             value={passwordState.value}
             label="Password"
@@ -336,7 +344,7 @@ export const LoginForm = () => {
             }
             sx={{ mb: 2 }}
           />
-          <Box sx={{ width: "100%", ...ContentEnd, mb: 2 }}>
+          <Box sx={{ width: "100%", ...ContentEnd, mb: 5 }}>
             <Typography
               variant="subtitle1"
               component="a"
@@ -346,22 +354,22 @@ export const LoginForm = () => {
               Forgot Password?
             </Typography>
           </Box>
-          <Box>
+          <Box sx={{ ...ContentMiddle }}>
             <Button type="submit" variant="primary" size="large">
               Login
             </Button>
+            <Typography variant="subtitle1" sx={{ fontWeight: "500", mt: 2 }}>
+              Dont have an account?
+              <Typography
+                component="a"
+                sx={{ color: "#1273EB", fontWeight: "500", pl:1 }}
+              >
+                Sign up
+              </Typography>
+            </Typography>
           </Box>
         </Box>
       </Grid>
-      <Grid
-        item
-        xs={6}
-        sx={{
-          backgroundImage: "url(/images/dark_mountain_bg.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      ></Grid>
     </Grid>
   );
 };
