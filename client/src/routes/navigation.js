@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import { AdminDashboard } from "../pages/admin/admin-dashboard";
 import { LandingPage } from "../pages/shared/landing_page";
-import { RegisterPages } from "../pages/shared/register-page";
+import { RegisterPages } from "../pages/user/register-page";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading

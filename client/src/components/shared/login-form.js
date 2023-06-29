@@ -363,6 +363,7 @@ export const LoginForm = () => {
               <Typography
                 component="a"
                 sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
+                href="/register"
               >
                 Sign up
               </Typography>

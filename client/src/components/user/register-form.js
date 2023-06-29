@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
 import { TextFieldOutlined, TextFieldFilled } from "../UI/custom-UI";
@@ -9,7 +10,56 @@ const RegisterForm = () => {
   // call the colors
   const lightColor = theme.palette.light.main;
   const dangerMain = theme.palette.danger.main;
-  const primaryMain = theme.palette.primary.main;
+
+  const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+
+  const [date, setDate] = useState("");
+
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleChange = {
+    username: (event) => {
+      setUsername(event.target.value);
+    },
+  };
+
+  const validator = {
+    checkEmpty: {
+      username: () => {
+        if (username.trim().length === 0) {
+          setUsernameError("Username cannot be empty");
+        }
+      },
+    },
+    checkValid:{
+      username: () =>{
+        if(username.trim().length<8){
+          setUsernameError("Username must be 8 or more characters long")
+        }
+      }
+    }
+  };
+
+  useEffect(()=>{
+    validator.checkValid.username()
+  },[username])
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const data = {
+      username: username,
+    };
+  };
   return (
     <Grid
       container
@@ -32,9 +82,16 @@ const RegisterForm = () => {
       <Grid
         item
         xs={4}
-        sx={{ ...ContentMiddle, backgroundColor: lightColor, height: "100%" }}
+        sx={{
+          ...ContentMiddle,
+          backgroundColor: lightColor,
+          height: "100%",
+          mt: 5,
+          mb: 5,
+        }}
       >
         <Box
+          onSubmit={handleSubmit}
           component="form"
           sx={{ width: "360px" }}
           display="60px"
@@ -58,10 +115,14 @@ const RegisterForm = () => {
           >
             Create an Account
           </Typography>
+
           <TextFieldOutlined
-            label="username"
+            label="Username"
             iconLeft={<Icon icon="ic:round-person" width="32" />}
             sx={{ mb: 2 }}
+            value={username}
+            onChange={handleChange.username}
+            errorMsg = {usernameError}
           />
           <TextFieldOutlined
             label="Date of Birth"
