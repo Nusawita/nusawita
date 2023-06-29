@@ -62,8 +62,13 @@ class UserController {
             return;
         }
 
+        //get query params
+        // console.log(req.query.search)
+        const search = req.query.search;
+        // console.log('')
+
         //get all user
-        const [allUser, errAllUser] = await this.userService.getAllUser(sessionToken);
+        const [allUser, errAllUser] = await this.userService.getAllUser(sessionToken, search);
         if (errAllUser != null) {
             return res.status(errAllUser.status).json(errAllUser);
         }

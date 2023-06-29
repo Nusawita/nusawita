@@ -97,7 +97,7 @@ class UserService {
         return null;
     }
 
-    async getAllUser(sessionToken) {
+    async getAllUser(sessionToken, search) {
         //check session
         const [session, errSession] = await this.sessionRepository.getSession(sessionToken);
         if (errSession != null) {
@@ -119,7 +119,7 @@ class UserService {
         }
 
         //get all user
-        const [allUser, errAllUser] = await this.userRepository.getAllUser()
+        const [allUser, errAllUser] = await this.userRepository.getAllUser(search)
         if (errAllUser != null) {
             const jsonData = dtoError(500, 'Internal Server Error', null);
             return [null, jsonData];
