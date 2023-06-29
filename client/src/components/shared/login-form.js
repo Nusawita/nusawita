@@ -1,8 +1,8 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useEffect, useReducer } from "react";
+import React, { useReducer } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
-import { TextFieldOutlined, TextFieldFilled } from "../UI/custom-UI";
+import { TextFieldOutlined } from "../UI/custom-UI";
 import { Icon } from "@iconify/react";
 import axios from "axios";
 
@@ -20,31 +20,17 @@ export const LoginForm = () => {
     if (action.type === "INPUT_CHANGE") {
       return {
         value: action.value,
-        isValid: false,
-        showError: false,
-        errorMsg: "",
+        errorMsg: state.errorMsg,
         inputVisibility: state.inputVisibility,
         focus: state.focus,
       };
     }
-    // this is called when we want to set error message and also decide whether to show the error or not
+
+    //this function is to set the error message
     if (action.type === "HANDLE_ERROR") {
       return {
         value: state.value,
-        isValid: state.isValid,
-        showError: action.showError, //variable to get the showError (true/false) from dispatch
-        errorMsg: action.errorMsg, //variable to get the errorMsg from dispatch
-        inputVisibility: state.inputVisibility,
-        focus: state.focus,
-      };
-    }
-    //this function is to set the validity of the data inputted (true/false)
-    if (action.type === "HANDLE_VALIDITY") {
-      return {
-        value: state.value,
-        isValid: action.isValid, //variable to get the isValid(true/false) from dispatch
-        showError: state.showError,
-        errorMsg: state.errorMsg,
+        errorMsg: action.errorMsg,
         inputVisibility: state.inputVisibility,
         focus: state.focus,
       };
@@ -53,8 +39,6 @@ export const LoginForm = () => {
     if (action.type === "HANDLE_FOCUS") {
       return {
         value: state.value,
-        isValid: state.isValid,
-        showError: state.showError,
         errorMsg: state.errorMsg,
         inputVisibility: state.inputVisibility,
         focus: action.focus,
@@ -64,8 +48,6 @@ export const LoginForm = () => {
     if (action.type === "SET_VISIBILITY") {
       return {
         value: state.value,
-        isValid: state.isValid,
-        showError: state.showError,
         errorMsg: state.errorMsg,
         inputVisibility: action.inputVisibility,
         focus: state.focus,
@@ -76,8 +58,6 @@ export const LoginForm = () => {
   //This is the username state reducer
   const [usernameState, dispatchUsername] = useReducer(inputReducer, {
     value: "",
-    isValid: false,
-    showError: false,
     errorMsg: "",
     inputVisibility: true,
     focus: false,
@@ -86,8 +66,6 @@ export const LoginForm = () => {
   // This is the password state reducer
   const [passwordState, dispatchPassword] = useReducer(inputReducer, {
     value: "",
-    isValid: false,
-    showError: false,
     errorMsg: "",
     inputVisibility: false,
     focus: false,
@@ -100,15 +78,17 @@ export const LoginForm = () => {
   //handle username focus
   const handleUsernameFocus = () => {
     dispatchUsername({ type: "HANDLE_FOCUS", focus: true }); //set focus is true
-    dispatchUsername({ type: "HANDLE_ERROR", showError: false }); //remove error when field is focused
+    dispatchUsername({
+      type: "HANDLE_ERROR",
+      errorMsg: "",
+    }); //remove error when field is focused
   };
   //handle usernmae blur
   const handleUsernameBlur = () => {
     if (usernameState.value.trim().length === 0) {
       dispatchUsername({
         type: "HANDLE_ERROR",
-        showError: true,
-        errorMsg: "Username cannot be empty",
+        errorMsg: "Username is empty",
       }); //if user have clicked the field and left it empty an error shows
     }
     dispatchUsername({ type: "HANDLE_FOCUS", focus: false }); //set focused to false
@@ -119,14 +99,16 @@ export const LoginForm = () => {
   };
   const handlePasswordFocus = () => {
     dispatchPassword({ type: "HANDLE_FOCUS", focus: true });
-    dispatchPassword({ type: "HANDLE_ERROR", showError: false });
+    dispatchPassword({
+      type: "HANDLE_ERROR",
+      errorMsg:""
+    });
   };
   const handlePasswordBlur = () => {
     if (passwordState.value.trim().length === 0) {
       dispatchPassword({
         type: "HANDLE_ERROR",
-        showError: true,
-        errorMsg: "Password cannot be empty",
+        errorMsg: "Password is empty",
       });
     }
     dispatchPassword({ type: "HANDLE_FOCUS", focus: false });
@@ -139,58 +121,6 @@ export const LoginForm = () => {
   const handleSetPassInvisible = () => {
     dispatchPassword({ type: "SET_VISIBILITY", inputVisibility: false });
   };
-
-  //Check the validity of the password input
-  useEffect(() => {
-    //Use timeout so function only runs after user finished typing
-    const timeout = setTimeout(() => {
-      //If no value is inputted print error "password cannot be empty"
-      if (passwordState.value.trim().length === 0) {
-        dispatchPassword({
-          type: "HANDLE_ERROR",
-          showError: false,
-          errorMsg: "Password cannot be empty",
-        });
-      } else {
-        dispatchPassword({ type: "HANDLE_VALIDITY", isValid: true });
-      }
-    });
-    //Reset the timeout
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [passwordState.value]);
-
-  //Check validity of the username input
-  useEffect(() => {
-    // Use timeout so check only runs after user finished typing
-    const timeout = setTimeout(() => {
-      //Username must be 5 or more characters long
-      if (usernameState.value.trim().length < 8) {
-        //Username cannot be empty
-        if (usernameState.value.trim().length === 0) {
-          dispatchUsername({
-            type: "HANDLE_ERROR",
-            showError: false,
-            errorMsg: "Username cannot be empty",
-          });
-        } else {
-          dispatchUsername({
-            type: "HANDLE_ERROR",
-            showError: true,
-            errorMsg: "Username must be 8 or more characters",
-          });
-        }
-      } else {
-        //If all checks passed username is valid (requirements wise)
-        dispatchUsername({ type: "HANDLE_VALIDITY", isValid: true });
-      }
-    }, 450);
-    // Reset timeout
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [usernameState.value]);
 
   //function to fetch the login api
   const fetchLoginApi = async (loginData) => {
@@ -210,42 +140,79 @@ export const LoginForm = () => {
       if (error.response.status === 401) {
         dispatchUsername({
           type: "HANDLE_ERROR",
-          showError: true,
           errorMsg: error.response.data.message,
         });
         dispatchPassword({
           type: "HANDLE_ERROR",
-          showError: true,
           errorMsg: error.response.data.message,
         });
       }
     }
   };
 
+  const usernameIsEmpty = () => {
+    //empty check
+    if (usernameState.value.trim().length === 0) {
+      dispatchUsername({
+        type: "HANDLE_ERROR",
+        errorMsg: "Username is empty",
+      });
+      return true;
+    }
+    return false;
+  };
+
+  const passwordIsEmpty = () => {
+    if (passwordState.value.trim().length === 0) {
+      dispatchPassword({
+        type: "HANDLE_ERROR",
+        errorMsg: "Password is empty",
+      });
+      return true;
+    }
+    return false;
+  };
+
   //handle the form submission
   const handleFormSubmit = (event) => {
     event.preventDefault();
+    //Reset error first
+    dispatchUsername({
+      type: "HANDLE_ERROR",
+      errorMsg: "",
+    });
+    dispatchPassword({
+      type: "HANDLE_ERROR",
+      errorMsg: "",
+    });
+    const usernameEmpty = usernameIsEmpty();
+    const passEmpty = passwordIsEmpty();
+    //if one field is empty do not continue
+    if (usernameEmpty || passEmpty) {
+      return;
+    }
+    // if less than 8 dont bother fetch api
+    if (
+      passwordState.value.trim().length < 8 ||
+      usernameState.value.trim().length < 8
+    ) {
+      dispatchUsername({
+        type: "HANDLE_ERROR",
+        errorMsg: "Invalid Username or Password",
+      });
+      dispatchPassword({
+        type: "HANDLE_ERROR",
+        errorMsg: "Invalid Username or Password",
+      });
+      return;
+    }
+    //if all passed then fetch api
+    console.log(usernameState.value.trim().length);
     //get the login data
     const loginData = {
       username: usernameState.value,
       password: passwordState.value,
     };
-    //if username or password s not valid show error to fill form correctly
-    if (!usernameState.isValid || !passwordState.isValid) {
-      dispatchUsername({
-        type: "HANDLE_ERROR",
-        showError: true,
-        errorMsg: "Please fill form correctly before submitting",
-      });
-
-      dispatchPassword({
-        type: "HANDLE_ERROR",
-        showError: true,
-        errorMsg: "Please fill form correctly before submitting",
-      });
-      return;
-    }
-    //if username and password valid fetch login api
     fetchLoginApi(loginData);
   };
 
@@ -292,11 +259,10 @@ export const LoginForm = () => {
             component="h4"
             sx={{ pb: 2, textAlign: "center" }}
           >
-            Admin Login
+            Login
           </Typography>
           <TextFieldOutlined
-            showError={usernameState.showError}
-            errorMsg={usernameState.errorMsg}
+            errorMsg={usernameState.errorMsg && usernameState.errorMsg}
             onChange={handleUsernameChange}
             value={usernameState.value}
             label="Username"
@@ -304,7 +270,7 @@ export const LoginForm = () => {
             onBlur={handleUsernameBlur}
             iconLeft={<Icon icon="ic:round-person" width="32" />}
             iconRight={
-              usernameState.showError && (
+              usernameState.errorMsg && (
                 <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
               )
             }
@@ -315,16 +281,12 @@ export const LoginForm = () => {
             value={passwordState.value}
             label="Password"
             onChange={handlePasswordChange}
-            showError={passwordState.showError}
             errorMsg={passwordState.errorMsg}
             onFocus={handlePasswordFocus}
             onBlur={handlePasswordBlur}
             iconLeft={<Icon icon="material-symbols:lock" width="32" />}
-            iconError={
-              <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
-            }
             iconRight={
-              passwordState.showError ? (
+              passwordState.errorMsg ? (
                 <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
               ) : !passwordState.inputVisibility ? (
                 <Icon
@@ -362,7 +324,7 @@ export const LoginForm = () => {
               Dont have an account?
               <Typography
                 component="a"
-                sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
+                sx={{ color: "#1273EB", fontWeight: "500", pl:  1 }}
                 href="/register"
               >
                 Sign up
