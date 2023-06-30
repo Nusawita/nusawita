@@ -1,0 +1,14 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - # Add any necessary pre-build commands here
+    build:
+      commands:
+        - # Add any necessary build commands here
+    postBuild:
+      commands:
+        - mv /path/to/your/index.html /dist/index.html  # Specify the source and destination paths here
+  artifacts:
+    # Add any necessary artifact settings here
