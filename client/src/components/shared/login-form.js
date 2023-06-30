@@ -13,6 +13,7 @@ export const LoginForm = () => {
   const lightColor = theme.palette.light.main;
   const dangerMain = theme.palette.danger.main;
   const primaryMain = theme.palette.primary.main;
+  const errorColor = theme.palette.error.main;
 
   //using reducer to handle input fields
   const inputReducer = (state, action) => {
@@ -101,7 +102,7 @@ export const LoginForm = () => {
     dispatchPassword({ type: "HANDLE_FOCUS", focus: true });
     dispatchPassword({
       type: "HANDLE_ERROR",
-      errorMsg:""
+      errorMsg: "",
     });
   };
   const handlePasswordBlur = () => {
@@ -262,7 +263,18 @@ export const LoginForm = () => {
             Login
           </Typography>
           <TextFieldOutlined
-            errorMsg={usernameState.errorMsg && usernameState.errorMsg}
+            message={
+              usernameState.errorMsg && (
+                <Typography
+                  variant="caption"
+                  component="span"
+                  sx={{ color: errorColor }}
+                >
+                  {usernameState.errorMsg}
+                </Typography>
+              )
+            }
+            display = {usernameState.errorMsg && "error"}
             onChange={handleUsernameChange}
             value={usernameState.value}
             label="Username"
@@ -281,7 +293,18 @@ export const LoginForm = () => {
             value={passwordState.value}
             label="Password"
             onChange={handlePasswordChange}
-            errorMsg={passwordState.errorMsg}
+            display = {passwordState.errorMsg && 'error'}
+            message={
+              passwordState.errorMsg && (
+                <Typography
+                  variant="caption"
+                  component="span"
+                  sx={{ color: errorColor }}
+                >
+                  {passwordState.errorMsg}
+                </Typography>
+              )
+            }
             onFocus={handlePasswordFocus}
             onBlur={handlePasswordBlur}
             iconLeft={<Icon icon="material-symbols:lock" width="32" />}
@@ -324,7 +347,7 @@ export const LoginForm = () => {
               Dont have an account?
               <Typography
                 component="a"
-                sx={{ color: "#1273EB", fontWeight: "500", pl:  1 }}
+                sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
                 href="/register"
               >
                 Sign up

@@ -1,5 +1,8 @@
 import { React, useState } from "react";
 import { Box, TextField, Typography, useTheme } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export const TextFieldOutlined = (props) => {
   const theme = useTheme();
@@ -22,15 +25,19 @@ export const TextFieldOutlined = (props) => {
   //onChange = function that handles when the inputted value inside the field changed
   //value = value of the field
   //label = label of the text_field
-  //showError = state to decide whether to shoe errorMsg or not
-  //errorMsg = the error message when error happens
+  //showError = state to decide whether to shoe message or not
+  //message = the error message when error happens
 
   return (
     <Box sx={{ ...props.sx }}>
       <Box
         border={2}
         borderColor={`${
-          props.errorMsg ? errorColor : isFocused ? successColor : "#79747E"
+          props.display === "error"
+            ? errorColor
+            : isFocused
+            ? successColor
+            : "#79747E"
         }`}
         borderRadius="5px"
         onFocus={props.onFocus} // this props receive a function that runs when the form is being focused
@@ -43,7 +50,7 @@ export const TextFieldOutlined = (props) => {
           backgroundColor: "#FEFEFE",
           "&:hover": {
             borderColor: `${
-              props.errorMsg 
+              props.display === "error"
                 ? errorColor
                 : isFocused
                 ? successColor
@@ -71,6 +78,7 @@ export const TextFieldOutlined = (props) => {
             style: {
               transform: "translateY(-20%)",
             },
+            readOnly: props.readOnly === "true" ? true : false,
           }}
           InputLabelProps={{
             style: {
@@ -80,7 +88,7 @@ export const TextFieldOutlined = (props) => {
               //label move to top on focused and when input value is present
               transform: `${
                 isFocused || props.value
-                  ? "translate(-40%,-72%)"
+                  ? "translate(-30%,-72%)"
                   : "translateY(60%)"
               }`,
             },
@@ -92,16 +100,13 @@ export const TextFieldOutlined = (props) => {
         />
         {props.iconRight}
       </Box>
-      {props.errorMsg && (
+      {props.message && (
         //if input is not valid and textfield was focused before, show the error message
-        <Typography variant="caption" sx={{ color: errorColor }}>
-          {props.errorMsg}
-        </Typography>
+        <Box>{props.message}</Box>
       )}
     </Box>
   );
 };
-
 export const TextFieldFilled = (props) => {
   const theme = useTheme();
   const errorColor = theme.palette.error.dark;
@@ -123,8 +128,8 @@ export const TextFieldFilled = (props) => {
   //onChange = function that handles when the inputted value inside the field changed
   //value = value of the field
   //label = label of the text_field
-  //showError = state to decide whether to shoe errorMsg or not
-  //errorMsg = the error message when error happens
+  //showError = state to decide whether to shoe message or not
+  //message = the error message when error happens
 
   return (
     <Box sx={{ ...props.sx }}>
@@ -139,11 +144,11 @@ export const TextFieldFilled = (props) => {
           height: "56px",
           borderColor: `${isFocused && successColor}`, //border change to green on textfield focus
           backgroundColor: `${
-            props.errorMsg ? "#FFEDEA" : "#E9F2F4" //if already interacted and input is not valid background
+            props.message ? "#FFEDEA" : "#E9F2F4" //if already interacted and input is not valid background
           }`,
           "&:hover": {
             backgroundColor: `${
-              props.errorMsg ? "#FFEDEA" : "#DBE4E6" //if already interacted and input is error hover is red
+              props.message ? "#FFEDEA" : "#DBE4E6" //if already interacted and input is error hover is red
             }`,
           },
         }}
@@ -181,12 +186,31 @@ export const TextFieldFilled = (props) => {
         {/* If input is not valid and textfield was focused before, show the error icon, otherwise show the right icon  */}
         {props.iconRight}
       </Box>
-      {props.errorMsg && (
+      {props.message && (
         //if input is not valid and textfield was focused before, show the error message
-        <Typography variant="caption" sx={{ color: errorColor }}>
-          {props.errorMsg}
-        </Typography>
+        <Box component='span'>{props.message}</Box>
       )}
+    </Box>
+  );
+};
+
+export const CustomDatePicker = (props) => {
+  return (
+    <Box sx = {{ ...props.sx }}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DatePicker
+          sx={{
+            width: "100%",
+          }}
+          label={props.label}
+          value={props.value}
+          onChange={props.onChange}
+        />
+        {props.message && (
+          //if input is not valid and textfield was focused before, show the error message
+          <Box component='span'>{props.message}</Box>
+        )}
+      </LocalizationProvider>
     </Box>
   );
 };
