@@ -3,12 +3,19 @@ frontend:
   phases:
     preBuild:
       commands:
-        - # Add any necessary pre-build commands here
+        - npm ci
+    # IMPORTANT - Please verify your build commands
     build:
-      commands:
-        - # Add any necessary build commands here
+      commands: []
     postBuild:
       commands:
-        - mv /path/to/your/index.html /dist/index.html  # Specify the source and destination paths here
+        - mv /client/public/index.html /dist/index.html
   artifacts:
-    # Add any necessary artifact settings here
+    # IMPORTANT - Please verify your build output directory
+    baseDirectory: /
+    files:
+      - '**/*'
+    
+  cache:
+    paths:
+      - node_modules/**/*
