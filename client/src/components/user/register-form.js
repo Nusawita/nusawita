@@ -5,6 +5,7 @@ import { CustomDatePicker, TextFieldOutlined } from "../UI/custom-UI";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import axios from "axios";
 
 import { Icon } from "@iconify/react";
 
@@ -197,13 +198,28 @@ const RegisterForm = () => {
           setInvalid("password");
           setPasswordError("Password must be 8 or more characters");
           showError("password");
-        } else {
-          setValid("password");
-          setPasswordError("");
-          hideError("");
+          return;
         }
+        if (password !== confirmPassword && confirmPassword) {
+          setInvalid("confirmPassword");
+          setConfirmPasswordError("Confirm password doesn't match");
+          showError("confirmPassword");
+          return;
+        }
+        setValid("confirmPassword");
+        setConfirmPasswordError("");
+        hideError("confirmPassword");
+        setValid("password");
+        setPasswordError("");
+        hideError("pasword");
       },
       confirmPassword: () => {
+        if (!password && confirmPassword) {
+          setInvalid("confirmPassword");
+          setConfirmPasswordError("Please fill password correctly first");
+          showError("confirmPassword");
+          return;
+        }
         if (confirmPassword.trim().length === 0) {
           setInvalid("confirmPassword");
           setConfirmPasswordError("Confirm password cannot be empty");
@@ -212,7 +228,7 @@ const RegisterForm = () => {
         if (password === confirmPassword) {
           setValid("confirmPassword");
           setConfirmPasswordError("");
-          hideError("");
+          hideError("confirmPassword");
           return;
         }
         setInvalid("confirmPassword");
@@ -251,16 +267,19 @@ const RegisterForm = () => {
     email: () => {
       if (email.trim().length === 0) {
         setEmailError("Email cannot be empty");
+        showError("email");
       }
     },
     password: () => {
       if (password.trim().length === 0) {
         setPasswordError("Password cannot be empty");
+        showError("password");
       }
     },
     confirmPassword: () => {
       if (confirmPassword.trim().length === 0) {
         setConfirmPasswordError("Confirm password cannot be empty");
+        showError("confirmPassword");
       }
     },
   };
@@ -314,6 +333,54 @@ const RegisterForm = () => {
     };
   }, [confirmPassword]);
 
+  const fetchRegisterAPI = async (registerData) => {
+    console.log(registerData);
+    try {
+      // call login api
+      const res = await axios.post(
+        "http://localhost:5000/api/register",
+        registerData,
+        { withCredentials: true }
+      );
+      //if login success redirect to landing page
+      if (res.status === 201) {
+        alert("Succesfully registered");
+        //log user in
+        const loginData = {
+          username: registerData.username,
+          password: registerData.password
+        }
+        fetchLoginApi(loginData)
+      }
+    } catch (error) {
+      // if unauthorized then show appropiate error in front
+      if (error.response.status === 409) {
+        setUsernameError("Username or email taken");
+        showError("username");
+        setEmailError("Username or email taken");
+        showError("email");
+      }
+    }
+  };
+
+  const fetchLoginApi = async (loginData) => {
+    try {
+      // call login api
+      const res = await axios.post(
+        "http://localhost:5000/api/login",
+        loginData,
+        { withCredentials: true }
+      );
+      //if login success redirect to landing page
+      if (res.status === 200) {
+        window.location.href = "/";
+      }
+    } catch (error) {
+      // if unauthorized then show appropiate error in front
+      alert("server error")
+    }
+
+  };
   const handleSubmit = (event) => {
     event.preventDefault();
     //DEBUGGING
@@ -325,7 +392,7 @@ const RegisterForm = () => {
       password: formValidity.password,
       confirmPassword: formValidity.confirmPassword,
     };
-    console.log(validObject);
+    // console.log(validObject);
     //END OF DEBUGGING
 
     //IF ALL VALID
@@ -337,15 +404,32 @@ const RegisterForm = () => {
       formValidity.password &&
       formValidity.confirmPassword
     ) {
-      alert("ALL DATA VALID");
+      const registerData = {
+        username: username,
+        email: email,
+        password: password,
+        noTelp: phone,
+        dob: date.format("YYYY-MM-DD"),
+        isAdmin: false,
+        ban: 0,
+      };
+      fetchRegisterAPI(registerData);
       return;
     }
     //Else show error if not already
     else {
-      showError("username");
-      showError("email");
-      showError("password");
-      showError("confirmPassword");
+      if (usernameError) {
+        showError("username");
+      }
+      if (emailError) {
+        showError("email");
+      }
+      if (passwordError) {
+        showError("password");
+      }
+      if (confirmPasswordError) {
+        showError("confirmPassword");
+      }
     }
   };
   return (
@@ -575,6 +659,7 @@ const RegisterForm = () => {
               Already Have An Account?
               <Typography
                 component="a"
+                href = '/login'
                 sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
               >
                 Login
