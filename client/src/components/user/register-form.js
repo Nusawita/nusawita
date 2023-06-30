@@ -138,14 +138,14 @@ const RegisterForm = () => {
           const parsed = dayjs(date);
           if (parsed.isValid()) {
             setValid("date");
-            setDateError("")
+            setDateError("");
             return;
           } else {
-            setInvalid('date')
+            setInvalid("date");
             throw new Error("Invalid date");
           }
         } catch (error) {
-          setInvalid('date')
+          setInvalid("date");
           setDateError("Please provide a valid date");
         }
       },
@@ -264,7 +264,7 @@ const RegisterForm = () => {
       }
     },
   };
-// Run check on value change with delay (wait for user typing)
+  // Run check on value change with delay (wait for user typing)
   useEffect(() => {
     const timeout = setTimeout(() => {
       validator.checkValid.username();
@@ -323,9 +323,9 @@ const RegisterForm = () => {
       phone: formValidity.phone,
       email: formValidity.email,
       password: formValidity.password,
-      confirmPassword: formValidity.confirmPassword
-    }
-    console.log(validObject)
+      confirmPassword: formValidity.confirmPassword,
+    };
+    console.log(validObject);
     //END OF DEBUGGING
 
     //IF ALL VALID
@@ -341,11 +341,11 @@ const RegisterForm = () => {
       return;
     }
     //Else show error if not already
-    else{
-      showError('username')
-      showError('email')
-      showError('password')
-      showError('confirmPassword')
+    else {
+      showError("username");
+      showError("email");
+      showError("password");
+      showError("confirmPassword");
     }
   };
   return (
@@ -497,23 +497,30 @@ const RegisterForm = () => {
             sx={{ mb: 2 }}
             type={passwordVisible ? "text" : "password"}
             iconRight={
-              passwordError && errorShow.password ? (
-                <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
-              ) : !passwordVisible ? (
-                <Icon
-                  onClick={visibilityHandler.password.setVisible}
-                  style={{ cursor: "pointer" }}
-                  icon="mdi:eye"
-                  width="32"
-                />
-              ) : (
-                <Icon
-                  onClick={visibilityHandler.password.setHidden}
-                  style={{ cursor: "pointer" }}
-                  icon="mdi:hide"
-                  width="32"
-                />
-              )
+              <>
+                {!passwordVisible ? (
+                  <Icon
+                    onClick={visibilityHandler.password.setVisible}
+                    style={{ cursor: "pointer" }}
+                    icon="mdi:eye"
+                    width="32"
+                  />
+                ) : (
+                  <Icon
+                    onClick={visibilityHandler.password.setHidden}
+                    style={{ cursor: "pointer" }}
+                    icon="mdi:hide"
+                    width="32"
+                  />
+                )}
+                {passwordError && errorShow.password && (
+                  <Icon
+                    icon="ep:warning-filled"
+                    color={dangerMain}
+                    width="32"
+                  />
+                )}
+              </>
             }
           />
           <TextFieldOutlined
@@ -532,23 +539,30 @@ const RegisterForm = () => {
             }
             type={confirmPasswordVisible ? "text" : "password"}
             iconRight={
-              confirmPasswordError && errorShow.confirmPassword ? (
-                <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
-              ) : !confirmPasswordVisible ? (
-                <Icon
-                  onClick={visibilityHandler.confirmPassword.setVisible}
-                  style={{ cursor: "pointer" }}
-                  icon="mdi:eye"
-                  width="32"
-                />
-              ) : (
-                <Icon
-                  onClick={visibilityHandler.confirmPassword.setHidden}
-                  style={{ cursor: "pointer" }}
-                  icon="mdi:hide"
-                  width="32"
-                />
-              )
+              <>
+                {!confirmPasswordVisible ? (
+                  <Icon
+                    onClick={visibilityHandler.confirmPassword.setVisible}
+                    style={{ cursor: "pointer" }}
+                    icon="mdi:eye"
+                    width="32"
+                  />
+                ) : (
+                  <Icon
+                    onClick={visibilityHandler.confirmPassword.setHidden}
+                    style={{ cursor: "pointer" }}
+                    icon="mdi:hide"
+                    width="32"
+                  />
+                )}
+                {confirmPasswordError && errorShow.confirmPassword && (
+                  <Icon
+                    icon="ep:warning-filled"
+                    color={dangerMain}
+                    width="32"
+                  />
+                )}
+              </>
             }
             iconLeft={<Icon icon="material-symbols:lock" width="32" />}
             sx={{ mb: 2 }}
