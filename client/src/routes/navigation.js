@@ -36,7 +36,7 @@ export const Navigation = () => {
           <Route
             path="/register"
             element={
-              <RegisterPages /> //If user is logged in, redirect to landing page
+              ctx.isLoggedIn ? <Navigate to="/" replace /> : <RegisterPages /> //If user is logged in, redirect to landing page
             }
           />
         </Routes>

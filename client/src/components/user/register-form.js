@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+import { ErrorBlinkingAnimation } from "../animation/custom-animation";
 
 import { Icon } from "@iconify/react";
 
@@ -37,6 +39,15 @@ const RegisterForm = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
+  //TO START ERROR ANIMATION
+  const [errorAnimation, setErrorAnimation] = useState({
+    username: false,
+    phone: false,
+    email: false,
+    password: false,
+    confirmPassword: "false",
+  });
+
   const [formValidity, setFormValidity] = useState({
     username: false,
     phone: false,
@@ -51,6 +62,19 @@ const RegisterForm = () => {
     password: false,
     confirmPassword: false,
   });
+
+  const startAnimation = (field) => {
+    setErrorAnimation((prev) => ({
+      ...prev,
+      [field]: true,
+    }));
+  };
+  const endAnimation = (field) => {
+    setErrorAnimation((prev) => ({
+      ...prev,
+      [field]: false,
+    }));
+  };
 
   const setValid = (field) => {
     setFormValidity((prev) => ({
@@ -211,10 +235,10 @@ const RegisterForm = () => {
         hideError("confirmPassword");
         setValid("password");
         setPasswordError("");
-        hideError("pasword");
+        hideError("password");
       },
       confirmPassword: () => {
-        if (!password && confirmPassword) {
+        if (!formValidity.password && confirmPassword) {
           setInvalid("confirmPassword");
           setConfirmPasswordError("Please fill password correctly first");
           showError("confirmPassword");
@@ -235,24 +259,6 @@ const RegisterForm = () => {
         setConfirmPasswordError("Confirm password doesn't match");
         showError("confirmPassword");
       },
-    },
-  };
-
-  const focusHandler = {
-    username: () => {
-      hideError("username");
-    },
-    phone: () => {
-      hideError("phone");
-    },
-    email: () => {
-      hideError("email");
-    },
-    password: () => {
-      hideError("password");
-    },
-    confirmPassword: () => {
-      hideError("confirmPassword");
     },
   };
 
@@ -283,6 +289,28 @@ const RegisterForm = () => {
       }
     },
   };
+
+  const handleAnimationComplete = {
+    username: () => {
+      endAnimation("username");
+    },
+    date: () => {
+      endAnimation("date");
+    },
+    phone: () => {
+      endAnimation("phone");
+    },
+    email: () => {
+      endAnimation("email");
+    },
+    password: () => {
+      endAnimation("password");
+    },
+    confirmPassword: () => {
+      endAnimation("confirmPassword");
+    },
+  };
+
   // Run check on value change with delay (wait for user typing)
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -334,7 +362,7 @@ const RegisterForm = () => {
   }, [confirmPassword]);
 
   const fetchRegisterAPI = async (registerData) => {
-    console.log(registerData);
+    alert("serverr fetched");
     try {
       // call login api
       const res = await axios.post(
@@ -348,17 +376,19 @@ const RegisterForm = () => {
         //log user in
         const loginData = {
           username: registerData.username,
-          password: registerData.password
-        }
-        fetchLoginApi(loginData)
+          password: registerData.password,
+        };
+        fetchLoginApi(loginData);
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
       if (error.response.status === 409) {
         setUsernameError("Username or email taken");
         showError("username");
+        setInvalid("username");
         setEmailError("Username or email taken");
         showError("email");
+        setInvalid("email");
       }
     }
   };
@@ -377,12 +407,12 @@ const RegisterForm = () => {
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
-      alert("server error")
+      alert("server error");
     }
-
   };
   const handleSubmit = (event) => {
     event.preventDefault();
+
     //DEBUGGING
     const validObject = {
       username: formValidity.username,
@@ -420,15 +450,27 @@ const RegisterForm = () => {
     else {
       if (usernameError) {
         showError("username");
+        startAnimation("username");
+      }
+      if (phoneError) {
+        showError("phone");
+        startAnimation("phone");
+      }
+      if (dateError) {
+        showError("date");
+        startAnimation("date");
       }
       if (emailError) {
         showError("email");
+        startAnimation("email");
       }
       if (passwordError) {
         showError("password");
+        startAnimation("password");
       }
       if (confirmPasswordError) {
         showError("confirmPassword");
+        startAnimation("confirmPassword");
       }
     }
   };
@@ -488,169 +530,212 @@ const RegisterForm = () => {
             Create an Account
           </Typography>
 
-          <TextFieldOutlined
-            label="Username"
-            iconLeft={<Icon icon="ic:round-person" width="32" />}
-            sx={{ mb: 2 }}
-            value={username}
-            onChange={changeHandler.username}
-            display={errorShow.username && "error"}
-            message={
-              errorShow.username && (
-                <Typography sx={{ color: dangerMain }} variant="caption">
-                  {usernameError}
-                </Typography>
-              )
-            }
-            onFocus={focusHandler.username}
-            onBlur={blurHandler.username}
-            iconRight={
-              errorShow.username && (
-                <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
-              )
-            }
-          />
-          <CustomDatePicker
-            sx={{ mb: 2 }}
-            label="Birth Date"
-            value={date}
-            display={dateError && "error"}
-            message={
-              dateError && (
-                <Typography sx={{ color: dangerMain }} variant="caption">
-                  {dateError}
-                </Typography>
-              )
-            }
-            onChange={(newDate) => {
-              setDate(dayjs(newDate).utc());
-            }}
-          />
-          <TextFieldOutlined
-            label="Phone (optional)"
-            value={phone}
-            onChange={changeHandler.phone}
-            display={errorShow.phone && "error"}
-            message={
-              errorShow.phone && (
-                <Typography sx={{ color: dangerMain }} variant="caption">
-                  {phoneError}
-                </Typography>
-              )
-            }
-            iconLeft={<Icon icon="solar:phone-bold" width="32" />}
-            sx={{ mb: 2 }}
-          />
-          <TextFieldOutlined
-            label="Email"
-            value={email}
-            onChange={changeHandler.email}
-            display={errorShow.email && "error"}
-            message={
-              errorShow.email && (
-                <Typography sx={{ color: dangerMain }} variant="caption">
-                  {emailError}
-                </Typography>
-              )
-            }
-            onFocus={focusHandler.email}
-            onBlur={blurHandler.email}
-            iconRight={
-              errorShow.email && (
-                <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
-              )
-            }
-            iconLeft={<Icon icon="ic:round-person" width="32" />}
-            sx={{ mb: 2 }}
-          />
-          <TextFieldOutlined
-            label="Password"
-            iconLeft={<Icon icon="material-symbols:lock" width="32" />}
-            value={password}
-            onChange={changeHandler.password}
-            display={errorShow.password && "error"}
-            message={
-              errorShow.password && (
-                <Typography sx={{ color: dangerMain }} variant="caption">
-                  {passwordError}
-                </Typography>
-              )
-            }
-            onFocus={focusHandler.password}
-            onBlur={blurHandler.password}
-            sx={{ mb: 2 }}
-            type={passwordVisible ? "text" : "password"}
-            iconRight={
-              <>
-                {!passwordVisible ? (
-                  <Icon
-                    onClick={visibilityHandler.password.setVisible}
-                    style={{ cursor: "pointer" }}
-                    icon="mdi:eye"
-                    width="32"
-                  />
-                ) : (
-                  <Icon
-                    onClick={visibilityHandler.password.setHidden}
-                    style={{ cursor: "pointer" }}
-                    icon="mdi:hide"
-                    width="32"
-                  />
-                )}
-                {passwordError && errorShow.password && (
+          <ErrorBlinkingAnimation
+            showAnimation={errorAnimation.username}
+            onAnimationComplete={handleAnimationComplete.username}
+          >
+            <TextFieldOutlined
+              label="Username"
+              iconLeft={<Icon icon="ic:round-person" width="32" />}
+              sx={{ mb: 2 }}
+              value={username}
+              onChange={changeHandler.username}
+              display={errorShow.username && "error"}
+              message={
+                errorShow.username && (
+                  <Typography sx={{ color: dangerMain }} variant="caption">
+                    {usernameError}
+                  </Typography>
+                )
+              }
+              onBlur={blurHandler.username}
+              iconRight={
+                errorShow.username && (
                   <Icon
                     icon="ep:warning-filled"
                     color={dangerMain}
                     width="32"
                   />
-                )}
-              </>
-            }
-          />
-          <TextFieldOutlined
-            label="Confirm Password"
-            value={confirmPassword}
-            onChange={changeHandler.confirmPassword}
-            onFocus={focusHandler.confirmPassword}
-            onBlur={blurHandler.confirmPassword}
-            display={errorShow.confirmPassword && "error"}
-            message={
-              errorShow.confirmPassword && (
-                <Typography sx={{ color: dangerMain }} variant="caption">
-                  {confirmPasswordError}
-                </Typography>
-              )
-            }
-            type={confirmPasswordVisible ? "text" : "password"}
-            iconRight={
-              <>
-                {!confirmPasswordVisible ? (
-                  <Icon
-                    onClick={visibilityHandler.confirmPassword.setVisible}
-                    style={{ cursor: "pointer" }}
-                    icon="mdi:eye"
-                    width="32"
-                  />
-                ) : (
-                  <Icon
-                    onClick={visibilityHandler.confirmPassword.setHidden}
-                    style={{ cursor: "pointer" }}
-                    icon="mdi:hide"
-                    width="32"
-                  />
-                )}
-                {confirmPasswordError && errorShow.confirmPassword && (
+                )
+              }
+            />
+          </ErrorBlinkingAnimation>
+          <ErrorBlinkingAnimation
+            showAnimation={errorAnimation.date}
+            onAnimationComplete={handleAnimationComplete.date}
+          >
+            <CustomDatePicker
+              sx={{ mb: 2 }}
+              label="Birth Date"
+              value={date}
+              display={dateError && "error"}
+              message={
+                dateError && (
+                  <Typography sx={{ color: dangerMain }} variant="caption">
+                    {dateError}
+                  </Typography>
+                )
+              }
+              onChange={(newDate) => {
+                setDate(dayjs(newDate).utc());
+              }}
+            />
+          </ErrorBlinkingAnimation>
+          <ErrorBlinkingAnimation
+            showAnimation={errorAnimation.phone}
+            onAnimationComplete={handleAnimationComplete.phone}
+          >
+            <TextFieldOutlined
+              label="Phone (optional)"
+              value={phone}
+              onChange={changeHandler.phone}
+              display={errorShow.phone && "error"}
+              message={
+                errorShow.phone && (
+                  <Typography sx={{ color: dangerMain }} variant="caption">
+                    {phoneError}
+                  </Typography>
+                )
+              }
+              iconLeft={<Icon icon="solar:phone-bold" width="32" />}
+              iconRight={
+                errorShow.phone && (
                   <Icon
                     icon="ep:warning-filled"
                     color={dangerMain}
                     width="32"
                   />
-                )}
-              </>
-            }
-            iconLeft={<Icon icon="material-symbols:lock" width="32" />}
-            sx={{ mb: 2 }}
-          />
+                )
+              }
+              sx={{ mb: 2 }}
+            />
+          </ErrorBlinkingAnimation>
+          <ErrorBlinkingAnimation
+            showAnimation={errorAnimation.email}
+            onAnimationComplete={handleAnimationComplete.email}
+          >
+            <TextFieldOutlined
+              label="Email"
+              value={email}
+              onChange={changeHandler.email}
+              display={errorShow.email && "error"}
+              message={
+                errorShow.email && (
+                  <Typography sx={{ color: dangerMain }} variant="caption">
+                    {emailError}
+                  </Typography>
+                )
+              }
+              onBlur={blurHandler.email}
+              iconRight={
+                errorShow.email && (
+                  <Icon
+                    icon="ep:warning-filled"
+                    color={dangerMain}
+                    width="32"
+                  />
+                )
+              }
+              iconLeft={<Icon icon="ic:round-person" width="32" />}
+              sx={{ mb: 2 }}
+            />
+          </ErrorBlinkingAnimation>
+          <ErrorBlinkingAnimation
+            showAnimation={errorAnimation.password}
+            onAnimationComplete={handleAnimationComplete.password}
+          >
+            <TextFieldOutlined
+              label="Password"
+              iconLeft={<Icon icon="material-symbols:lock" width="32" />}
+              value={password}
+              onChange={changeHandler.password}
+              display={errorShow.password && "error"}
+              message={
+                errorShow.password && (
+                  <Typography sx={{ color: dangerMain }} variant="caption">
+                    {passwordError}
+                  </Typography>
+                )
+              }
+              onBlur={blurHandler.password}
+              sx={{ mb: 2 }}
+              type={passwordVisible ? "text" : "password"}
+              iconRight={
+                <>
+                  {!passwordVisible ? (
+                    <Icon
+                      onClick={visibilityHandler.password.setVisible}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:eye"
+                      width="32"
+                    />
+                  ) : (
+                    <Icon
+                      onClick={visibilityHandler.password.setHidden}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:hide"
+                      width="32"
+                    />
+                  )}
+                  {passwordError && errorShow.password && (
+                    <Icon
+                      icon="ep:warning-filled"
+                      color={dangerMain}
+                      width="32"
+                    />
+                  )}
+                </>
+              }
+            />
+          </ErrorBlinkingAnimation>
+          <ErrorBlinkingAnimation
+            showAnimation={errorAnimation.confirmPassword}
+            onAnimationComplete={handleAnimationComplete.confirmPassword}
+          >
+            <TextFieldOutlined
+              label="Confirm Password"
+              value={confirmPassword}
+              onChange={changeHandler.confirmPassword}
+              onBlur={blurHandler.confirmPassword}
+              display={errorShow.confirmPassword && "error"}
+              message={
+                errorShow.confirmPassword && (
+                  <Typography sx={{ color: dangerMain }} variant="caption">
+                    {confirmPasswordError}
+                  </Typography>
+                )
+              }
+              type={confirmPasswordVisible ? "text" : "password"}
+              iconRight={
+                <>
+                  {!confirmPasswordVisible ? (
+                    <Icon
+                      onClick={visibilityHandler.confirmPassword.setVisible}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:eye"
+                      width="32"
+                    />
+                  ) : (
+                    <Icon
+                      onClick={visibilityHandler.confirmPassword.setHidden}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:hide"
+                      width="32"
+                    />
+                  )}
+                  {confirmPasswordError && errorShow.confirmPassword && (
+                    <Icon
+                      icon="ep:warning-filled"
+                      color={dangerMain}
+                      width="32"
+                    />
+                  )}
+                </>
+              }
+              iconLeft={<Icon icon="material-symbols:lock" width="32" />}
+              sx={{ mb: 2 }}
+            />
+          </ErrorBlinkingAnimation>
           <Box sx={{ ...ContentMiddle }}>
             <Button type="submit" variant="primary" size="large">
               SIGN IN
@@ -659,7 +744,7 @@ const RegisterForm = () => {
               Already Have An Account?
               <Typography
                 component="a"
-                href = '/login'
+                href="/login"
                 sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
               >
                 Login

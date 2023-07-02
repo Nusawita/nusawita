@@ -1,9 +1,11 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
 import { TextFieldOutlined } from "../UI/custom-UI";
 import { Icon } from "@iconify/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ErrorBlinkingAnimation } from "../animation/custom-animation";
 import axios from "axios";
 
 export const LoginForm = () => {
@@ -14,6 +16,24 @@ export const LoginForm = () => {
   const dangerMain = theme.palette.danger.main;
   const primaryMain = theme.palette.primary.main;
   const errorColor = theme.palette.error.main;
+
+  const [errorAnimation, setErrorAnimation] = useState({
+    username: false,
+    password:false
+  })
+
+  const endAnimation = (field) => {
+    setErrorAnimation((prev) => ({
+      ...prev,
+      [field]: false,
+    }));
+  };
+  const startAnimation = (field) => {
+    setErrorAnimation((prev) => ({
+      ...prev,
+      [field]: true,
+    }));
+  };
 
   //using reducer to handle input fields
   const inputReducer = (state, action) => {
@@ -74,15 +94,12 @@ export const LoginForm = () => {
 
   //Handle the username change
   const handleUsernameChange = (event) => {
-    dispatchUsername({ type: "INPUT_CHANGE", value: event.target.value });
-  };
-  //handle username focus
-  const handleUsernameFocus = () => {
-    dispatchUsername({ type: "HANDLE_FOCUS", focus: true }); //set focus is true
+    //reset error on new input
     dispatchUsername({
       type: "HANDLE_ERROR",
       errorMsg: "",
     }); //remove error when field is focused
+    dispatchUsername({ type: "INPUT_CHANGE", value: event.target.value });
   };
   //handle usernmae blur
   const handleUsernameBlur = () => {
@@ -96,15 +113,13 @@ export const LoginForm = () => {
   };
   // Handle the password change
   const handlePasswordChange = (event) => {
-    dispatchPassword({ type: "INPUT_CHANGE", value: event.target.value });
-  };
-  const handlePasswordFocus = () => {
-    dispatchPassword({ type: "HANDLE_FOCUS", focus: true });
     dispatchPassword({
       type: "HANDLE_ERROR",
       errorMsg: "",
     });
+    dispatchPassword({ type: "INPUT_CHANGE", value: event.target.value });
   };
+
   const handlePasswordBlur = () => {
     if (passwordState.value.trim().length === 0) {
       dispatchPassword({
@@ -174,22 +189,29 @@ export const LoginForm = () => {
     return false;
   };
 
-  //handle the form submission
+  const onAnimationComplete = {
+    username: ()=>{
+      endAnimation('username')
+    },
+    password: ()=>{
+      endAnimation('password')
+    }
+  }
+
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    //Reset error first
-    dispatchUsername({
-      type: "HANDLE_ERROR",
-      errorMsg: "",
-    });
-    dispatchPassword({
-      type: "HANDLE_ERROR",
-      errorMsg: "",
-    });
     const usernameEmpty = usernameIsEmpty();
     const passEmpty = passwordIsEmpty();
     //if one field is empty do not continue
     if (usernameEmpty || passEmpty) {
+      if(usernameEmpty && passEmpty){
+        startAnimation('username')
+        startAnimation('password')
+      }else if (passEmpty){
+        startAnimation('password')
+      }else{
+        startAnimation('username')
+      }
       return;
     }
     // if less than 8 dont bother fetch api
@@ -205,10 +227,9 @@ export const LoginForm = () => {
         type: "HANDLE_ERROR",
         errorMsg: "Invalid Username or Password",
       });
-      return;
+      startAnimation('username')
+      startAnimation('password')
     }
-    //if all passed then fetch api
-    console.log(usernameState.value.trim().length);
     //get the login data
     const loginData = {
       username: usernameState.value,
@@ -262,73 +283,92 @@ export const LoginForm = () => {
           >
             Login
           </Typography>
-          <TextFieldOutlined
-            message={
-              usernameState.errorMsg && (
-                <Typography
-                  variant="caption"
-                  component="span"
-                  sx={{ color: errorColor }}
-                >
-                  {usernameState.errorMsg}
-                </Typography>
-              )
-            }
-            display = {usernameState.errorMsg && "error"}
-            onChange={handleUsernameChange}
-            value={usernameState.value}
-            label="Username"
-            onFocus={handleUsernameFocus}
-            onBlur={handleUsernameBlur}
-            iconLeft={<Icon icon="ic:round-person" width="32" />}
-            iconRight={
-              usernameState.errorMsg && (
-                <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
-              )
-            }
-            sx={{ mb: 2 }}
-          />
-          <TextFieldOutlined
-            type={`${passwordState.inputVisibility ? "text" : "password"}`}
-            value={passwordState.value}
-            label="Password"
-            onChange={handlePasswordChange}
-            display = {passwordState.errorMsg && 'error'}
-            message={
-              passwordState.errorMsg && (
-                <Typography
-                  variant="caption"
-                  component="span"
-                  sx={{ color: errorColor }}
-                >
-                  {passwordState.errorMsg}
-                </Typography>
-              )
-            }
-            onFocus={handlePasswordFocus}
-            onBlur={handlePasswordBlur}
-            iconLeft={<Icon icon="material-symbols:lock" width="32" />}
-            iconRight={
-              passwordState.errorMsg ? (
-                <Icon icon="ep:warning-filled" color={dangerMain} width="32" />
-              ) : !passwordState.inputVisibility ? (
-                <Icon
-                  onClick={handleSetPassVisible}
-                  style={{ cursor: "pointer" }}
-                  icon="mdi:hide"
-                  width="32"
-                />
-              ) : (
-                <Icon
-                  onClick={handleSetPassInvisible}
-                  style={{ cursor: "pointer" }}
-                  icon="mdi:eye"
-                  width="32"
-                />
-              )
-            }
-            sx={{ mb: 2 }}
-          />
+          <ErrorBlinkingAnimation
+            showAnimation={errorAnimation.username}
+            onAnimationComplete={onAnimationComplete.username}
+          >
+            <TextFieldOutlined
+              message={
+                usernameState.errorMsg && (
+                  <Typography
+                    variant="caption"
+                    component="span"
+                    sx={{ color: errorColor }}
+                  >
+                    {usernameState.errorMsg}
+                  </Typography>
+                )
+              }
+              display={usernameState.errorMsg && "error"}
+              onChange={handleUsernameChange}
+              value={usernameState.value}
+              label="Username"
+              onBlur={handleUsernameBlur}
+              iconLeft={<Icon icon="ic:round-person" width="32" />}
+              iconRight={
+                usernameState.errorMsg && (
+                  <Icon
+                    icon="ep:warning-filled"
+                    color={dangerMain}
+                    width="32"
+                  />
+                )
+              }
+              sx={{ mb: 2 }}
+            />
+          </ErrorBlinkingAnimation>
+          <ErrorBlinkingAnimation
+            showAnimation={errorAnimation.password}
+            onAnimationComplete={onAnimationComplete.password}
+          >
+            <TextFieldOutlined
+              type={`${passwordState.inputVisibility ? "text" : "password"}`}
+              value={passwordState.value}
+              label="Password"
+              onChange={handlePasswordChange}
+              display={passwordState.errorMsg && "error"}
+              message={
+                passwordState.errorMsg && (
+                  <Typography
+                    variant="caption"
+                    component="span"
+                    sx={{ color: errorColor }}
+                  >
+                    {passwordState.errorMsg}
+                  </Typography>
+                )
+              }
+              onBlur={handlePasswordBlur}
+              iconLeft={<Icon icon="material-symbols:lock" width="32" />}
+              iconRight={
+                <>
+                  {!passwordState.inputVisibility ? (
+                    <Icon
+                      onClick={handleSetPassVisible}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:hide"
+                      width="32"
+                    />
+                  ) : (
+                    <Icon
+                      onClick={handleSetPassInvisible}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:eye"
+                      width="32"
+                    />
+                  )}
+                  {passwordState.errorMsg && (
+                    <Icon
+                      icon="ep:warning-filled"
+                      color={dangerMain}
+                      width="32"
+                    />
+                  )}
+                </>
+              }
+              sx={{ mb: 2 }}
+            />
+          </ErrorBlinkingAnimation>
           <Box sx={{ width: "100%", ...ContentEnd, mb: 5 }}>
             <Typography
               variant="subtitle1"
