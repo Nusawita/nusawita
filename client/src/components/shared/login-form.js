@@ -5,7 +5,7 @@ import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
 import { TextFieldOutlined } from "../UI/custom-UI";
 import { Icon } from "@iconify/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ErrorBlinkingAnimation } from "../animation/custom-animation";
+import { ErrorVibrateAnimation } from "../animation/custom-animation";
 import axios from "axios";
 
 export const LoginForm = () => {
@@ -19,8 +19,8 @@ export const LoginForm = () => {
 
   const [errorAnimation, setErrorAnimation] = useState({
     username: false,
-    password:false
-  })
+    password: false,
+  });
 
   const endAnimation = (field) => {
     setErrorAnimation((prev) => ({
@@ -190,13 +190,13 @@ export const LoginForm = () => {
   };
 
   const onAnimationComplete = {
-    username: ()=>{
-      endAnimation('username')
+    username: () => {
+      endAnimation("username");
     },
-    password: ()=>{
-      endAnimation('password')
-    }
-  }
+    password: () => {
+      endAnimation("password");
+    },
+  };
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
@@ -204,13 +204,13 @@ export const LoginForm = () => {
     const passEmpty = passwordIsEmpty();
     //if one field is empty do not continue
     if (usernameEmpty || passEmpty) {
-      if(usernameEmpty && passEmpty){
-        startAnimation('username')
-        startAnimation('password')
-      }else if (passEmpty){
-        startAnimation('password')
-      }else{
-        startAnimation('username')
+      if (usernameEmpty && passEmpty) {
+        startAnimation("username");
+        startAnimation("password");
+      } else if (passEmpty) {
+        startAnimation("password");
+      } else {
+        startAnimation("username");
       }
       return;
     }
@@ -227,8 +227,8 @@ export const LoginForm = () => {
         type: "HANDLE_ERROR",
         errorMsg: "Invalid Username or Password",
       });
-      startAnimation('username')
-      startAnimation('password')
+      startAnimation("username");
+      startAnimation("password");
     }
     //get the login data
     const loginData = {
@@ -283,7 +283,7 @@ export const LoginForm = () => {
           >
             Login
           </Typography>
-          <ErrorBlinkingAnimation
+          <ErrorVibrateAnimation
             showAnimation={errorAnimation.username}
             onAnimationComplete={onAnimationComplete.username}
           >
@@ -316,59 +316,59 @@ export const LoginForm = () => {
               }
               sx={{ mb: 2 }}
             />
-          </ErrorBlinkingAnimation>
-          <ErrorBlinkingAnimation
+          </ErrorVibrateAnimation>
+          <ErrorVibrateAnimation
             showAnimation={errorAnimation.password}
             onAnimationComplete={onAnimationComplete.password}
           >
-            <TextFieldOutlined
-              type={`${passwordState.inputVisibility ? "text" : "password"}`}
-              value={passwordState.value}
-              label="Password"
-              onChange={handlePasswordChange}
-              display={passwordState.errorMsg && "error"}
-              message={
-                passwordState.errorMsg && (
-                  <Typography
-                    variant="caption"
-                    component="span"
-                    sx={{ color: errorColor }}
-                  >
-                    {passwordState.errorMsg}
-                  </Typography>
-                )
-              }
-              onBlur={handlePasswordBlur}
-              iconLeft={<Icon icon="material-symbols:lock" width="32" />}
-              iconRight={
-                <>
-                  {!passwordState.inputVisibility ? (
-                    <Icon
-                      onClick={handleSetPassVisible}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:hide"
-                      width="32"
-                    />
-                  ) : (
-                    <Icon
-                      onClick={handleSetPassInvisible}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:eye"
-                      width="32"
-                    />
-                  )}
-                  {passwordState.errorMsg && (
-                    <Icon
-                      icon="ep:warning-filled"
-                      color={dangerMain}
-                      width="32"
-                    />
-                  )}
-                </>
-              }
-              sx={{ mb: 2 }}
-            />
-          </ErrorBlinkingAnimation>
+              <TextFieldOutlined
+                type={`${passwordState.inputVisibility ? "text" : "password"}`}
+                value={passwordState.value}
+                label="Password"
+                onChange={handlePasswordChange}
+                display={passwordState.errorMsg && "error"}
+                message={
+                  passwordState.errorMsg && (
+                    <Typography
+                      variant="caption"
+                      component="span"
+                      sx={{ color: errorColor }}
+                    >
+                      {passwordState.errorMsg}
+                    </Typography>
+                  )
+                }
+                onBlur={handlePasswordBlur}
+                iconLeft={<Icon icon="material-symbols:lock" width="32" />}
+                iconRight={
+                  <>
+                    {!passwordState.inputVisibility ? (
+                      <Icon
+                        onClick={handleSetPassVisible}
+                        style={{ cursor: "pointer" }}
+                        icon="mdi:hide"
+                        width="32"
+                      />
+                    ) : (
+                      <Icon
+                        onClick={handleSetPassInvisible}
+                        style={{ cursor: "pointer" }}
+                        icon="mdi:eye"
+                        width="32"
+                      />
+                    )}
+                    {passwordState.errorMsg && (
+                      <Icon
+                        icon="ep:warning-filled"
+                        color={dangerMain}
+                        width="32"
+                      />
+                    )}
+                  </>
+                }
+                sx={{ mb: 2 }}
+              />
+          </ErrorVibrateAnimation>
           <Box sx={{ width: "100%", ...ContentEnd, mb: 5 }}>
             <Typography
               variant="subtitle1"

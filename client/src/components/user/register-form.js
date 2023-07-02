@@ -7,7 +7,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { ErrorBlinkingAnimation } from "../animation/custom-animation";
+import { ErrorVibrateAnimation } from "../animation/custom-animation";
 
 import { Icon } from "@iconify/react";
 
@@ -530,12 +530,13 @@ const RegisterForm = () => {
             Create an Account
           </Typography>
 
-          <ErrorBlinkingAnimation
+          <ErrorVibrateAnimation
             showAnimation={errorAnimation.username}
             onAnimationComplete={handleAnimationComplete.username}
           >
             <TextFieldOutlined
               label="Username"
+              labelDisplay={errorShow.username && "error"}
               iconLeft={<Icon icon="ic:round-person" width="32" />}
               sx={{ mb: 2 }}
               value={username}
@@ -559,14 +560,15 @@ const RegisterForm = () => {
                 )
               }
             />
-          </ErrorBlinkingAnimation>
-          <ErrorBlinkingAnimation
+          </ErrorVibrateAnimation>
+          <ErrorVibrateAnimation
             showAnimation={errorAnimation.date}
             onAnimationComplete={handleAnimationComplete.date}
           >
             <CustomDatePicker
               sx={{ mb: 2 }}
               label="Birth Date"
+              labelDisplay={dateError && "error"}
               value={date}
               display={dateError && "error"}
               message={
@@ -580,13 +582,14 @@ const RegisterForm = () => {
                 setDate(dayjs(newDate).utc());
               }}
             />
-          </ErrorBlinkingAnimation>
-          <ErrorBlinkingAnimation
+          </ErrorVibrateAnimation>
+          <ErrorVibrateAnimation
             showAnimation={errorAnimation.phone}
             onAnimationComplete={handleAnimationComplete.phone}
           >
             <TextFieldOutlined
               label="Phone (optional)"
+              labelDisplay={errorShow.phone && "error"}
               value={phone}
               onChange={changeHandler.phone}
               display={errorShow.phone && "error"}
@@ -609,13 +612,14 @@ const RegisterForm = () => {
               }
               sx={{ mb: 2 }}
             />
-          </ErrorBlinkingAnimation>
-          <ErrorBlinkingAnimation
+          </ErrorVibrateAnimation>
+          <ErrorVibrateAnimation
             showAnimation={errorAnimation.email}
             onAnimationComplete={handleAnimationComplete.email}
           >
             <TextFieldOutlined
               label="Email"
+              labelDisplay={errorShow.email && "error"}
               value={email}
               onChange={changeHandler.email}
               display={errorShow.email && "error"}
@@ -639,13 +643,14 @@ const RegisterForm = () => {
               iconLeft={<Icon icon="ic:round-person" width="32" />}
               sx={{ mb: 2 }}
             />
-          </ErrorBlinkingAnimation>
-          <ErrorBlinkingAnimation
+          </ErrorVibrateAnimation>
+          <ErrorVibrateAnimation
             showAnimation={errorAnimation.password}
             onAnimationComplete={handleAnimationComplete.password}
           >
             <TextFieldOutlined
               label="Password"
+              labelDisplay={errorShow.password && "error"}
               iconLeft={<Icon icon="material-symbols:lock" width="32" />}
               value={password}
               onChange={changeHandler.password}
@@ -687,13 +692,14 @@ const RegisterForm = () => {
                 </>
               }
             />
-          </ErrorBlinkingAnimation>
-          <ErrorBlinkingAnimation
+          </ErrorVibrateAnimation>
+          <ErrorVibrateAnimation
             showAnimation={errorAnimation.confirmPassword}
             onAnimationComplete={handleAnimationComplete.confirmPassword}
           >
             <TextFieldOutlined
               label="Confirm Password"
+              labelDisplay={errorShow.confirmPassword && "error"}
               value={confirmPassword}
               onChange={changeHandler.confirmPassword}
               onBlur={blurHandler.confirmPassword}
@@ -735,7 +741,7 @@ const RegisterForm = () => {
               iconLeft={<Icon icon="material-symbols:lock" width="32" />}
               sx={{ mb: 2 }}
             />
-          </ErrorBlinkingAnimation>
+          </ErrorVibrateAnimation>
           <Box sx={{ ...ContentMiddle }}>
             <Button type="submit" variant="primary" size="large">
               SIGN IN

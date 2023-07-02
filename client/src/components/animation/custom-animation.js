@@ -20,3 +20,25 @@ export const ErrorBlinkingAnimation = (props) => {
     </>
   );
 };
+
+export const ErrorVibrateAnimation = (props) => {
+  return (
+    <>
+      {props.showAnimation ? (
+        <AnimatePresence>
+          <motion.div
+            initial={{ y: 5, x:0 }}
+            animate={{ y: 2, x:2 }}
+            exit={{ y:5, x:0 }}
+            transition={{ duration: 0.16, repeat: 1 }}
+            onAnimationComplete={props.onAnimationComplete}
+          >
+            {props.children}
+          </motion.div>
+        </AnimatePresence>
+      ) : (
+        <>{props.children}</>
+      )}
+    </>
+  );
+};

@@ -68,6 +68,7 @@ export const TextFieldOutlined = (props) => {
           value={props.value} //the field value
           label={
             <Typography
+            sx={{ color: props.labelDisplay === 'error' && errorColor  }}
               variant={isFocused || props.value ? "caption" : "body1"}
             >
               {props.label}
