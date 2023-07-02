@@ -11,10 +11,10 @@ exports.validateRegister = [
     body('password')
         .notEmpty().withMessage('Password required')
         .isLength({min:8}).withMessage('Password mus be at least 8 character long'),
-    body('noTelp')
-        .custom(value => {
-            if (!/^\d+$/.test(value)) {
-                throw new Error('must be number')
-            }
-        }),
+    // body('noTelp')
+    //     .custom(value => {
+    //         if (!/^\d+$/.test(value)) {
+    //             throw new Error('must be number')
+    //         }
+    //     }),
 ];
