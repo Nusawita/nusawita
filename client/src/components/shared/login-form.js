@@ -1,14 +1,14 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
 import { TextFieldOutlined } from "../UI/custom-UI";
 import { Icon } from "@iconify/react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ErrorVibrateAnimation } from "../animation/custom-animation";
 import axios from "axios";
 
-export const LoginForm = () => {
+const LoginForm = () => {
+  console.log('rerenders')
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -17,129 +17,133 @@ export const LoginForm = () => {
   const primaryMain = theme.palette.primary.main;
   const errorColor = theme.palette.error.main;
 
+  const [enteredUsername, setEnteredUsername] = useState("");
+  const [enteredPassword, setEnteredPassword] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordVisibility, setPasswordVisibility] = useState(false);
+
+  const [authError, setAuthError] = useState(false);
+
   const [errorAnimation, setErrorAnimation] = useState({
     username: false,
     password: false,
   });
-
-  const endAnimation = (field) => {
-    setErrorAnimation((prev) => ({
-      ...prev,
-      [field]: false,
-    }));
-  };
   const startAnimation = (field) => {
     setErrorAnimation((prev) => ({
       ...prev,
       [field]: true,
     }));
   };
-
-  //using reducer to handle input fields
-  const inputReducer = (state, action) => {
-    //this is called when there is an input change on the field
-    if (action.type === "INPUT_CHANGE") {
-      return {
-        value: action.value,
-        errorMsg: state.errorMsg,
-        inputVisibility: state.inputVisibility,
-        focus: state.focus,
-      };
-    }
-
-    //this function is to set the error message
-    if (action.type === "HANDLE_ERROR") {
-      return {
-        value: state.value,
-        errorMsg: action.errorMsg,
-        inputVisibility: state.inputVisibility,
-        focus: state.focus,
-      };
-    }
-    //this function is to set the focus state when user click on a text field
-    if (action.type === "HANDLE_FOCUS") {
-      return {
-        value: state.value,
-        errorMsg: state.errorMsg,
-        inputVisibility: state.inputVisibility,
-        focus: action.focus,
-      };
-    }
-    //function to set visibility of the inputted value of the field
-    if (action.type === "SET_VISIBILITY") {
-      return {
-        value: state.value,
-        errorMsg: state.errorMsg,
-        inputVisibility: action.inputVisibility,
-        focus: state.focus,
-      };
-    }
+  const endAnimation = (field) => {
+    setErrorAnimation((prev) => ({
+      ...prev,
+      [field]: false,
+    }));
   };
 
-  //This is the username state reducer
-  const [usernameState, dispatchUsername] = useReducer(inputReducer, {
-    value: "",
-    errorMsg: "",
-    inputVisibility: true,
-    focus: false,
+  const [errorShow, setErrorShow] = useState({
+    username: false,
+    password: false,
   });
 
-  // This is the password state reducer
-  const [passwordState, dispatchPassword] = useReducer(inputReducer, {
-    value: "",
-    errorMsg: "",
-    inputVisibility: false,
-    focus: false,
-  });
-
-  //Handle the username change
-  const handleUsernameChange = (event) => {
-    //reset error on new input
-    dispatchUsername({
-      type: "HANDLE_ERROR",
-      errorMsg: "",
-    }); //remove error when field is focused
-    dispatchUsername({ type: "INPUT_CHANGE", value: event.target.value });
+  const showError = (field) => {
+    setErrorShow((prev) => ({
+      ...prev,
+      [field]: true,
+    }));
   };
-  //handle usernmae blur
-  const handleUsernameBlur = () => {
-    if (usernameState.value.trim().length === 0) {
-      dispatchUsername({
-        type: "HANDLE_ERROR",
-        errorMsg: "Username is empty",
-      }); //if user have clicked the field and left it empty an error shows
-    }
-    dispatchUsername({ type: "HANDLE_FOCUS", focus: false }); //set focused to false
-  };
-  // Handle the password change
-  const handlePasswordChange = (event) => {
-    dispatchPassword({
-      type: "HANDLE_ERROR",
-      errorMsg: "",
-    });
-    dispatchPassword({ type: "INPUT_CHANGE", value: event.target.value });
+  const hideError = (field) => {
+    setErrorShow((prev) => ({
+      ...prev,
+      [field]: false,
+    }));
   };
 
-  const handlePasswordBlur = () => {
-    if (passwordState.value.trim().length === 0) {
-      dispatchPassword({
-        type: "HANDLE_ERROR",
-        errorMsg: "Password is empty",
-      });
-    }
-    dispatchPassword({ type: "HANDLE_FOCUS", focus: false });
+  const handleVisibility = {
+    setVisible: () => {
+      setPasswordVisibility(true);
+    },
+    setHidden: () => {
+      setPasswordVisibility(false);
+    },
   };
-  // Function to set password to visible
-  const handleSetPassVisible = () => {
-    dispatchPassword({ type: "SET_VISIBILITY", inputVisibility: true });
+
+  const handleAnimationComplete = {
+    username: () => {
+      endAnimation("username");
+    },
+    password: () => {
+      endAnimation("password");
+    },
   };
-  //Function to hide the password
-  const handleSetPassInvisible = () => {
-    dispatchPassword({ type: "SET_VISIBILITY", inputVisibility: false });
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setUsernameError("");
+      hideError("username");
+      setPasswordError('')
+      hideError('password')
+      setAuthError(false);
+    }, 300);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [enteredUsername]);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setPasswordError("");
+      hideError("password");
+      setPasswordError('')
+      hideError('username')
+      setAuthError(false);
+    }, 300);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [enteredPassword]);
+
+  const validator = {
+    username: () => {
+      if (enteredUsername.trim().length < 8) {
+        setUsernameError("Invalid username or password");
+        showError("username");
+        setPasswordError("Invalid username or password");
+        showError("password");
+        return false;
+      }
+      return true;
+    },
+    password: () => {
+      if (enteredPassword.trim().length === 0) {
+        setPasswordError("Password is empty");
+        showError("password");
+        return false;
+      }
+      if (enteredPassword.trim().length < 8) {
+        setUsernameError("Invalid username or password");
+        showError("username");
+        setPasswordError("Invalid username or password");
+        showError("password");
+        return false;
+      }
+      return true;
+    },
+  };
+
+  const changeHandler = {
+    username: (event) => {
+      setEnteredUsername(event.target.value);
+    },
+    password: (event) => {
+      setEnteredPassword(event.target.value);
+    },
   };
 
   //function to fetch the login api
   const fetchLoginApi = async (loginData) => {
+    console.log("fetchApi");
     try {
       // call login api
       const res = await axios.post(
@@ -154,88 +158,62 @@ export const LoginForm = () => {
     } catch (error) {
       // if unauthorized then show appropiate error in front
       if (error.response.status === 401) {
-        dispatchUsername({
-          type: "HANDLE_ERROR",
-          errorMsg: error.response.data.message,
-        });
-        dispatchPassword({
-          type: "HANDLE_ERROR",
-          errorMsg: error.response.data.message,
-        });
+        setUsernameError("Invalid username or password");
+        showError("username");
+        setPasswordError("Invalid username or password");
+        showError("password");
+        setAuthError(true);
+        startAnimation('username')
+        startAnimation('password')
       }
     }
   };
 
-  const usernameIsEmpty = () => {
-    //empty check
-    if (usernameState.value.trim().length === 0) {
-      dispatchUsername({
-        type: "HANDLE_ERROR",
-        errorMsg: "Username is empty",
-      });
-      return true;
-    }
-    return false;
-  };
-
-  const passwordIsEmpty = () => {
-    if (passwordState.value.trim().length === 0) {
-      dispatchPassword({
-        type: "HANDLE_ERROR",
-        errorMsg: "Password is empty",
-      });
-      return true;
-    }
-    return false;
-  };
-
-  const onAnimationComplete = {
-    username: () => {
-      endAnimation("username");
-    },
-    password: () => {
-      endAnimation("password");
-    },
-  };
-
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
-    const usernameEmpty = usernameIsEmpty();
-    const passEmpty = passwordIsEmpty();
-    //if one field is empty do not continue
-    if (usernameEmpty || passEmpty) {
-      if (usernameEmpty && passEmpty) {
-        startAnimation("username");
-        startAnimation("password");
-      } else if (passEmpty) {
-        startAnimation("password");
-      } else {
-        startAnimation("username");
-      }
-      return;
-    }
-    // if less than 8 dont bother fetch api
-    if (
-      passwordState.value.trim().length < 8 ||
-      usernameState.value.trim().length < 8
-    ) {
-      dispatchUsername({
-        type: "HANDLE_ERROR",
-        errorMsg: "Invalid Username or Password",
-      });
-      dispatchPassword({
-        type: "HANDLE_ERROR",
-        errorMsg: "Invalid Username or Password",
-      });
+    if (authError) {
       startAnimation("username");
       startAnimation("password");
+      return;
     }
-    //get the login data
-    const loginData = {
-      username: usernameState.value,
-      password: passwordState.value,
-    };
-    fetchLoginApi(loginData);
+    //empty check first
+    if (
+      enteredUsername.trim().length === 0 &&
+      enteredPassword.trim().length === 0
+    ) {
+      setUsernameError("Username Is Empty");
+      showError("username");
+      setPasswordError("Password is empty");
+      showError("password");
+      startAnimation('username')
+      startAnimation('password')
+      return;
+    }
+    if (enteredUsername.trim().length === 0) {
+      setUsernameError("Username Is Empty");
+      showError("username");
+      startAnimation('username')
+      return;
+    }
+    if (enteredPassword.trim().length === 0) {
+      setPasswordError("Password is empty");
+      showError("password");
+      startAnimation('password')
+      return;
+    }
+    //other validation
+    const usrValid = validator.username();
+    const passValid = validator.password();
+    if (usrValid && passValid) {
+      const loginData = {
+        username: enteredUsername,
+        password: enteredPassword,
+      };
+      await fetchLoginApi(loginData);
+    } else {
+      startAnimation('username')
+      startAnimation('password')
+    }
   };
 
   return (
@@ -260,10 +238,10 @@ export const LoginForm = () => {
       <Grid item xs={4} sx={{ ...ContentMiddle, backgroundColor: lightColor }}>
         <Box
           component="form"
-          onSubmit={handleFormSubmit}
           sx={{ width: "360px" }}
           display="flex"
           flexDirection="column"
+          onSubmit={handleFormSubmit}
         >
           <Box sx={{ ...ContentMiddle }}>
             <Box
@@ -285,28 +263,29 @@ export const LoginForm = () => {
           </Typography>
           <ErrorVibrateAnimation
             showAnimation={errorAnimation.username}
-            onAnimationComplete={onAnimationComplete.username}
+            onAnimationComplete={handleAnimationComplete.username}
           >
             <TextFieldOutlined
+              label="Username"
+              labelDisplay={errorShow.username && "error"}
+              display={errorShow.username && "error"}
+              value={enteredUsername}
+              onChange={changeHandler.username}
+              sx={{ mb: 2 }}
               message={
-                usernameState.errorMsg && (
+                errorShow.username && (
                   <Typography
                     variant="caption"
-                    component="span"
-                    sx={{ color: errorColor }}
+                    component="p"
+                    color={errorColor}
                   >
-                    {usernameState.errorMsg}
+                    {usernameError}
                   </Typography>
                 )
               }
-              display={usernameState.errorMsg && "error"}
-              onChange={handleUsernameChange}
-              value={usernameState.value}
-              label="Username"
-              onBlur={handleUsernameBlur}
               iconLeft={<Icon icon="ic:round-person" width="32" />}
               iconRight={
-                usernameState.errorMsg && (
+                errorShow.username && (
                   <Icon
                     icon="ep:warning-filled"
                     color={dangerMain}
@@ -314,60 +293,60 @@ export const LoginForm = () => {
                   />
                 )
               }
-              sx={{ mb: 2 }}
             />
           </ErrorVibrateAnimation>
           <ErrorVibrateAnimation
-            showAnimation={errorAnimation.password}
-            onAnimationComplete={onAnimationComplete.password}
+          showAnimation = {errorAnimation.password}
+          onAnimationComplete = {handleAnimationComplete.password}
           >
-              <TextFieldOutlined
-                type={`${passwordState.inputVisibility ? "text" : "password"}`}
-                value={passwordState.value}
-                label="Password"
-                onChange={handlePasswordChange}
-                display={passwordState.errorMsg && "error"}
-                message={
-                  passwordState.errorMsg && (
-                    <Typography
-                      variant="caption"
-                      component="span"
-                      sx={{ color: errorColor }}
-                    >
-                      {passwordState.errorMsg}
-                    </Typography>
-                  )
-                }
-                onBlur={handlePasswordBlur}
-                iconLeft={<Icon icon="material-symbols:lock" width="32" />}
-                iconRight={
-                  <>
-                    {!passwordState.inputVisibility ? (
-                      <Icon
-                        onClick={handleSetPassVisible}
-                        style={{ cursor: "pointer" }}
-                        icon="mdi:hide"
-                        width="32"
-                      />
-                    ) : (
-                      <Icon
-                        onClick={handleSetPassInvisible}
-                        style={{ cursor: "pointer" }}
-                        icon="mdi:eye"
-                        width="32"
-                      />
-                    )}
-                    {passwordState.errorMsg && (
-                      <Icon
-                        icon="ep:warning-filled"
-                        color={dangerMain}
-                        width="32"
-                      />
-                    )}
-                  </>
-                }
-                sx={{ mb: 2 }}
-              />
+            <TextFieldOutlined
+              label="Password"
+              type={!passwordVisibility ? "password" : "text"}
+              labelDisplay={errorShow.password && "error"}
+              display={errorShow.password && "error"}
+              value={enteredPassword}
+              onChange={changeHandler.password}
+              message={
+                errorShow.password && (
+                  <Typography
+                    variant="caption"
+                    component="p"
+                    color={errorColor}
+                  >
+                    {passwordError}
+                  </Typography>
+                )
+              }
+              iconLeft={<Icon icon="material-symbols:lock" width="32" />}
+              iconRight={
+                <>
+                  {" "}
+                  {!passwordVisibility ? (
+                    <Icon
+                      onClick={handleVisibility.setVisible}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:hide"
+                      width="32"
+                    />
+                  ) : (
+                    <Icon
+                      onClick={handleVisibility.setHidden}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:eye"
+                      width="32"
+                    />
+                  )}
+                  {errorShow.password && (
+                    <Icon
+                      icon="ep:warning-filled"
+                      color={dangerMain}
+                      width="32"
+                    />
+                  )}
+                </>
+              }
+              sx={{ mb: 2 }}
+            />
           </ErrorVibrateAnimation>
           <Box sx={{ width: "100%", ...ContentEnd, mb: 5 }}>
             <Typography
@@ -399,3 +378,5 @@ export const LoginForm = () => {
     </Grid>
   );
 };
+
+export default React.memo(LoginForm);

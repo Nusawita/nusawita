@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle } from "../../styles/shared-styles";
 import { CustomDatePicker, TextFieldOutlined } from "../UI/custom-UI";
@@ -6,12 +6,12 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
 import { ErrorVibrateAnimation } from "../animation/custom-animation";
 
 import { Icon } from "@iconify/react";
 
 const RegisterForm = () => {
+  // console.log('rerendeers')
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const theme = useTheme();
@@ -45,7 +45,7 @@ const RegisterForm = () => {
     phone: false,
     email: false,
     password: false,
-    confirmPassword: "false",
+    confirmPassword: false,
   });
 
   const [formValidity, setFormValidity] = useState({
@@ -138,130 +138,6 @@ const RegisterForm = () => {
     },
   };
 
-  // Reset all error in focus
-  const validator = {
-    checkValid: {
-      //Username validator
-      username: () => {
-        if (username.trim().length === 0) {
-          setInvalid("username");
-          setUsernameError("Username cannot be empty");
-          return;
-        }
-        if (username.trim().length < 8) {
-          setInvalid("username");
-          setUsernameError("Username must be 8 or more characters long");
-          showError("username");
-        } else {
-          setValid("username");
-          setUsernameError("");
-          hideError("username");
-        }
-      },
-      date: () => {
-        try {
-          const parsed = dayjs(date);
-          if (parsed.isValid()) {
-            setValid("date");
-            setDateError("");
-            return;
-          } else {
-            setInvalid("date");
-            throw new Error("Invalid date");
-          }
-        } catch (error) {
-          setInvalid("date");
-          setDateError("Please provide a valid date");
-        }
-      },
-      phone: () => {
-        if (!phone) {
-          setValid("phone");
-          setPhoneError("");
-          hideError("phone");
-          return;
-        }
-        if (phone.trim().length < 11 || phone.trim().length > 12) {
-          setInvalid("phone");
-          setPhoneError(
-            "Phone must be 11 or 12 characters or you can leave this empty"
-          );
-          showError("phone");
-        } else {
-          setValid("phone");
-          setPhoneError("");
-          hideError("phone");
-        }
-      },
-      // Email validator
-      email: () => {
-        if (email.trim().length === 0) {
-          setInvalid("email");
-          setEmailError("Email cannot be empty");
-          return;
-        }
-        const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-        if (!emailRegex.test(email) && email) {
-          setInvalid("email");
-          setEmailError("Please enter a valid email");
-          showError("email");
-        } else {
-          setValid("email");
-          setEmailError("");
-          hideError("email");
-        }
-      },
-      //Pass Validator
-      password: () => {
-        if (password.trim().length === 0) {
-          setInvalid("password");
-          setPasswordError("Password cannot be empty");
-          return;
-        }
-        if (password.trim().length < 8) {
-          setInvalid("password");
-          setPasswordError("Password must be 8 or more characters");
-          showError("password");
-          return;
-        }
-        if (password !== confirmPassword && confirmPassword) {
-          setInvalid("confirmPassword");
-          setConfirmPasswordError("Confirm password doesn't match");
-          showError("confirmPassword");
-          return;
-        }
-        setValid("confirmPassword");
-        setConfirmPasswordError("");
-        hideError("confirmPassword");
-        setValid("password");
-        setPasswordError("");
-        hideError("password");
-      },
-      confirmPassword: () => {
-        if (!formValidity.password && confirmPassword) {
-          setInvalid("confirmPassword");
-          setConfirmPasswordError("Please fill password correctly first");
-          showError("confirmPassword");
-          return;
-        }
-        if (confirmPassword.trim().length === 0) {
-          setInvalid("confirmPassword");
-          setConfirmPasswordError("Confirm password cannot be empty");
-          return;
-        }
-        if (password === confirmPassword) {
-          setValid("confirmPassword");
-          setConfirmPasswordError("");
-          hideError("confirmPassword");
-          return;
-        }
-        setInvalid("confirmPassword");
-        setConfirmPasswordError("Confirm password doesn't match");
-        showError("confirmPassword");
-      },
-    },
-  };
-
   const blurHandler = {
     // Show empty error on blur
     username: () => {
@@ -314,51 +190,152 @@ const RegisterForm = () => {
   // Run check on value change with delay (wait for user typing)
   useEffect(() => {
     const timeout = setTimeout(() => {
-      validator.checkValid.username();
+      if (username.trim().length === 0) {
+        setInvalid("username");
+        setUsernameError("Username cannot be empty");
+        return;
+      }
+      if (username.trim().length < 8) {
+        setInvalid("username");
+        setUsernameError("Username must be 8 or more characters long");
+        showError("username");
+      } else {
+        setValid("username");
+        setUsernameError("");
+        hideError("username");
+      }
     }, 500);
     return () => {
       clearTimeout(timeout);
     };
   }, [username]);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
-      validator.checkValid.date();
+      try {
+        const parsed = dayjs(date);
+        if (parsed.isValid()) {
+          setValid("date");
+          setDateError("");
+          return;
+        } else {
+          setInvalid("date");
+          throw new Error("Invalid date");
+        }
+      } catch (error) {
+        setInvalid("date");
+        setDateError("Please provide a valid date");
+      }
     }, 500);
     return () => {
       clearTimeout(timeout);
     };
   }, [date]);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
-      validator.checkValid.phone();
+      if (!phone) {
+        setValid("phone");
+        setPhoneError("");
+        hideError("phone");
+        return;
+      }
+      if (phone.trim().length < 11 || phone.trim().length > 12) {
+        setInvalid("phone");
+        setPhoneError(
+          "Phone must be 11 or 12 characters or you can leave this empty"
+        );
+        showError("phone");
+      } else {
+        setValid("phone");
+        setPhoneError("");
+        hideError("phone");
+      }
     }, 500);
     return () => {
       clearTimeout(timeout);
     };
   }, [phone]);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
-      validator.checkValid.email();
+      if (email.trim().length === 0) {
+        setInvalid("email");
+        setEmailError("Email cannot be empty");
+        return;
+      }
+      const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      if (!emailRegex.test(email) && email) {
+        setInvalid("email");
+        setEmailError("Please enter a valid email");
+        showError("email");
+      } else {
+        setValid("email");
+        setEmailError("");
+        hideError("email");
+      }
     }, 500);
     return () => {
       clearTimeout(timeout);
     };
   }, [email]);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
-      validator.checkValid.password();
+      if (password.trim().length === 0) {
+        if (confirmPassword) {
+          setInvalid("confirmPassword");
+          setConfirmPasswordError("Please correctly fill password first");
+          showError("confirmPassword");
+        }
+        setInvalid("password");
+        setPasswordError("Password cannot be empty");
+        return;
+      }
+      if (password.trim().length < 8) {
+        if (confirmPassword) {
+          setInvalid("confirmPassword");
+          setConfirmPasswordError("Please correctly fill password first");
+          showError("confirmPassword");
+        }
+        setInvalid("password");
+        setPasswordError("Password must be 8 or more characters");
+        showError("password");
+        return;
+      }
+      setValid("password");
+      setPasswordError("");
+      hideError("password");
+      if(!confirmPassword){
+        return
+      }
+      if (password !== confirmPassword) {
+        setInvalid("confirmPassword");
+        setConfirmPasswordError("Confirm password doesn't match");
+        showError("confirmPassword");
+        return;
+      }
+      setValid("confirmPassword");
+      setConfirmPasswordError("");
+      hideError("confirmPassword");
     }, 500);
     return () => {
       clearTimeout(timeout);
     };
-  }, [password]);
+  }, [password, confirmPassword]);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
-      validator.checkValid.confirmPassword();
-    });
-    return () => {
-      clearTimeout(timeout);
-    };
+      if (confirmPassword.trim().length === 0) {
+        console.log('runs?')
+        setInvalid("confirmPassword");
+        setConfirmPasswordError("Confirm Password cannot be empty");
+        hideError('confirmPassword')
+      }
+    }, 500);
+    return ()=>{
+      clearTimeout(timeout)
+    }
   }, [confirmPassword]);
 
   const fetchRegisterAPI = async (registerData) => {
@@ -412,18 +389,7 @@ const RegisterForm = () => {
   };
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    //DEBUGGING
-    const validObject = {
-      username: formValidity.username,
-      date: formValidity.date,
-      phone: formValidity.phone,
-      email: formValidity.email,
-      password: formValidity.password,
-      confirmPassword: formValidity.confirmPassword,
-    };
-    // console.log(validObject);
-    //END OF DEBUGGING
+    console.log(formValidity);
 
     //IF ALL VALID
     if (
@@ -473,7 +439,7 @@ const RegisterForm = () => {
         startAnimation("confirmPassword");
       }
     }
-  };
+  }
   return (
     <Grid
       container
@@ -499,16 +465,12 @@ const RegisterForm = () => {
         sx={{
           ...ContentMiddle,
           backgroundColor: lightColor,
-          height: "100%",
-          mt: 5,
-          mb: 5,
         }}
       >
         <Box
           onSubmit={handleSubmit}
           component="form"
-          sx={{ width: "360px" }}
-          display="60px"
+          sx={{ width: "70%" }}
           flexDirection="column"
         >
           <Box sx={{ ...ContentMiddle }}>
@@ -579,7 +541,7 @@ const RegisterForm = () => {
                 )
               }
               onChange={(newDate) => {
-                setDate(dayjs(newDate).utc());
+                setDate(dayjs(newDate).utc())
               }}
             />
           </ErrorVibrateAnimation>
@@ -766,7 +728,7 @@ const RegisterForm = () => {
               sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
             >
               Terms of Use
-            </Typography>{" "}
+            </Typography>
             and
             <Typography
               component="span"
@@ -778,7 +740,7 @@ const RegisterForm = () => {
         </Box>
       </Grid>
     </Grid>
-  );
-};
+  )
+}
 
-export default RegisterForm;
+export default React.memo(RegisterForm);

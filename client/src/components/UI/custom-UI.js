@@ -61,6 +61,7 @@ export const TextFieldOutlined = (props) => {
       >
         {props.iconLeft}
         <TextField
+          ref={props.ref}
           type={props.type} //type of the input
           onChange={props.onChange} //function to run when the value inside the field changed
           onFocus={handleFocus}
@@ -68,7 +69,7 @@ export const TextFieldOutlined = (props) => {
           value={props.value} //the field value
           label={
             <Typography
-            sx={{ color: props.labelDisplay === 'error' && errorColor  }}
+              sx={{ color: props.labelDisplay === "error" && errorColor }}
               variant={isFocused || props.value ? "caption" : "body1"}
             >
               {props.label}
@@ -189,7 +190,7 @@ export const TextFieldFilled = (props) => {
       </Box>
       {props.message && (
         //if input is not valid and textfield was focused before, show the error message
-        <Box component='span'>{props.message}</Box>
+        <Box component="span">{props.message}</Box>
       )}
     </Box>
   );
@@ -197,7 +198,7 @@ export const TextFieldFilled = (props) => {
 
 export const CustomDatePicker = (props) => {
   return (
-    <Box sx = {{ ...props.sx }}>
+    <Box sx={{ ...props.sx }}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
           sx={{
@@ -209,7 +210,7 @@ export const CustomDatePicker = (props) => {
         />
         {props.message && (
           //if input is not valid and textfield was focused before, show the error message
-          <Box component='span'>{props.message}</Box>
+          <Box component="span">{props.message}</Box>
         )}
       </LocalizationProvider>
     </Box>
