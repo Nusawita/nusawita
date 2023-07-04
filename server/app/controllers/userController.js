@@ -1,76 +1,96 @@
-const userService = require("../services/userService");
+const userService = require('../services/userService');
 
 class UserController {
-  constructor(userService) {
-    this.userService = userService;
-  }
-
-  //register
-  async register(req, res) {
-    const userData = req.body;
-    const errRegister = await this.userService.register(userData);
-    //if error occured
-    if (errRegister != null) {
-      return res.status(errRegister.status).json(errRegister);
+    constructor(userService) {
+        this.userService = userService;
     }
 
-    //json message
-    res.status(201).json({ message: "User created" });
-  }
+    //register
+    async register(req, res) {
+        const userData = req.body;
+        const errRegister = await this.userService.register(userData);
+        //if error occured
+        if (errRegister != null) {
+            return res.status(errRegister.status).json({message: errRegister.message})
+        }
 
-  //login
-  async login(req, res) {
-    const loginData = req.body;
-    const [user, session, errLogin] = await this.userService.login(loginData);
-    //if error occured
-    if (errLogin != null) {
-      return res.status(errLogin.status).json(errLogin);
-    }
-    await res.cookie("session_token", session.id, { maxAge: session.expirationTime });
-
-    //return success
-    res.status(200).json(user);
-  }
-
-  //logout
-  async logout(req, res) {
-    const sessionToken = req.cookies["session_token"];
-    //if there is no session or cookies
-    if (!sessionToken) {
-      res.status(401).end();
-      return;
+        //json message
+        res.status(201).json({message: 'User created'});
     }
 
-    //logoutt
-    const errLogout = await this.userService.logout(sessionToken);
-    if (errLogout != null) {
-      return res.status(errLogout.status).json(errLogout);
+    //login
+    async login(req, res) {
+        const loginData = req.body;
+        const [user, token, errLogin] = await this.userService.login(loginData);
+        //if error occured
+        if (errLogin != null) {
+            return res.status(errLogin.status).json({
+                message: errLogin.message,
+                data: null,
+            });
+        }
+
+        //create cookie
+        res.cookie("session_token", token, {maxAge: 86400000}) //86400000 equal to 1 day
+
+        //return success
+        res.status(200).json({
+            message: 'User Log in',
+            data: user
+        });
     }
 
-    //delete cookies
-    res.cookie("session_token", {
-      expires: new Date(),
-      domain: "localhost",
-    });
+    //logout
+    async logout(req, res) {
+        //delete cookies
+        res.cookie("session_token", "", { expires: new Date() })
 
-    res.status(201).json({ message: "Log out success" });
-  }
-
-  async profile(req, res) {
-    const sessionToken = req.cookies["session_token"];
-    //if there is no session or cookies
-    if (!sessionToken) {
-      res.status(401).end();
-      return;
+        res.status(200).json({message: 'Log out success'});
     }
 
-    const [profile, errProfile] = await this.userService.profile(sessionToken);
-    if (errProfile != null) {
-      return res.status(errProfile.status).json(errProfile);
+    async getAllUser (req, res) {
+        const user = req.user;
+
+        //get query params
+        const search = req.query.search;
+
+        //get all user
+        const [allUser, errAllUser] = await this.userService.getAllUser(user, search);
+        if (errAllUser != null) {
+            return res.status(errAllUser.status).json({
+                message: errAllUser.message,
+                data: null
+            });
+        }
+
+        res.status(200).json({
+            message: "success get all user",
+            data: allUser});
     }
 
-    res.status(200).json(profile);
-  }
+    async checkUsername (req, res) {
+        const username = req.body.username;
+
+        //check username
+        const errUsername = await this.userService.checkUsername(username);
+        if (errUsername != null) {
+            return res.status(errUsername.status).end();
+        }
+
+        res.status(200).end();
+    }
+
+    async checkEmail (req, res) {
+        const email = req.body.email;
+
+        //check email
+        const errEmail = await this.userService.checkEmail(email);
+        if (errEmail != null) {
+            return res.status(errEmail.status).end();
+        }
+
+        res.status(200).end();
+    }
 }
 
 module.exports = UserController;

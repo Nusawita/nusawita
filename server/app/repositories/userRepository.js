@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { Op } = require('sequelize')
 
 class UserRepository {
     async createUser(userData) {
@@ -34,6 +35,21 @@ class UserRepository {
             return [user, null];
         } catch (error) {
             return [null, error];
+        }
+    }
+
+    async getAllUser(search) {
+        try{
+            const allUser = await User.findAll({where: 
+                {
+                    [Op.and] : [
+                        {isAdmin: false},
+                        {username: {[Op.substring]: `${search}`}}
+                    ]
+                }});
+            return [allUser, null];
+        }catch (error) {
+            return [null, error]
         }
     }
 }

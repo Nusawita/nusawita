@@ -3,9 +3,8 @@ const dtoLogin = (user) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        no_telp: user.no_telp,
+        noTelp: user.noTelp,
         dob: user.dob,
-        isAdmin: user.isAdmin,
         ban: user.ban
     }
 

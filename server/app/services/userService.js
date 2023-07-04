@@ -1,126 +1,148 @@
 const userRepository = require('../repositories/userRepository');
-const sessionRepository = require('../repositories/sessionRepository');
 const {dtoError} = require('../dto/dtoError');
 const {dtoLogin} = require('../dto/dtoLogin');
-const uuid = require('uuid');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 class UserService {
-    constructor(userRepository, sessionRepository) {
+    constructor(userRepository) {
         this.userRepository = userRepository;
-        this.sessionRepository = sessionRepository
     }
 
     async register(userData) {
         //check if username already exist
         const [userCheckUsername, errCheckUsername] = await this.userRepository.getUserByUsername(userData.username);
-        if (userCheckUsername != null) { //if username already exist
-            //create error message
-            const jsonData = dtoError(409, 'Username already been taken', null);
-            
-            return jsonData //return error
-        } else {
-            //check if email already exist
-            const [userCheckEmail, errCheckEmail] = await this.userRepository.getUserByEmail(userData.email);
-            if (userCheckEmail != null) { 
-                //create error message
-                const jsonData = dtoError(409, 'Email already been taken', null);
-                
-                return jsonData
-            } else {
-                //encrypt user password
-                userData.password = await bcrypt.hash(userData.password, 10);
-
-                //send data to repsitory
-                const errCreateUser = await this.userRepository.createUser(userData)
-                if (errCreateUser != null){   // check if error occured when registering new user
-                    const jsonData = dtoError(500, 'Internal server error', errCreateUser);
-        
-                    return jsonData
-                }
-            }
+        let usernameMessage = null;
+        if (userCheckUsername != null) {
+            usernameMessage = 'Username has already been taken';
         }
-        return null;
+
+        //check if email already exist
+        const [userCheckEmail, errCheckEmail] = await this.userRepository.getUserByEmail(userData.email);
+        let emailMessage = null;
+        if (userCheckEmail != null) {
+            emailMessage = 'Email has already been taken';
+        }
+
+        if ((usernameMessage != null) || (emailMessage != null)) {
+            const jsonData = dtoError(401, {username: usernameMessage, email: emailMessage})
+            return jsonData;
+        } else {
+            //encrypt user password
+            userData.password = await bcrypt.hash(userData.password, 10);
+
+            //send data to repsitory
+            const errCreateUser = await this.userRepository.createUser(userData);
+            if (errCreateUser != null){   // check if error occured when registering new user
+                const jsonData = dtoError(500, 'Internal server error');
+    
+                return jsonData;
+            }
+
+            return null;
+        }
     }
 
     async login(loginData) {
-        const [user, errUser] = await this.userRepository.getUserByUsername(loginData.username);
+        const [userByUsername, errUserByUsername] = await this.userRepository.getUserByUsername(loginData.username);
+        const [userByEmail, errUserByEmail] = await this.userRepository.getUserByEmail(loginData.username);
 
         //check if user exist
-        if (user === null) {
-            const jsonData = dtoError(401, 'Invalid Username or Password', null);
+        if (!(userByUsername || userByEmail)) {
+            const jsonData = dtoError(401, 'Username or Password are invalid');
             return [null, null, jsonData] //return error
+        }
+
+        //insert to user
+        let user = {}
+        if (userByUsername) {
+            user.id = userByUsername.id,
+            user.username = userByUsername.username,
+            user.email = userByUsername.email,
+            user.isAdmin = userByUsername.isAdmin,
+            user.password = userByUsername.password
+        } else {
+            user.id = userByEmail.id,
+            user.username = userByEmail.username,
+            user.email = userByEmail.email,
+            user.isAdmin = userByEmail.isAdmin,
+            user.password = userByEmail.password
         }
 
         //check if user exist and password correct
         if (user && (await bcrypt.compare(loginData.password, user.password))) {
-            const sessionToken = uuid.v4(); //create session token
-            
-            //create session expire date
-            const now = new Date()
-            const expireAt = new Date(+now + 86400000) //86400000 equal to one day
-            
-            //add session token to session table
-            const sessionData = {
-                id: sessionToken,
-                userId: user.id,
-                loginStatus: true,
-                expirationTime: expireAt
+            const payload = {
+                id: user.id,
             }
 
-            //send session to repository
-            const [session, errSession] = await this.sessionRepository.createSession(sessionData);
-            
-            //check if session succesfully created at database
-            if (errSession != null) {
-                const jsonData = dtoError(500, 'Internal server error', errSession);
-    
-                return [null, null, jsonData]
+            const option = {
+                expiresIn: '1d'
+            };
+
+            const token = jwt.sign(payload, process.env.TOKEN_KEY, option);
+
+            const loggedUser = {
+                username: user.username,
+                isAdmin: user.isAdmin,
             }
 
-            const loggedUser = dtoLogin(user);
-
-            return [loggedUser, session, null] //if success
+            return [loggedUser, token, null] //if success
         } else {    //if user or password incorrect
-            const jsonData = dtoError(401, 'Username or Password are invalid', null);
+            const jsonData = dtoError(401, 'Username or Password are invalid');
             return [null, null, jsonData] //return error
         }
     }
 
-    async logout(sessionToken) {
-        const errLogout = await this.sessionRepository.deleteSession(sessionToken);
-        if (errLogout != null) {
-            const jsonData = dtoError(500, 'Internal Server Error', null);
+    async getAllUser(user, search) {
+        //get user by user id
+        const [userLog, errUserLog] = await this.userRepository.getUserByUserId(user.id);
+        if (errUserLog != null) {
+            const jsonData = dtoError(500, 'Internal server error');
+            return [null, jsonData];
+        }
+
+        //check if user is admin
+        if (!userLog.isAdmin) {
+            const jsonData = dtoError(401, 'Unauthorized User');
+            return [null, jsonData];
+        }
+
+        //get all user
+        const [allUser, errAllUser] = await this.userRepository.getAllUser(search)
+        if (errAllUser != null) {
+            const jsonData = dtoError(500, 'Internal Server Error');
+            return [null, jsonData];
+        }
+
+        let allUsers = []
+
+        for(let i = 0; i < allUser.length; i++) {
+            allUsers.push(dtoLogin(allUser[i]))
+        }
+
+        return [allUsers, null];
+    }
+
+    async checkUsername(username) {
+        //check if username already exist
+        const [userCheckUsername, errCheckUsername] = await this.userRepository.getUserByUsername(username);
+        if (userCheckUsername != null) {
+            const jsonData = dtoError(401, 'Username has already been taken')
             return jsonData;
         }
 
         return null;
     }
 
-    async profile(sessionToken) {
-        //get session
-        const [session, errSession] = await this.sessionRepository.getSession(sessionToken);
-        if (errSession != null) {
-            const jsonData = dtoError(401, 'Unauthorized user', null);
-            return [null, jsonData];
+    async checkEmail(email) {
+        //check if email already exist
+        const [userCheckEmail, errCheckEmail] = await this.userRepository.getUserByEmail(email);
+        if (userCheckEmail != null) {
+            const jsonData = dtoError(401, 'Email has already been taken')
+            return jsonData;
         }
 
-        //get user
-        const [profile, errProfile] = await this.userRepository.getUserByUserId(session.userId)
-        if (errProfile != null) {
-            const jsonData = dtoError(500, 'Internal Server Error', null);
-            return [null, jsonData];
-        }
-
-        //check if user admin
-        //temporary check as long this used as quick dashboard
-        if (profile.isAdmin) {
-            const loggedUser = dtoLogin(profile);
-            return [loggedUser, null]
-        } else {
-            const jsonData = dtoError(401, 'Unauthorized user', null);
-            return [null, jsonData]
-        }
+        return null;
     }
 }
 
