@@ -11,7 +11,7 @@ class UserController {
         const errRegister = await this.userService.register(userData);
         //if error occured
         if (errRegister != null) {
-            return res.status(errRegister.status).json(errRegister)
+            return res.status(errRegister.status).json({message: errRegister.message})
         }
 
         //json message
@@ -21,17 +21,23 @@ class UserController {
     //login
     async login(req, res) {
         const loginData = req.body;
-        const [token, errLogin] = await this.userService.login(loginData);
+        const [user, token, errLogin] = await this.userService.login(loginData);
         //if error occured
         if (errLogin != null) {
-            return res.status(errLogin.status).json(errLogin)
+            return res.status(errLogin.status).json({
+                message: errLogin.message,
+                data: null,
+            });
         }
 
         //create cookie
         res.cookie("session_token", token, {maxAge: 86400000}) //86400000 equal to 1 day
 
         //return success
-        res.status(200).json({message: 'User Log in'});
+        res.status(200).json({
+            message: 'User Log in',
+            data: user
+        });
     }
 
     //logout
@@ -39,7 +45,7 @@ class UserController {
         //delete cookies
         res.cookie("session_token", "", { expires: new Date() })
 
-        res.status(201).json({message: 'Log out success'});
+        res.status(200).json({message: 'Log out success'});
     }
 
     async getAllUser (req, res) {
@@ -51,10 +57,15 @@ class UserController {
         //get all user
         const [allUser, errAllUser] = await this.userService.getAllUser(user, search);
         if (errAllUser != null) {
-            return res.status(errAllUser.status).json(errAllUser);
+            return res.status(errAllUser.status).json({
+                message: errAllUser.message,
+                data: null
+            });
         }
 
-        res.status(200).json(allUser);
+        res.status(200).json({
+            message: "success get all user",
+            data: allUser});
     }
 
     async checkUsername (req, res) {
@@ -63,7 +74,7 @@ class UserController {
         //check username
         const errUsername = await this.userService.checkUsername(username);
         if (errUsername != null) {
-            return res.status(errUsername.status).json(errUsername);
+            return res.status(errUsername.status).end();
         }
 
         res.status(200).end();
@@ -75,7 +86,7 @@ class UserController {
         //check email
         const errEmail = await this.userService.checkEmail(email);
         if (errEmail != null) {
-            return res.status(errEmail.status).json(errEmail);
+            return res.status(errEmail.status).end();
         }
 
         res.status(200).end();

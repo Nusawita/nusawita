@@ -1,12 +1,11 @@
 const userRepository = require('../repositories/userRepository');
 const {dtoError} = require('../dto/dtoError');
 const {dtoLogin} = require('../dto/dtoLogin');
-const uuid = require('uuid');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 class UserService {
-    constructor(userRepository, sessionRepository) {
+    constructor(userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -26,9 +25,20 @@ class UserService {
         }
 
         if ((usernameMessage != null) || (emailMessage != null)) {
-            const jsonData = dtoError(401, {username: usernameMessage, email: emailMessage}, null)
+            const jsonData = dtoError(401, {username: usernameMessage, email: emailMessage})
             return jsonData;
         } else {
+            //encrypt user password
+            userData.password = await bcrypt.hash(userData.password, 10);
+
+            //send data to repsitory
+            const errCreateUser = await this.userRepository.createUser(userData);
+            if (errCreateUser != null){   // check if error occured when registering new user
+                const jsonData = dtoError(500, 'Internal server error');
+    
+                return jsonData;
+            }
+
             return null;
         }
     }
@@ -39,7 +49,7 @@ class UserService {
 
         //check if user exist
         if (!(userByUsername || userByEmail)) {
-            const jsonData = dtoError(401, 'Username or Password are invalid', null);
+            const jsonData = dtoError(401, 'Username or Password are invalid');
             return [null, null, jsonData] //return error
         }
 
@@ -63,9 +73,6 @@ class UserService {
         if (user && (await bcrypt.compare(loginData.password, user.password))) {
             const payload = {
                 id: user.id,
-                username: user.username,
-                email: user.email,
-                isAdmin: user.isAdmin
             }
 
             const option = {
@@ -74,24 +81,36 @@ class UserService {
 
             const token = jwt.sign(payload, process.env.TOKEN_KEY, option);
 
-            return [token, null] //if success
+            const loggedUser = {
+                username: user.username,
+                isAdmin: user.isAdmin,
+            }
+
+            return [loggedUser, token, null] //if success
         } else {    //if user or password incorrect
-            const jsonData = dtoError(401, 'Username or Password are invalid', null);
-            return [null, jsonData] //return error
+            const jsonData = dtoError(401, 'Username or Password are invalid');
+            return [null, null, jsonData] //return error
         }
     }
 
     async getAllUser(user, search) {
+        //get user by user id
+        const [userLog, errUserLog] = await this.userRepository.getUserByUserId(user.id);
+        if (errUserLog != null) {
+            const jsonData = dtoError(500, 'Internal server error');
+            return [null, jsonData];
+        }
+
         //check if user is admin
-        if (!user.isAdmin) {
-            const jsonData = dtoError(401, 'Unauthorized User', null);
+        if (!userLog.isAdmin) {
+            const jsonData = dtoError(401, 'Unauthorized User');
             return [null, jsonData];
         }
 
         //get all user
         const [allUser, errAllUser] = await this.userRepository.getAllUser(search)
         if (errAllUser != null) {
-            const jsonData = dtoError(500, 'Internal Server Error', null);
+            const jsonData = dtoError(500, 'Internal Server Error');
             return [null, jsonData];
         }
 
@@ -108,7 +127,7 @@ class UserService {
         //check if username already exist
         const [userCheckUsername, errCheckUsername] = await this.userRepository.getUserByUsername(username);
         if (userCheckUsername != null) {
-            const jsonData = dtoError(401, 'Username has already been taken', null)
+            const jsonData = dtoError(401, 'Username has already been taken')
             return jsonData;
         }
 
@@ -119,7 +138,7 @@ class UserService {
         //check if email already exist
         const [userCheckEmail, errCheckEmail] = await this.userRepository.getUserByEmail(email);
         if (userCheckEmail != null) {
-            const jsonData = dtoError(401, 'Email has already been taken', null)
+            const jsonData = dtoError(401, 'Email has already been taken')
             return jsonData;
         }
 

@@ -23,6 +23,7 @@
     "pg": "^8.11.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.32.1",
+    "swagger-ui-express": "^4.6.3",
     "uuid": "^9.0.0"
   }
 }

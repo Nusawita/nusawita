@@ -1,6 +1,8 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const swaggerUI = require('swagger-ui-express');
+const docs = require('./app/docs');
 require('dotenv').config();
 
 const app = express();
@@ -15,6 +17,7 @@ app.use(cookieParser(process.env.TOKEN_KEY));
 app.use(morgan('dev'));
 
 app.use('/api', router);
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(docs));
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
