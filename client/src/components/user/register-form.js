@@ -181,12 +181,26 @@ const RegisterForm = () => {
 
   const blurHandler = {
     // Show empty error on blur
-    username: () => {
+    username: async() => {
       handleBlur("username");
       if (username.trim().length === 0) {
         setUsernameError("Username cannot be empty");
         showError("username");
+        return
       }
+      //check username realtime api currently error
+      // if(formValidity.username){
+      //   try{
+      //     const res = await axios.post(
+      //       "http://localhost:5000/api/check-username",
+      //       username,
+      //       { withCredentials: true }
+      //     );
+      //     console.log(res)
+      //   }catch(error){
+      //     console.log(error)
+      //   }
+      // }
     },
     phone: () => {
       handleBlur("phone");
@@ -197,6 +211,7 @@ const RegisterForm = () => {
         setEmailError("Email cannot be empty");
         showError("email");
       }
+      //call email checker realtime api
     },
     password: () => {
       handleBlur("password");
@@ -385,7 +400,7 @@ const RegisterForm = () => {
   }, [confirmPassword]);
 
   const fetchRegisterAPI = async (registerData) => {
-    alert("serverr fetched");
+    alert('fetchin')
     try {
       // call login api
       const res = await axios.post(
@@ -395,23 +410,29 @@ const RegisterForm = () => {
       );
       //if login success redirect to landing page
       if (res.status === 201) {
-        alert("Succesfully registered");
         //log user in
         const loginData = {
           username: registerData.username,
           password: registerData.password,
         };
-        fetchLoginApi(loginData);
+        await fetchLoginApi(loginData);
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
-      if (error.response.status === 409) {
-        setUsernameError("Username or email taken");
-        showError("username");
-        setInvalid("username");
-        setEmailError("Username or email taken");
-        showError("email");
-        setInvalid("email");
+      console.log(error)
+      if (error.response.status === 401) {
+        if(error.response.data.message.username){
+          setInvalid("username");
+          setUsernameError("Username already taken");
+          showError("username");
+          startAnimation('username')
+        }
+        if(error.response.data.message.email){
+          setInvalid("email");
+          setEmailError("Email already taken");
+          showError("email");
+          startAnimation('email')
+        }
       }
     }
   };
@@ -426,6 +447,7 @@ const RegisterForm = () => {
       );
       //if login success redirect to landing page
       if (res.status === 200) {
+        localStorage.setItem("loginCredentials", JSON.stringify(res.data.data));
         window.location.href = "/";
       }
     } catch (error) {

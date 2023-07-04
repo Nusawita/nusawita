@@ -33,13 +33,15 @@ export const AuthContextProvider = (props) => {
       //else user is logged in
       else {
         setIsLoggedIn(true);
+        console.log('runs')
         const storedData = localStorage.getItem('loginCredentials')
         const parsedData = JSON.parse(storedData)
+        console.log(storedData)
         setLoginUser(parsedData.username)
         checkAdmin(parsedData.isAdmin); //check if user is admin
       }
     } catch (error) {
-      console.log("Error Logging In");
+      console.log(error);
     } finally {
       setLoading(false); //after checking done setloading to false
     }
@@ -77,6 +79,7 @@ export const AuthContextProvider = (props) => {
   // Use useEffect hook on checkLoggedIn to check if the user is loggedIn everytime page refreshes
   useEffect(() => {
     // Cookies.remove("session_token"); //remove the session token
+    // localStorage.removeItem('loginCredentials');
     checkLoggedIn();
   }, []);
 
