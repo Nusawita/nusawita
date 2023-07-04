@@ -177,19 +177,22 @@ export const customTheme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          "& .MuiInput-underline": {
-            "&:before": {
-              borderBottom: "none", // Remove the underline
-            },
-            "&:after": {
-              borderBottom: "none", // Remove the underline after interaction
-            },
-            "&:hover:not(.Mui-disabled):before": {
-              borderBottom: "none", // Remove the underline on hover
-            },
-          },
+  
         },
       },
+      variants: [
+        {
+          props: { variant: "outlined" },
+          style: {
+            backgroundColor: customGlobalTheme.palette.light.main,
+            textTransform: "none",
+            "& .MuiOutlinedInput-root": {
+              "& > fieldset": { border: "1px solid #79747E" },
+            }
+          }
+          ,
+        },
+      ],
     },
   },
 });

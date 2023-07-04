@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle } from "../../styles/shared-styles";
-import { CustomDatePicker, TextFieldOutlined } from "../UI/custom-UI";
+import { CustomDatePicker, CustomTextField } from "../UI/custom-UI";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -22,7 +22,7 @@ const RegisterForm = () => {
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState("");
 
-  const [date, setDate] = useState(dayjs("2011-09-24").utc());
+  const [date, setDate] = useState(dayjs("2011-09-28").utc());
   const [dateError, setDateError] = useState("");
 
   const [phone, setPhone] = useState("");
@@ -41,6 +41,14 @@ const RegisterForm = () => {
 
   //TO START ERROR ANIMATION
   const [errorAnimation, setErrorAnimation] = useState({
+    username: false,
+    phone: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  });
+
+  const [focused, setFocused] = useState({
     username: false,
     phone: false,
     email: false,
@@ -88,6 +96,7 @@ const RegisterForm = () => {
       [field]: false,
     }));
   };
+
   const showError = (field) => {
     setErrorShow((prev) => ({
       ...prev,
@@ -100,6 +109,38 @@ const RegisterForm = () => {
       [field]: false,
     }));
   };
+
+  const handleFocus = (field) => {
+    setFocused((prev) => ({
+      ...prev,
+      [field]: true,
+    }));
+  };
+  const handleBlur = (field) => {
+    setFocused((prev) => ({
+      ...prev,
+      [field]: false,
+    }));
+  };
+
+  const focusHandler = {
+    username: () => {
+      handleFocus("username");
+    },
+    phone: () => {
+      handleFocus("phone");
+    },
+    email: () => {
+      handleFocus("email");
+    },
+    password: () => {
+      handleFocus("password");
+    },
+    confirmPassword: () => {
+      handleFocus("confirmPassword");
+    },
+  };
+
   const changeHandler = {
     username: (event) => {
       setUsername(event.target.value);
@@ -141,24 +182,31 @@ const RegisterForm = () => {
   const blurHandler = {
     // Show empty error on blur
     username: () => {
+      handleBlur("username");
       if (username.trim().length === 0) {
         setUsernameError("Username cannot be empty");
         showError("username");
       }
     },
+    phone: () => {
+      handleBlur("phone");
+    },
     email: () => {
+      handleBlur("email");
       if (email.trim().length === 0) {
         setEmailError("Email cannot be empty");
         showError("email");
       }
     },
     password: () => {
+      handleBlur("password");
       if (password.trim().length === 0) {
         setPasswordError("Password cannot be empty");
         showError("password");
       }
     },
     confirmPassword: () => {
+      handleBlur("confirmPassword");
       if (confirmPassword.trim().length === 0) {
         setConfirmPasswordError("Confirm password cannot be empty");
         showError("confirmPassword");
@@ -242,9 +290,7 @@ const RegisterForm = () => {
       }
       if (phone.trim().length < 11 || phone.trim().length > 12) {
         setInvalid("phone");
-        setPhoneError(
-          "Phone must be 11 or 12 characters or you can leave this empty"
-        );
+        setPhoneError("Phone must be 11 or 12 characters or leave this empty");
         showError("phone");
       } else {
         setValid("phone");
@@ -306,8 +352,8 @@ const RegisterForm = () => {
       setValid("password");
       setPasswordError("");
       hideError("password");
-      if(!confirmPassword){
-        return
+      if (!confirmPassword) {
+        return;
       }
       if (password !== confirmPassword) {
         setInvalid("confirmPassword");
@@ -327,15 +373,15 @@ const RegisterForm = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (confirmPassword.trim().length === 0) {
-        console.log('runs?')
+        console.log("runs?");
         setInvalid("confirmPassword");
         setConfirmPasswordError("Confirm Password cannot be empty");
-        hideError('confirmPassword')
+        hideError("confirmPassword");
       }
     }, 500);
-    return ()=>{
-      clearTimeout(timeout)
-    }
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [confirmPassword]);
 
   const fetchRegisterAPI = async (registerData) => {
@@ -439,7 +485,7 @@ const RegisterForm = () => {
         startAnimation("confirmPassword");
       }
     }
-  }
+  };
   return (
     <Grid
       container
@@ -496,31 +542,32 @@ const RegisterForm = () => {
             showAnimation={errorAnimation.username}
             onAnimationComplete={handleAnimationComplete.username}
           >
-            <TextFieldOutlined
-              label="Username"
-              labelDisplay={errorShow.username && "error"}
-              iconLeft={<Icon icon="ic:round-person" width="32" />}
-              sx={{ mb: 2 }}
-              value={username}
+            <CustomTextField
+              type="text"
+              fullWidth
+              color={errorShow.username && "error"}
               onChange={changeHandler.username}
-              display={errorShow.username && "error"}
-              message={
-                errorShow.username && (
-                  <Typography sx={{ color: dangerMain }} variant="caption">
-                    {usernameError}
-                  </Typography>
-                )
-              }
+              error={errorShow.username}
+              label="Username"
+              variant="outlined"
+              onFocus={focusHandler.username}
               onBlur={blurHandler.username}
-              iconRight={
+              value={username}
+              helperText={errorShow.username && usernameError}
+              focused={focused.username}
+              leftIcon={
+                <Icon icon="ic:round-person" color="black" width="28" />
+              }
+              rightIcon={
                 errorShow.username && (
                   <Icon
                     icon="ep:warning-filled"
                     color={dangerMain}
-                    width="32"
+                    width="27"
                   />
                 )
               }
+              sx={{ mb: 2 }}
             />
           </ErrorVibrateAnimation>
           <ErrorVibrateAnimation
@@ -541,7 +588,7 @@ const RegisterForm = () => {
                 )
               }
               onChange={(newDate) => {
-                setDate(dayjs(newDate).utc())
+                setDate(dayjs(newDate).utc());
               }}
             />
           </ErrorVibrateAnimation>
@@ -549,26 +596,27 @@ const RegisterForm = () => {
             showAnimation={errorAnimation.phone}
             onAnimationComplete={handleAnimationComplete.phone}
           >
-            <TextFieldOutlined
+            <CustomTextField
+              fullWidth
               label="Phone (optional)"
-              labelDisplay={errorShow.phone && "error"}
               value={phone}
               onChange={changeHandler.phone}
-              display={errorShow.phone && "error"}
-              message={
-                errorShow.phone && (
-                  <Typography sx={{ color: dangerMain }} variant="caption">
-                    {phoneError}
-                  </Typography>
-                )
+              error={errorShow.phone}
+              color={errorShow.phone && "error"}
+              variant="outlined"
+              focused={focused.phone}
+              onFocus={focusHandler.phone}
+              onBlur={blurHandler.phone}
+              helperText={errorShow.phone && phoneError}
+              leftIcon={
+                <Icon icon="solar:phone-bold" color="black" width="28" />
               }
-              iconLeft={<Icon icon="solar:phone-bold" width="32" />}
-              iconRight={
+              rightIcon={
                 errorShow.phone && (
                   <Icon
                     icon="ep:warning-filled"
                     color={dangerMain}
-                    width="32"
+                    width="27"
                   />
                 )
               }
@@ -579,30 +627,28 @@ const RegisterForm = () => {
             showAnimation={errorAnimation.email}
             onAnimationComplete={handleAnimationComplete.email}
           >
-            <TextFieldOutlined
+            <CustomTextField
+              fullWidth
               label="Email"
-              labelDisplay={errorShow.email && "error"}
               value={email}
               onChange={changeHandler.email}
-              display={errorShow.email && "error"}
-              message={
-                errorShow.email && (
-                  <Typography sx={{ color: dangerMain }} variant="caption">
-                    {emailError}
-                  </Typography>
-                )
-              }
+              error={errorShow.email}
+              color={errorShow.email && "error"}
+              variant="outlined"
+              focused={focused.email}
+              onFocus={focusHandler.email}
               onBlur={blurHandler.email}
-              iconRight={
+              helperText={errorShow.email && emailError}
+              leftIcon={<Icon icon="ic:round-email" color="black" width="28" />}
+              rightIcon={
                 errorShow.email && (
                   <Icon
                     icon="ep:warning-filled"
                     color={dangerMain}
-                    width="32"
+                    width="27"
                   />
                 )
               }
-              iconLeft={<Icon icon="ic:round-person" width="32" />}
               sx={{ mb: 2 }}
             />
           </ErrorVibrateAnimation>
@@ -610,97 +656,101 @@ const RegisterForm = () => {
             showAnimation={errorAnimation.password}
             onAnimationComplete={handleAnimationComplete.password}
           >
-            <TextFieldOutlined
+            <CustomTextField
+              type={passwordVisible ? "text" : "password"}
+              fullWidth
               label="Password"
-              labelDisplay={errorShow.password && "error"}
-              iconLeft={<Icon icon="material-symbols:lock" width="32" />}
               value={password}
               onChange={changeHandler.password}
-              display={errorShow.password && "error"}
-              message={
-                errorShow.password && (
-                  <Typography sx={{ color: dangerMain }} variant="caption">
-                    {passwordError}
-                  </Typography>
-                )
-              }
+              error={errorShow.password}
+              color={errorShow.password && "error"}
+              variant="outlined"
+              focused={focused.password}
+              onFocus={focusHandler.password}
               onBlur={blurHandler.password}
-              sx={{ mb: 2 }}
-              type={passwordVisible ? "text" : "password"}
-              iconRight={
+              helperText={errorShow.password && passwordError}
+              leftIcon={
+                <Icon icon="material-symbols:lock" color="black" width="28" />
+              }
+              rightIcon={
                 <>
-                  {!passwordVisible ? (
-                    <Icon
-                      onClick={visibilityHandler.password.setVisible}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:eye"
-                      width="32"
-                    />
-                  ) : (
+                  {passwordVisible ? (
                     <Icon
                       onClick={visibilityHandler.password.setHidden}
                       style={{ cursor: "pointer" }}
+                      icon="mdi:eye"
+                      color="black"
+                      width="28"
+                    />
+                  ) : (
+                    <Icon
+                      onClick={visibilityHandler.password.setVisible}
+                      style={{ cursor: "pointer" }}
                       icon="mdi:hide"
-                      width="32"
+                      color="black"
+                      width="28"
                     />
                   )}
-                  {passwordError && errorShow.password && (
+                  {errorShow.password && (
                     <Icon
                       icon="ep:warning-filled"
                       color={dangerMain}
-                      width="32"
+                      width="27"
                     />
                   )}
                 </>
               }
+              sx={{ mb: 2 }}
             />
           </ErrorVibrateAnimation>
           <ErrorVibrateAnimation
             showAnimation={errorAnimation.confirmPassword}
             onAnimationComplete={handleAnimationComplete.confirmPassword}
           >
-            <TextFieldOutlined
+            <CustomTextField
+              type={confirmPasswordVisible ? "text" : "password"}
+              fullWidth
               label="Confirm Password"
-              labelDisplay={errorShow.confirmPassword && "error"}
               value={confirmPassword}
               onChange={changeHandler.confirmPassword}
+              error={errorShow.confirmPassword}
+              color={errorShow.confirmPassword && "error"}
+              variant="outlined"
+              focused={focused.confirmPassword}
+              onFocus={focusHandler.confirmPassword}
               onBlur={blurHandler.confirmPassword}
-              display={errorShow.confirmPassword && "error"}
-              message={
-                errorShow.confirmPassword && (
-                  <Typography sx={{ color: dangerMain }} variant="caption">
-                    {confirmPasswordError}
-                  </Typography>
-                )
+              helperText={errorShow.confirmPassword && confirmPasswordError}
+              leftIcon={
+                <Icon icon="material-symbols:lock" color="black" width="28" />
               }
-              type={confirmPasswordVisible ? "text" : "password"}
-              iconRight={
+              rightIcon={
                 <>
-                  {!confirmPasswordVisible ? (
-                    <Icon
-                      onClick={visibilityHandler.confirmPassword.setVisible}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:eye"
-                      width="32"
-                    />
-                  ) : (
+                  {confirmPasswordVisible ? (
                     <Icon
                       onClick={visibilityHandler.confirmPassword.setHidden}
                       style={{ cursor: "pointer" }}
+                      icon="mdi:eye"
+                      color="black"
+                      width="28"
+                    />
+                  ) : (
+                    <Icon
+                      onClick={visibilityHandler.confirmPassword.setVisible}
+                      style={{ cursor: "pointer" }}
                       icon="mdi:hide"
-                      width="32"
+                      color="black"
+                      width="28"
                     />
                   )}
-                  {confirmPasswordError && errorShow.confirmPassword && (
+                  {errorShow.confirmPassword && (
                     <Icon
                       icon="ep:warning-filled"
                       color={dangerMain}
-                      width="32"
+                      width="27"
                     />
                   )}
                 </>
               }
-              iconLeft={<Icon icon="material-symbols:lock" width="32" />}
               sx={{ mb: 2 }}
             />
           </ErrorVibrateAnimation>
@@ -740,7 +790,7 @@ const RegisterForm = () => {
         </Box>
       </Grid>
     </Grid>
-  )
-}
+  );
+};
 
 export default React.memo(RegisterForm);

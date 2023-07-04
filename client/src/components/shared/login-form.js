@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
-import { TextFieldOutlined } from "../UI/custom-UI";
+import { CustomTextField } from "../UI/custom-UI";
 import { Icon } from "@iconify/react";
 import { ErrorVibrateAnimation } from "../animation/custom-animation";
 import axios from "axios";
@@ -19,11 +19,30 @@ const LoginForm = () => {
   const [enteredUsername, setEnteredUsername] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
+  const [usernameFocused, setUsernameFocused] = useState(false);
 
   const [passwordError, setPasswordError] = useState("");
   const [passwordVisibility, setPasswordVisibility] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
   const [authError, setAuthError] = useState(false);
+
+  const focusHandler = {
+    username: () => {
+      setUsernameFocused(true);
+    },
+    password: () => {
+      setPasswordFocused(true);
+    },
+  };
+  const blurHandler = {
+    username: () => {
+      setUsernameFocused(false);
+    },
+    password: () => {
+      setPasswordFocused(false);
+    },
+  };
 
   const [errorAnimation, setErrorAnimation] = useState({
     username: false,
@@ -82,8 +101,8 @@ const LoginForm = () => {
     const timeout = setTimeout(() => {
       setUsernameError("");
       hideError("username");
-      setPasswordError('')
-      hideError('password')
+      setPasswordError("");
+      hideError("password");
       setAuthError(false);
     }, 300);
     return () => {
@@ -94,8 +113,8 @@ const LoginForm = () => {
     const timeout = setTimeout(() => {
       setPasswordError("");
       hideError("password");
-      setPasswordError('')
-      hideError('username')
+      setPasswordError("");
+      hideError("username");
       setAuthError(false);
     }, 300);
     return () => {
@@ -153,11 +172,11 @@ const LoginForm = () => {
       //if login success redirect to landing page
       if (res.status === 200) {
         const data = {
-          username:res.data.username,
-          isAdmin: res.data.isAdmin
-        }
-        localStorage.setItem('loginCredentials', JSON.stringify(data))
-        window.location.href = '/'
+          username: res.data.username,
+          isAdmin: res.data.isAdmin,
+        };
+        localStorage.setItem("loginCredentials", JSON.stringify(data));
+        window.location.href = "/";
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
@@ -167,8 +186,8 @@ const LoginForm = () => {
         setPasswordError("Invalid username or password");
         showError("password");
         setAuthError(true);
-        startAnimation('username')
-        startAnimation('password')
+        startAnimation("username");
+        startAnimation("password");
       }
     }
   };
@@ -189,20 +208,20 @@ const LoginForm = () => {
       showError("username");
       setPasswordError("Password is empty");
       showError("password");
-      startAnimation('username')
-      startAnimation('password')
+      startAnimation("username");
+      startAnimation("password");
       return;
     }
     if (enteredUsername.trim().length === 0) {
       setUsernameError("Username Is Empty");
       showError("username");
-      startAnimation('username')
+      startAnimation("username");
       return;
     }
     if (enteredPassword.trim().length === 0) {
       setPasswordError("Password is empty");
       showError("password");
-      startAnimation('password')
+      startAnimation("password");
       return;
     }
     //other validation
@@ -215,8 +234,8 @@ const LoginForm = () => {
       };
       await fetchLoginApi(loginData);
     } else {
-      startAnimation('username')
-      startAnimation('password')
+      startAnimation("username");
+      startAnimation("password");
     }
   };
 
@@ -265,91 +284,88 @@ const LoginForm = () => {
           >
             Login
           </Typography>
+          {/* <Icon icon="ic:round-person" width="27" /> */}
           <ErrorVibrateAnimation
             showAnimation={errorAnimation.username}
             onAnimationComplete={handleAnimationComplete.username}
           >
-            <TextFieldOutlined
-              label="Username"
-              labelDisplay={errorShow.username && "error"}
-              display={errorShow.username && "error"}
-              value={enteredUsername}
-              onChange={changeHandler.username}
+            <CustomTextField
+              type="text"
+              fullWidth
               sx={{ mb: 2 }}
-              message={
-                errorShow.username && (
-                  <Typography
-                    variant="caption"
-                    component="p"
-                    color={errorColor}
-                  >
-                    {usernameError}
-                  </Typography>
-                )
+              color={errorShow.username && "error"}
+              onChange={changeHandler.username}
+              error={errorShow.username}
+              label="Username"
+              variant="outlined"
+              onFocus={focusHandler.username}
+              onBlur={blurHandler.username}
+              value={enteredUsername}
+              helperText={errorShow.username && usernameError}
+              focused={usernameFocused}
+              leftIcon={
+                <Icon icon="ic:round-person" color="black" width="27" />
               }
-              iconLeft={<Icon icon="ic:round-person" width="32" />}
-              iconRight={
+              rightIcon={
                 errorShow.username && (
                   <Icon
                     icon="ep:warning-filled"
                     color={dangerMain}
-                    width="32"
+                    width="27"
                   />
                 )
               }
             />
           </ErrorVibrateAnimation>
           <ErrorVibrateAnimation
-          showAnimation = {errorAnimation.password}
-          onAnimationComplete = {handleAnimationComplete.password}
+            showAnimation={errorAnimation.password}
+            onAnimationComplete={handleAnimationComplete.password}
           >
-            <TextFieldOutlined
-              label="Password"
-              type={!passwordVisibility ? "password" : "text"}
-              labelDisplay={errorShow.password && "error"}
-              display={errorShow.password && "error"}
-              value={enteredPassword}
+            <CustomTextField
+              type={passwordVisibility?'text':'password'}
+              fullWidth
+              sx={{ mb: 2 }}
+              color={errorShow.password && "error"}
               onChange={changeHandler.password}
-              message={
-                errorShow.password && (
-                  <Typography
-                    variant="caption"
-                    component="p"
-                    color={errorColor}
-                  >
-                    {passwordError}
-                  </Typography>
-                )
+              error={errorShow.password}
+              label="Password"
+              variant="outlined"
+              onFocus={focusHandler.password}
+              onBlur={blurHandler.password}
+              value={enteredPassword}
+              helperText={errorShow.password && passwordError}
+              focused={passwordFocused}
+              leftIcon={
+                <Icon icon="material-symbols:lock" color="black" width="27" />
               }
-              iconLeft={<Icon icon="material-symbols:lock" width="32" />}
-              iconRight={
+              rightIcon={
                 <>
-                  {" "}
-                  {!passwordVisibility ? (
-                    <Icon
-                      onClick={handleVisibility.setVisible}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:hide"
-                      width="32"
-                    />
-                  ) : (
+                  {passwordVisibility ? (
                     <Icon
                       onClick={handleVisibility.setHidden}
                       style={{ cursor: "pointer" }}
                       icon="mdi:eye"
-                      width="32"
+                      color="black"
+                      width="27"
+                    />
+                  ) : (
+                    <Icon
+                      onClick={handleVisibility.setVisible}
+                      style={{ cursor: "pointer" }}
+                      icon="mdi:hide"
+                      color="black"
+                      width="27"
                     />
                   )}
                   {errorShow.password && (
                     <Icon
                       icon="ep:warning-filled"
                       color={dangerMain}
-                      width="32"
+                      width="27"
                     />
                   )}
                 </>
               }
-              sx={{ mb: 2 }}
             />
           </ErrorVibrateAnimation>
           <Box sx={{ width: "100%", ...ContentEnd, mb: 5 }}>
