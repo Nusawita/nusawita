@@ -1,6 +1,6 @@
 module.exports = {
     //operation method
-    post: {
+    get: {
         security: [
             {
                 cookieAuth: [],
