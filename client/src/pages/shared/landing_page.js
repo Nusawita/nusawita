@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { Button, Box, Typography } from "@mui/material";
+import { Button, Box, Typography, Grid } from "@mui/material";
 import AuthContext from "../../context/auth-context";
-import { ContentEnd, ContentMiddle } from "../../styles/shared-styles";
+import { ContentMiddle } from "../../styles/shared-styles";
 import { Icon } from "@iconify/react";
 import { useTheme } from "@emotion/react";
 
@@ -26,21 +26,37 @@ export const LandingPage = (props) => {
       >
         {/* Navbar Sementara */}
         {/* Contact Us Section */}
-        <Box
+        <Grid
+          container
           sx={{
             backgroundColor: colorPalette.primary.main,
-            width: "100%",
-            display: "flex",
-            flexDirection: "row-reverse",
-            py: 2,
           }}
         >
-          <Box sx={{ px: 20 }}>
-            <Typography variant="button-text" color="white">
-              Contact Us
-            </Typography>
-          </Box>
-        </Box>
+          <Grid sx={{}} item>
+            <Box >
+              {ctxAuth.isLoggedIn && (
+                <Typography variant="button-text" color="white">
+                  {`Welcome ${ctxAuth.loginUser}`}
+                </Typography>
+              )}
+            </Box>
+          </Grid>
+          <Grid
+            item
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row-reverse",
+              pb: 3,
+            }}
+          >
+            <Box sx={{ px: 20 }}>
+              <Typography variant="button-text" color="white">
+                Contact us
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
         {/* Button Section */}
         <Box
           sx={{
@@ -162,10 +178,15 @@ export const LandingPage = (props) => {
             backgroundImage: "url(/images/gapurasunset.jpg)",
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
-            mb:5
+            mb: 5,
           }}
         >
-          <Typography color='white' variant="h2" component="h2" sx={{ px:5, py:20, maxWidth:'45rem' }}>
+          <Typography
+            color="white"
+            variant="h2"
+            component="h2"
+            sx={{ px: 5, py: 20, maxWidth: "45rem" }}
+          >
             Lorem ipsum dolor sit amet consectetur.
           </Typography>
         </Box>

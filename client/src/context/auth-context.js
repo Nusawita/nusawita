@@ -7,6 +7,7 @@ const AuthContext = React.createContext({
   isLoggedIn: false, //state to store user logged in or not
   isAdmin: false, // state to store user is admin or not
   loading: false, // state to store loading status
+  loginUser: '',
   logoutUser: () => {}, //function to log user out
   checkAdmin: () => {}, //function to check if logged in user is admin
   checkLoggedIn: () => {}, //function to check if user logged in or not
@@ -17,6 +18,7 @@ export const AuthContextProvider = (props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); //state to store user logged in or not
   const [isAdmin, setIsAdmin] = useState(false); // state to store user is admin or not
   const [loading, setLoading] = useState(true); // state to store loading status
+  const [loginUser, setLoginUser] = useState('')
 
   //function to check if user logged in or not
   const checkLoggedIn = async () => {
@@ -25,12 +27,16 @@ export const AuthContextProvider = (props) => {
       const sessionToken = Cookies.get("session_token"); //get session token cookies
       //if session token is not valid user is not logged in
       if (!sessionToken) {
+        localStorage.removeItem('loginCredentials');
         setIsLoggedIn(false);
       }
       //else user is logged in
       else {
         setIsLoggedIn(true);
-        await checkAdmin(); //check if user is admin
+        const storedData = localStorage.getItem('loginCredentials')
+        const parsedData = JSON.parse(storedData)
+        setLoginUser(parsedData.username)
+        checkAdmin(parsedData.isAdmin); //check if user is admin
       }
     } catch (error) {
       console.log("Error Logging In");
@@ -39,15 +45,12 @@ export const AuthContextProvider = (props) => {
     }
   };
   //function to check if user is admin
-  const checkAdmin = async () => {
+  const checkAdmin = async (isAdmin) => {
     try {
-      //get the api to get the admin checker api
-      const res = await axios.get("http://localhost:5000/api/dashboard", {
-        withCredentials: true,
-      });
-      //if successfully call the api, then user is admin
-      if (res.status === 200) {
-        setIsAdmin(true);
+      if (isAdmin){
+        setIsAdmin(true)
+      }else{
+        setIsAdmin(false)
       }
     } catch (error) {
       //else user is not admin
@@ -63,6 +66,7 @@ export const AuthContextProvider = (props) => {
         withCredentials: true,
       });
       Cookies.remove("session_token"); //remove the session token
+      localStorage.removeItem('loginCredentials');
       setIsLoggedIn(false); //set the logged_in state to false
       window.location.href = "/"; //Redirect to landing page
     } 
@@ -72,6 +76,7 @@ export const AuthContextProvider = (props) => {
   };
   // Use useEffect hook on checkLoggedIn to check if the user is loggedIn everytime page refreshes
   useEffect(() => {
+    // Cookies.remove("session_token"); //remove the session token
     checkLoggedIn();
   }, []);
 
@@ -84,6 +89,7 @@ export const AuthContextProvider = (props) => {
         isAdmin: isAdmin,
         checkLoggedIn: checkLoggedIn,
         loading: loading,
+        loginUser: loginUser
       }}
     >
       {props.children}

@@ -26,7 +26,7 @@ class UserController {
     if (errLogin != null) {
       return res.status(errLogin.status).json(errLogin);
     }
-    await res.cookie("session_token", session.id, { maxAge: session.expirationTime, domain: 'localhost' });
+    await res.cookie("session_token", session.id, { maxAge: session.expirationTime });
 
     //return success
     res.status(200).json(user);

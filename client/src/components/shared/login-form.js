@@ -8,7 +8,6 @@ import { ErrorVibrateAnimation } from "../animation/custom-animation";
 import axios from "axios";
 
 const LoginForm = () => {
-  console.log('rerenders')
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -153,7 +152,12 @@ const LoginForm = () => {
       );
       //if login success redirect to landing page
       if (res.status === 200) {
-        window.location.href = "/";
+        const data = {
+          username:res.data.username,
+          isAdmin: res.data.isAdmin
+        }
+        localStorage.setItem('loginCredentials', JSON.stringify(data))
+        window.location.href = '/'
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
