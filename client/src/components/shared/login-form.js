@@ -1,5 +1,5 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
 import { CustomTextField } from "../UI/custom-UI";
@@ -24,6 +24,7 @@ const LoginForm = () => {
   const [passwordError, setPasswordError] = useState("");
   const [passwordVisibility, setPasswordVisibility] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  let passwordRef = useRef();
 
   const [authError, setAuthError] = useState(false);
 
@@ -82,9 +83,11 @@ const LoginForm = () => {
   const handleVisibility = {
     setVisible: () => {
       setPasswordVisibility(true);
+      passwordRef.current.focus()
     },
     setHidden: () => {
       setPasswordVisibility(false);
+      passwordRef.current.focus()
     },
   };
 
@@ -171,11 +174,7 @@ const LoginForm = () => {
       );
       //if login success redirect to landing page
       if (res.status === 200) {
-        const data = {
-          username: res.data.username,
-          isAdmin: res.data.isAdmin,
-        };
-        localStorage.setItem("loginCredentials", JSON.stringify(data));
+        localStorage.setItem("loginCredentials", JSON.stringify(res.data.data));
         window.location.href = "/";
       }
     } catch (error) {
@@ -292,8 +291,9 @@ const LoginForm = () => {
             <CustomTextField
               type="text"
               fullWidth
+              autoFocus
               sx={{ mb: 2 }}
-              color={errorShow.username && "error"}
+              // color={errorShow.username && "error"}
               onChange={changeHandler.username}
               error={errorShow.username}
               label="Username"
@@ -322,7 +322,8 @@ const LoginForm = () => {
             onAnimationComplete={handleAnimationComplete.password}
           >
             <CustomTextField
-              type={passwordVisibility?'text':'password'}
+              inputRef={passwordRef}
+              type={passwordVisibility ? "text" : "password"}
               fullWidth
               sx={{ mb: 2 }}
               color={errorShow.password && "error"}

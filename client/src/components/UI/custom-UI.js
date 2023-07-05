@@ -14,10 +14,12 @@ export const CustomTextField = (props) => {
   const errorColor = theme.palette.error.main;
   return (
     <TextField
+      autoFocus={props.autoFocus}
+      inputRef={props.inputRef}
       type={props.type}
       fullWidth={props.fullWidth}
       sx={props.sx}
-      color={props.color}
+      color={props.color?props.color:''}
       onChange={props.onChange}
       error={props.error}
       label={props.label}
@@ -27,12 +29,12 @@ export const CustomTextField = (props) => {
       value={props.value}
       helperText={props.helperText}
       InputLabelProps={
-        props.leftIcon&&
-        !props.focused &&
-        !props.value && {
-          shrink: false,
-          style: { marginLeft: 35 },
-        }
+        props.leftIcon && !props.focused && !props.value
+          ? {
+              shrink: false,
+              style: { marginLeft: 35 },
+            }
+          : {}
       }
       InputProps={{
         startAdornment: props.leftIcon && (

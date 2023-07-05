@@ -184,7 +184,7 @@ export const customTheme = createTheme({
         {
           props: { variant: "outlined" },
           style: {
-            backgroundColor: customGlobalTheme.palette.light.main,
+          
             textTransform: "none",
             "& .MuiOutlinedInput-root": {
               "& > fieldset": { border: "1px solid #79747E" },
