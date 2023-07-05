@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const app = express();
 const router = require('./app/routes/v1/route.js');
+const morgan = require('morgan')
 const port = process.env.PORT
 
 const bodyParser = require('body-parser');

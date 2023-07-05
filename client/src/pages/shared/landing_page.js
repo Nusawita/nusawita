@@ -4,6 +4,8 @@ import AuthContext from "../../context/auth-context";
 import { ContentMiddle } from "../../styles/shared-styles";
 import { Icon } from "@iconify/react";
 import { useTheme } from "@emotion/react";
+import HeaderInformation from "./HeaderInformation";
+import Header from "./Header";
 
 export const LandingPage = (props) => {
   const ctxAuth = useContext(AuthContext);
@@ -26,81 +28,9 @@ export const LandingPage = (props) => {
       >
         {/* Navbar Sementara */}
         {/* Contact Us Section */}
-        <Grid
-          container
-          sx={{
-            backgroundColor: colorPalette.primary.main,
-          }}
-        >
-          <Grid sx={{}} item>
-            <Box >
-              {ctxAuth.isLoggedIn && (
-                <Typography variant="button-text" color="white">
-                  {`Welcome ${ctxAuth.loginUser}`}
-                </Typography>
-              )}
-            </Box>
-          </Grid>
-          <Grid
-            item
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "row-reverse",
-              pb: 3,
-            }}
-          >
-            <Box sx={{ px: 20 }}>
-              <Typography variant="button-text" color="white">
-                Contact us
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
+        <HeaderInformation />
         {/* Button Section */}
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "row-reverse",
-            backgroundColor: "white",
-            py: 2,
-            opacity: "90%",
-          }}
-        >
-          <Box component="span" sx={{ px: 5 }}>
-            {loggedIn ? (
-              <>
-                {" "}
-                <Button
-                  variant="primary"
-                  sx={{ mx: 2, my: 2, width: "7rem", height: "2.5rem", px: 15 }}
-                  onClick={ctxAuth.logoutUser}
-                >
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                {" "}
-                <Button
-                  variant="primary"
-                  sx={{ mx: 2, my: 2, width: "7rem", height: "2.5rem" }}
-                  href="/login"
-                >
-                  Login
-                </Button>
-                <Button
-                  variant="primary"
-                  sx={{ mx: 2, my: 2, width: "7rem", height: "2.5rem" }}
-                  href="/register"
-                >
-                  Sign up
-                </Button>
-              </>
-            )}
-          </Box>
-        </Box>
+        <Header />
         <Box sx={{ px: 7, pb: 15, pt: 5 }}>
           <Typography
             variant="h1"

@@ -171,7 +171,11 @@ const LoginForm = () => {
       );
       //if login success redirect to landing page
       if (res.status === 200) {
-        localStorage.setItem("loginCredentials", JSON.stringify(res.data.data));
+        const data = {
+          username: res.data.username,
+          isAdmin: res.data.isAdmin,
+        };
+        localStorage.setItem("loginCredentials", JSON.stringify(data));
         window.location.href = "/";
       }
     } catch (error) {
