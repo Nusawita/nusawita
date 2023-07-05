@@ -1,9 +1,53 @@
 import { createTheme } from "@mui/material/styles";
 
-export const customTheme = createTheme({
+export const customGlobalTheme = createTheme({
+  // CUSTOM TYPOGRAPHY
   typography: {
     fontFamily: "Roboto, Arial, sans-serif",
+    h1: {
+      fontSize: "96px",
+    },
+    h2: {
+      fontSize: "60px",
+    },
+    h3: {
+      fontSize: "48px",
+    },
+    h4: {
+      fontSize: "34px",
+    },
+    h5: {
+      fontSize: "24px",
+    },
+    h6: {
+      fontSize: "20px",
+    },
+    subtitle1: {
+      fontSize: "16px",
+    },
+    subtitle2: {
+      fontSize: "14px",
+    },
+    body1: {
+      fontSize: "16px",
+    },
+    body2: {
+      fontSize: "14px",
+    },
+    caption: {
+      fontSize: "12px",
+    },
+    overline: {
+      fontSize: "12px",
+    },
+    tableHeader: {
+      fontSize: "14px",
+    },
+    buttonText: {
+      fontSize: "16px",
+    },
   },
+  // COLOR PALETTE
   palette: {
     primary: {
       main: "#008676",
@@ -16,9 +60,9 @@ export const customTheme = createTheme({
       light: "#FF544D",
     },
     info: {
-      main: "#039BE5",
-      dark: "#0381BF",
-      light: "#2DACE9",
+      main: "#0381BF",
+      dark: "#026799",
+      light: "#039BE5",
     },
     warning: {
       main: "#ED6C02",
@@ -46,9 +90,122 @@ export const customTheme = createTheme({
   },
 });
 
+export const customTheme = createTheme({
+  ...customGlobalTheme,
+  //Custom component
+  components: {
+    // BUTTON COMPONENTS
+    MuiButton: {
+      variants: [
+        //Button Variants
+        {
+          props: { variant: "primary" },
+          style: {
+            backgroundColor: customGlobalTheme.palette.primary.main,
+            color: "white",
+            textTransform: "none",
+            borderRadius: "4px",
+            "&:hover": {
+              backgroundColor: customGlobalTheme.palette.primary.light,
+              color: "white",
+            },
+            "&:active": {
+              backgroundColor: customGlobalTheme.palette.primary.dark,
+            },
+            ":disabled": {
+              backgroundColor: customGlobalTheme.palette.primary.main,
+              opacity: 0.5,
+              color: "white",
+            },
+            "&:focus": {
+              backgroundColor: customGlobalTheme.palette.primary.light,
+              color: "white",
+            },
+          },
+        },
+        {
+          props: { variant: "secondary" },
+          style: {
+            backgroundColor: customGlobalTheme.palette.light.main,
+            border: `1px solid ${customGlobalTheme.palette.primary.main}`,
+            color: customGlobalTheme.palette.primary.main,
+            textTransform: "none",
+            borderRadius: "4px",
+            "&:hover": {
+              color: customGlobalTheme.palette.primary.dark,
+              backgroundColor: "white",
+            },
+            "&:focus": {
+              color: customGlobalTheme.palette.primary.dark,
+              backgroundColor: "white",
+            },
+            "&:active": {
+              color: customGlobalTheme.palette.primary.dark,
+              backgroundColor: "white",
+            },
+            ":disabled": {
+              opacity: 0.5,
+              color: customGlobalTheme.palette.primary.dark,
+            },
+          },
+        },
+        //Button Size
+        {
+          props: { size: "small" },
+          style: {
+            width: "315px",
+            height: "32px",
+          },
+        },
+        {
+          props: { size: "medium" },
+          style: {
+            width: "315px",
+            height: "40px",
+          },
+        },
+        {
+          props: { size: "large" },
+          style: {
+            width: "315px",
+            height: "48px",
+          },
+        },
+      ],
+    },
+    // TEXT FIELD
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+  
+        },
+      },
+      variants: [
+        {
+          props: { variant: "outlined" },
+          style: {
+          
+            textTransform: "none",
+            "& .MuiOutlinedInput-root": {
+              "& > fieldset": { border: "1px solid #79747E" },
+            }
+          }
+          ,
+        },
+      ],
+    },
+  },
+});
+
 export const ContentMiddle = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
+};
+
+export const ContentEnd = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-end",
 };

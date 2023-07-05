@@ -11,7 +11,7 @@ class UserController {
         const errRegister = await this.userService.register(userData);
         //if error occured
         if (errRegister != null) {
-            return res.status(errRegister.status).json(errRegister)
+            return res.status(errRegister.status).json({message: errRegister.message})
         }
 
         //json message
@@ -21,59 +21,75 @@ class UserController {
     //login
     async login(req, res) {
         const loginData = req.body;
-        const [user, session, errLogin] = await this.userService.login(loginData);
+        const [user, token, errLogin] = await this.userService.login(loginData);
         //if error occured
         if (errLogin != null) {
-            return res.status(errLogin.status).json(errLogin)
+            return res.status(errLogin.status).json({
+                message: errLogin.message,
+                data: null,
+            });
         }
 
         //create cookie
-        res.cookie("session_token", session.id, {maxAge: session.expirationTime})
+        res.cookie("session_token", token, {maxAge: 86400000}) //86400000 equal to 1 day
 
         //return success
-        res.status(200).json(user);
+        res.status(200).json({
+            message: 'User Log in',
+            data: user
+        });
     }
 
     //logout
     async logout(req, res) {
-        const sessionToken = req.cookies["session_token"]
-        //if there is no session or cookies
-        if (!sessionToken) {
-            res.status(401).end()
-            return
-        }
-
-        //logoutt
-        const errLogout = await this.userService.logout(sessionToken)
-        if (errLogout != null) {
-            return res.status(errLogout.status).json(errLogout)
-        }
-
         //delete cookies
         res.cookie("session_token", "", { expires: new Date() })
 
-        res.status(201).json({message: 'Log out success'});
+        res.status(200).json({message: 'Log out success'});
     }
 
     async getAllUser (req, res) {
-        const sessionToken = req.cookies["session_token"]
-        if(!sessionToken) {
-            res.status(400).end();
-            return;
-        }
+        const user = req.user;
 
         //get query params
-        // console.log(req.query.search)
         const search = req.query.search;
-        // console.log('')
 
         //get all user
-        const [allUser, errAllUser] = await this.userService.getAllUser(sessionToken, search);
+        const [allUser, errAllUser] = await this.userService.getAllUser(user, search);
         if (errAllUser != null) {
-            return res.status(errAllUser.status).json(errAllUser);
+            return res.status(errAllUser.status).json({
+                message: errAllUser.message,
+                data: null
+            });
         }
 
-        res.status(200).json(allUser);
+        res.status(200).json({
+            message: "success get all user",
+            data: allUser});
+    }
+
+    async checkUsername (req, res) {
+        const username = req.body.username;
+
+        //check username
+        const errUsername = await this.userService.checkUsername(username);
+        if (errUsername != null) {
+            return res.status(errUsername.status).end();
+        }
+
+        res.status(200).end();
+    }
+
+    async checkEmail (req, res) {
+        const email = req.body.email;
+
+        //check email
+        const errEmail = await this.userService.checkEmail(email);
+        if (errEmail != null) {
+            return res.status(errEmail.status).end();
+        }
+
+        res.status(200).end();
     }
 }
 

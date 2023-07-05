@@ -5,14 +5,16 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ThemeProvider } from "@emotion/react";
 import { customTheme } from "./styles/shared-styles";
+import { AuthContextProvider } from "./context/auth-context"; // This is the context for the logged in state
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
+
     <ThemeProvider theme={customTheme}>
-      <App />
+      <AuthContextProvider>
+        <App />
+      </AuthContextProvider>
     </ThemeProvider>
-  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

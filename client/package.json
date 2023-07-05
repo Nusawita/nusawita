@@ -5,12 +5,20 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.13.5",
+    "@mui/material": "^5.13.7",
+    "@mui/x-date-pickers": "^6.9.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.4.0",
+    "dayjs": "^1.11.8",
+    "framer-motion": "^10.12.18",
+    "js_cookie": "^1.0.0",
+    "js-cookie": "^3.0.5",
     "react": "^18.2.0",
+    "react-datepicker": "^4.14.1",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -37,5 +45,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@iconify/react": "^4.1.0"
   }
 }

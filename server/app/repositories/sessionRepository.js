@@ -12,7 +12,7 @@ class SessionRepository {
 
     async getSession(sessionToken) {
         try {
-            const session = await Session.findOne({where: {id: `${sessionToken}`}})
+            const session = await Session.findOne({where: {id: `${sessionToken}`}});
             return [session, null]
         } catch (error) {
             return [null, error]
