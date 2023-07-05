@@ -183,47 +183,36 @@ const RegisterForm = () => {
     // Show empty error on blur
     username: async () => {
       handleBlur("username");
-      if (username.trim().length === 0) {
-        setUsernameError("Username cannot be empty");
+      if (usernameError) {
         showError("username");
-        return;
-      }
-      // check username realtime api currently error
-      if (formValidity.username) {
-        try {
-          const res = await axios.post(
-            "http://localhost:5000/api/check-username",
-            username,
-            { withCredentials: true }
-          );
-          console.log(res);
-        } catch (error) {
-          console.log(error);
-        }
+        startAnimation("username");
       }
     },
     phone: () => {
       handleBlur("phone");
+      if (errorShow.phone) {
+        startAnimation("phone");
+      }
     },
-    email: () => {
+    email: async () => {
       handleBlur("email");
-      if (email.trim().length === 0) {
-        setEmailError("Email cannot be empty");
+      if (emailError) {
         showError("email");
+        startAnimation("email");
       }
     },
     password: () => {
       handleBlur("password");
-      if (password.trim().length === 0) {
-        setPasswordError("Password cannot be empty");
+      if (passwordError) {
         showError("password");
+        startAnimation("password");
       }
     },
     confirmPassword: () => {
       handleBlur("confirmPassword");
-      if (confirmPassword.trim().length === 0) {
-        setConfirmPasswordError("Confirm password cannot be empty");
+      if (confirmPasswordError) {
         showError("confirmPassword");
+        startAnimation("confirmPassword");
       }
     },
   };
@@ -251,22 +240,42 @@ const RegisterForm = () => {
 
   // Run check on value change with delay (wait for user typing)
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    const timeout = setTimeout(async () => {
       if (username.trim().length === 0) {
         setInvalid("username");
         setUsernameError("Username cannot be empty");
         return;
       }
+
       if (username.trim().length < 8) {
         setInvalid("username");
         setUsernameError("Username must be 8 or more characters long");
         showError("username");
-      } else {
-        setValid("username");
-        setUsernameError("");
-        hideError("username");
+        return;
       }
-    }, 500);
+      // check username realtime api currently error
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/check-username",
+          { username },
+          { withCredentials: true }
+        );
+        if (res.status === 200) {
+          setValid("username");
+          setUsernameError("");
+          hideError("username");
+          return;
+        }
+      } catch (error) {
+        if (error.response.status === 401) {
+          setInvalid('username')
+          setUsernameError("Username exists please use another username");
+          showError("username");
+          startAnimation("username");
+          return;
+        }
+      }
+    }, 400);
     return () => {
       clearTimeout(timeout);
     };
@@ -279,16 +288,12 @@ const RegisterForm = () => {
         if (parsed.isValid()) {
           setValid("date");
           setDateError("");
-          return;
-        } else {
-          setInvalid("date");
-          throw new Error("Invalid date");
         }
       } catch (error) {
         setInvalid("date");
         setDateError("Please provide a valid date");
       }
-    }, 500);
+    }, 400);
     return () => {
       clearTimeout(timeout);
     };
@@ -302,39 +307,61 @@ const RegisterForm = () => {
         hideError("phone");
         return;
       }
+
       if (phone.trim().length < 11 || phone.trim().length > 12) {
         setInvalid("phone");
         setPhoneError("Phone must be 11 or 12 characters or leave this empty");
         showError("phone");
-      } else {
-        setValid("phone");
-        setPhoneError("");
-        hideError("phone");
+        return;
       }
-    }, 500);
+
+      setValid("phone");
+      setPhoneError("");
+      hideError("phone");
+    }, 400);
     return () => {
       clearTimeout(timeout);
     };
   }, [phone]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    const timeout = setTimeout(async () => {
       if (email.trim().length === 0) {
         setInvalid("email");
         setEmailError("Email cannot be empty");
         return;
       }
+      
       const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
       if (!emailRegex.test(email) && email) {
         setInvalid("email");
         setEmailError("Please enter a valid email");
         showError("email");
-      } else {
-        setValid("email");
-        setEmailError("");
-        hideError("email");
+        return
       }
-    }, 500);
+
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/check-email",
+          { email },
+          { withCredentials: true }
+        );
+        if (res.status === 200) {
+          setValid("email");
+          setUsernameError("");
+          hideError("email");
+          return
+        }
+      } catch (error) {
+        if (error.response.status === 401) {
+          setInvalid('email')
+          setEmailError("Email exists please use another email");
+          showError("email");
+          startAnimation("email");
+          return
+        }
+      }
+    }, 400);
     return () => {
       clearTimeout(timeout);
     };
@@ -378,7 +405,7 @@ const RegisterForm = () => {
       setValid("confirmPassword");
       setConfirmPasswordError("");
       hideError("confirmPassword");
-    }, 500);
+    }, 400);
     return () => {
       clearTimeout(timeout);
     };
@@ -391,7 +418,7 @@ const RegisterForm = () => {
         setConfirmPasswordError("Confirm Password cannot be empty");
         hideError("confirmPassword");
       }
-    }, 500);
+    }, 400);
     return () => {
       clearTimeout(timeout);
     };
@@ -456,17 +483,9 @@ const RegisterForm = () => {
   };
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(formValidity);
-
+    const isFormValid = Object.values(formValidity).every((valid) => valid);
     //IF ALL VALID
-    if (
-      formValidity.username &&
-      formValidity.date &&
-      formValidity.phone &&
-      formValidity.email &&
-      formValidity.password &&
-      formValidity.confirmPassword
-    ) {
+    if (isFormValid) {
       const registerData = {
         username: username,
         email: email,
@@ -564,7 +583,6 @@ const RegisterForm = () => {
             onAnimationComplete={handleAnimationComplete.username}
           >
             <CustomTextField
-              autoFocus
               type="text"
               fullWidth
               color={errorShow.username && "error"}

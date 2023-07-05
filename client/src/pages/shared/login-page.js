@@ -8,7 +8,6 @@ export const LoginPage = () => {
   return (
     <Box
       sx={{
-        width: "100vw",
         height: "100vh",
       }}
     >
