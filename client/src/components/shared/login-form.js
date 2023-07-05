@@ -8,6 +8,7 @@ import { ErrorVibrateAnimation } from "../animation/custom-animation";
 import axios from "axios";
 
 const LoginForm = () => {
+  console.log('rerenders')
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -83,11 +84,11 @@ const LoginForm = () => {
   const handleVisibility = {
     setVisible: () => {
       setPasswordVisibility(true);
-      passwordRef.current.focus()
+      passwordRef.current.focus();
     },
     setHidden: () => {
       setPasswordVisibility(false);
-      passwordRef.current.focus()
+      passwordRef.current.focus();
     },
   };
 
@@ -101,28 +102,22 @@ const LoginForm = () => {
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    if (usernameError) {
       setUsernameError("");
       hideError("username");
       setPasswordError("");
       hideError("password");
       setAuthError(false);
-    }, 300);
-    return () => {
-      clearTimeout(timeout);
-    };
+    }
   }, [enteredUsername]);
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    if (passwordError) {
       setPasswordError("");
       hideError("password");
       setPasswordError("");
       hideError("username");
       setAuthError(false);
-    }, 300);
-    return () => {
-      clearTimeout(timeout);
-    };
+    }
   }, [enteredPassword]);
 
   const validator = {
