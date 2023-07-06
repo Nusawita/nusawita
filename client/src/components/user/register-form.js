@@ -348,7 +348,7 @@ const RegisterForm = () => {
         );
         if (res.status === 200) {
           setValid("email");
-          setUsernameError("");
+          setEmailError("");
           hideError("email");
           return
         }
