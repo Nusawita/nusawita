@@ -49,7 +49,28 @@ class UserRepository {
                 }});
             return [allUser, null];
         }catch (error) {
-            return [null, error]
+            return [null, error];
+        }
+    }
+
+    async banUser(userId, ban) {
+        try{
+            const banned = await User.update(
+                    {ban: `${ban}`}, 
+                    {where: {id: `${userId}`}}
+                );
+            return null;
+        } catch (error) {
+            return error;
+        }
+    }
+
+    async deleteUser(userId) {
+        try{
+            const deleteUser = await User.destroy({where: {id: userId}})
+            return null
+        } catch (error) {
+            return error;
         }
     }
 }

@@ -68,6 +68,56 @@ class UserController {
             data: allUser});
     }
 
+    async getUser (req, res) {
+        const logUser = req.user;
+
+        const userId = req.params.id;
+
+        //get user by id
+        const [user, errUser] = await this.userService.getUser(logUser, userId)
+        if (errUser != null) {
+            return res.status(errUser.status).json({
+                message: errUser.message,
+                data: null
+            });
+        }
+
+        return res.status(200).json({
+            message: "success get user",
+            data: user
+        });
+    }
+
+    async banUser (req, res) {
+        const logUser = req.user;
+
+        //get user id and ban value
+        const userId = req.params.id;
+        const ban = req.body.ban;
+
+        //ban user
+        const errBan = await this.userService.banUser(logUser, userId, ban);
+        if (errBan != null) {
+            return res.status(errBan.status).json({message: errBan.message});
+        }
+
+        return res.status(200).json({message: "User banned"});
+    }
+
+    async deleteUser (req, res) {
+        const logUser = req.user;
+
+        const userId = req.params.id;
+
+        //delete user
+        const errDeleteUser = await this.userService.deleteUser(logUser, userId);
+        if (errDeleteUser != null) {
+            return res.status(errDeleteUser.status).json({message: errDeleteUser.message});
+        }
+
+        return res.status(200).json({message: "User deleted"});
+    }
+
     async checkUsername (req, res) {
         const username = req.body.username;
 

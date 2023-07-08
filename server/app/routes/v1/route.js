@@ -17,5 +17,8 @@ router.post('/check-username', (req, res) => userController.checkUsername(req, r
 router.post('/check-email', (req, res) => userController.checkEmail(req, res));
 
 router.get('/admin/users', auth, (req, res) => userController.getAllUser(req, res));
+router.get('/admin/user/:id', auth, (req, res) => userController.getUser(req, res));
+router.put('/admin/user/:id/ban', auth, (req, res) => userController.banUser(req, res));
+router.delete('/admin/user/:id', auth, (req, res) => userController.deleteUser(req, res));
 
 module.exports = router

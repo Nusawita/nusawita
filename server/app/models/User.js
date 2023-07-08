@@ -38,7 +38,7 @@ const User = sequelize.define('user',{
         allowNull: false
     },
     ban: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         allowNull: true
     },
 });

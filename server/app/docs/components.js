@@ -17,7 +17,7 @@ module.exports = {
                         format: "email",
                         required: true,
                         description: "Email of user",
-                        example: "fajartapa@gmail.go.id"
+                        example: "fajartapa@gmail.co.id"
                     },
                     password: {
                         type: "string",
@@ -70,6 +70,17 @@ module.exports = {
                         required: true,
                         description: "Password of user",
                         example: "fajar1234"
+                    },
+                },
+            },
+            //ban user model
+            Ban: {
+                type: "object",
+                properties: {
+                    ban: {
+                        type: "integer",
+                        description: "number of days user will be banned",
+                        example: 5,
                     },
                 },
             },
