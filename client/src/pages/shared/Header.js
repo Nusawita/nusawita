@@ -18,7 +18,15 @@ const Header = () => {
         alignItems: "center",
       }}
     >
-      <Box component="img" src="/logos/nusawita.png"></Box>
+      <Box
+        component="img"
+        src="/logos/nusawita.png"
+        onClick={() => {
+          window.location.href = "/";
+        }}
+        sx={{ cursor:'pointer' }}
+      />
+
       <Box component="span" sx={{}}>
         {loggedIn ? (
           <>
