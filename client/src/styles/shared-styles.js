@@ -42,9 +42,13 @@ export const customGlobalTheme = createTheme({
     },
     tableHeader: {
       fontSize: "14px",
+      fontWeight:'500',
+      lineHeight:'24px'
     },
     buttonText: {
       fontSize: "16px",
+      fontWeight:'500',
+      lineHeight:'26px'
     },
   },
   // COLOR PALETTE
@@ -132,7 +136,8 @@ export const customTheme = createTheme({
             textTransform: "none",
             borderRadius: "4px",
             "&:hover": {
-              color: customGlobalTheme.palette.primary.dark,
+              color:customGlobalTheme.palette.primary.dark,
+              borderColor: customGlobalTheme.palette.primary.dark,
               backgroundColor: "white",
             },
             "&:focus": {
