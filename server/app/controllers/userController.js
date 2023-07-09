@@ -49,7 +49,7 @@ class UserController {
   //logout
   async logout(req, res) {
     //delete cookies
-    res.cookie("session_token", "", { expires: new Date() });
+    res.clearCookie("session_token");
 
     res.status(200).json({ message: "Log out success" });
   }
