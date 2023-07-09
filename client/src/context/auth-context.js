@@ -7,7 +7,7 @@ const AuthContext = React.createContext({
   isLoggedIn: false, //state to store user logged in or not
   isAdmin: false, // state to store user is admin or not
   loading: false, // state to store loading status
-  loginUser: '',
+  loginUser: "",
   logoutUser: () => {}, //function to log user out
   checkAdmin: () => {}, //function to check if logged in user is admin
   checkLoggedIn: () => {}, //function to check if user logged in or not
@@ -18,59 +18,36 @@ export const AuthContextProvider = (props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); //state to store user logged in or not
   const [isAdmin, setIsAdmin] = useState(false); // state to store user is admin or not
   const [loading, setLoading] = useState(true); // state to store loading status
-  const [loginUser, setLoginUser] = useState('')
+  const [loginUser, setLoginUser] = useState("");
 
-  //function to check if user logged in or not
+  // function to check if user logged in or not
   const checkLoggedIn = async () => {
     //Call the check login api here
     try {
-      const sessionToken = Cookies.get("session_token"); //get session token cookies
-      //if session token is not valid user is not logged in
-      if (!sessionToken) {
-        localStorage.removeItem('loginCredentials');
-        setIsLoggedIn(false);
-      }
-      //else user is logged in
-      else {
-        setIsLoggedIn(true);
-        const storedData = localStorage.getItem('loginCredentials')
-        const parsedData = JSON.parse(storedData)
-        setLoginUser(parsedData.username)
-        checkAdmin(parsedData.isAdmin); //check if user is admin
-      }
+      const res = await axios.get(
+        "https://clumsy-pink-bedclothes.cyclic.app/api/home",
+        { withCredentials: true }
+      );
+      setIsLoggedIn(true);
+      const loginData = res.data
+      setLoginUser(loginData.username);
+      setIsAdmin(loginData.isAdmin)
     } catch (error) {
-      console.log("Error Logging In");
+      setIsLoggedIn(false);
     } finally {
       setLoading(false); //after checking done setloading to false
     }
   };
-  //function to check if user is admin
-  const checkAdmin = async (isAdmin) => {
-    try {
-      if (isAdmin){
-        setIsAdmin(true)
-      }else{
-        setIsAdmin(false)
-      }
-    } catch (error) {
-      //else user is not admin
-      setIsAdmin(false);
-    }
-  };
-
   //function to logout user
   const logoutUser = async () => {
     try {
       //call the logout api
-      await axios.get("http://localhost:5000/api/logout", {
+      const res = await axios.get("https://clumsy-pink-bedclothes.cyclic.app/api/logout", {
         withCredentials: true,
       });
-      Cookies.remove("session_token"); //remove the session token
-      localStorage.removeItem('loginCredentials');
       setIsLoggedIn(false); //set the logged_in state to false
       window.location.href = "/"; //Redirect to landing page
-    } 
-    catch (error) {
+    } catch (error) {
       console.log(error);
     }
   };
@@ -89,7 +66,7 @@ export const AuthContextProvider = (props) => {
         isAdmin: isAdmin,
         checkLoggedIn: checkLoggedIn,
         loading: loading,
-        loginUser: loginUser
+        loginUser: loginUser,
       }}
     >
       {props.children}

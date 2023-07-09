@@ -73,6 +73,8 @@ class UserService {
         if (user && (await bcrypt.compare(loginData.password, user.password))) {
             const payload = {
                 id: user.id,
+                username: user.username,
+                isAdmin: user.isAdmin,
             }
 
             const option = {
