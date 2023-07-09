@@ -9,6 +9,10 @@ const auth = require('../../middleware/jwt_auth');
 
 const router = express.Router();
 
+router.get('/home', auth, (req, res) => {
+    return res.status(200).end();
+});
+
 router.post('/register', validateRegister, handleValidationErrors, (req, res) => userController.register(req, res));
 router.post('/login', validateLogin, handleValidationErrors, (req, res) => userController.login(req,res))
 router.get('/logout', auth, (req, res) => userController.logout(req,res));
