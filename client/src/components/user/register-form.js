@@ -21,6 +21,7 @@ const RegisterForm = () => {
 
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState("");
+  const [checkingUsername, setCheckingUsername] = useState(false);
 
   const [date, setDate] = useState(dayjs("2011-09-28").utc());
   const [dateError, setDateError] = useState("");
@@ -30,6 +31,7 @@ const RegisterForm = () => {
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [checkingEmail, setCheckingEmail] = useState(false);
 
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -254,13 +256,15 @@ const RegisterForm = () => {
         return;
       }
       // check username realtime api currently error
+      setCheckingUsername(true);
       try {
         const res = await axios.post(
-          "https://dark-stockings-eel.cyclic.app/api/register",
+          "https://dark-stockings-eel.cyclic.app/api/check-username",
           { username },
           { withCredentials: true }
         );
         if (res.status === 200) {
+          setCheckingUsername(false);
           setValid("username");
           setUsernameError("");
           hideError("username");
@@ -268,7 +272,8 @@ const RegisterForm = () => {
         }
       } catch (error) {
         if (error.response.status === 401) {
-          setInvalid('username')
+          setCheckingUsername(false);
+          setInvalid("username");
           setUsernameError("Username exists please use another username");
           showError("username");
           startAnimation("username");
@@ -280,6 +285,21 @@ const RegisterForm = () => {
       clearTimeout(timeout);
     };
   }, [username]);
+
+  useEffect(() => {
+    if (checkingUsername) {
+      hideError("username");
+      setUsernameError("Checking username avaibility...");
+      return;
+    }
+  }, [checkingUsername]);
+  useEffect(() => {
+    if (checkingEmail) {
+      hideError("email");
+      setEmailError("Checking email avaibility...");
+      return;
+    }
+  }, [checkingEmail]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -331,15 +351,15 @@ const RegisterForm = () => {
         setEmailError("Email cannot be empty");
         return;
       }
-      
+
       const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
       if (!emailRegex.test(email) && email) {
         setInvalid("email");
         setEmailError("Please enter a valid email");
         showError("email");
-        return
+        return;
       }
-
+      setCheckingEmail(true);
       try {
         const res = await axios.post(
           "https://dark-stockings-eel.cyclic.app/api/check-email",
@@ -347,18 +367,20 @@ const RegisterForm = () => {
           { withCredentials: true }
         );
         if (res.status === 200) {
+          setCheckingEmail(false)
           setValid("email");
           setEmailError("");
           hideError("email");
-          return
+          return;
         }
       } catch (error) {
+        setCheckingEmail(false)
         if (error.response.status === 401) {
-          setInvalid('email')
+          setInvalid("email");
           setEmailError("Email exists please use another email");
           showError("email");
           startAnimation("email");
-          return
+          return;
         }
       }
     }, 400);
@@ -593,7 +615,10 @@ const RegisterForm = () => {
               onFocus={focusHandler.username}
               onBlur={blurHandler.username}
               value={username}
-              helperText={errorShow.username && usernameError}
+              helperText={
+                (errorShow.username && usernameError) ||
+                (checkingUsername && usernameError)
+              }
               focused={focused.username}
               leftIcon={
                 <Icon icon="ic:round-person" color="black" width="28" />
@@ -678,7 +703,7 @@ const RegisterForm = () => {
               focused={focused.email}
               onFocus={focusHandler.email}
               onBlur={blurHandler.email}
-              helperText={errorShow.email && emailError}
+              helperText={(errorShow.email && emailError)||(checkingEmail && emailError)}
               leftIcon={<Icon icon="ic:round-email" color="black" width="28" />}
               rightIcon={
                 errorShow.email && (
