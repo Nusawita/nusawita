@@ -13,11 +13,11 @@ const port = process.env.PORT
 const bodyParser = require('body-parser');
 
 app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ["GET", "POST"],
-  credentials:true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+    origin: 'http://localhost:3000',
+    methods: ["GET", "POST"],
+    credentials:true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended : false }));
