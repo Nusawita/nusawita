@@ -256,7 +256,7 @@ const RegisterForm = () => {
       // check username realtime api currently error
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/check-username",
+          "https://dark-stockings-eel.cyclic.app/api/register",
           { username },
           { withCredentials: true }
         );
@@ -342,7 +342,7 @@ const RegisterForm = () => {
 
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/check-email",
+          "https://dark-stockings-eel.cyclic.app/api/check-email",
           { email },
           { withCredentials: true }
         );
@@ -429,7 +429,7 @@ const RegisterForm = () => {
     try {
       // call login api
       const res = await axios.post(
-        "http://localhost:5000/api/register",
+        "https://dark-stockings-eel.cyclic.app/api/register",
         registerData,
         { withCredentials: true }
       );
@@ -467,7 +467,7 @@ const RegisterForm = () => {
     try {
       // call login api
       const res = await axios.post(
-        "http://localhost:5000/api/login",
+        "https://dark-stockings-eel.cyclic.app/api/login",
         loginData,
         { withCredentials: true }
       );

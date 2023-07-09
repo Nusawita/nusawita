@@ -163,7 +163,7 @@ const LoginForm = () => {
     try {
       // call login api
       const res = await axios.post(
-        "http://localhost:5000/api/login",
+        "https://dark-stockings-eel.cyclic.app/api/login",
         loginData,
         { withCredentials: true }
       );
