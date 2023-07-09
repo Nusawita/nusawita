@@ -25,6 +25,7 @@ export const AuthContextProvider = (props) => {
     //Call the check login api here
     try {
       const sessionToken = Cookies.get("session_token"); //get session token cookies
+      console.log(sessionToken)
       //if session token is not valid user is not logged in
       if (!sessionToken) {
         localStorage.removeItem('loginCredentials');

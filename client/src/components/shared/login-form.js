@@ -8,7 +8,6 @@ import { ErrorVibrateAnimation } from "../animation/custom-animation";
 import axios from "axios";
 
 const LoginForm = () => {
-  console.log('rerenders')
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -163,7 +162,7 @@ const LoginForm = () => {
     try {
       // call login api
       const res = await axios.post(
-        "https://dark-stockings-eel.cyclic.app/api/login",
+        "https://black-centipede-hose.cyclic.app/api/login",
         loginData,
         { withCredentials: true }
       );

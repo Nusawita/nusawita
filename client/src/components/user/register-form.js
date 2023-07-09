@@ -259,7 +259,7 @@ const RegisterForm = () => {
       setCheckingUsername(true);
       try {
         const res = await axios.post(
-          "https://dark-stockings-eel.cyclic.app/api/check-username",
+          "https://black-centipede-hose.cyclic.app/api/check-username",
           { username },
           { withCredentials: true }
         );
@@ -362,7 +362,7 @@ const RegisterForm = () => {
       setCheckingEmail(true);
       try {
         const res = await axios.post(
-          "https://dark-stockings-eel.cyclic.app/api/check-email",
+          "https://black-centipede-hose.cyclic.app/api/check-email",
           { email },
           { withCredentials: true }
         );
@@ -451,7 +451,7 @@ const RegisterForm = () => {
     try {
       // call login api
       const res = await axios.post(
-        "https://dark-stockings-eel.cyclic.app/api/register",
+        "https://black-centipede-hose.cyclic.app/api/register",
         registerData,
         { withCredentials: true }
       );
@@ -489,7 +489,7 @@ const RegisterForm = () => {
     try {
       // call login api
       const res = await axios.post(
-        "https://dark-stockings-eel.cyclic.app/api/login",
+        "https://black-centipede-hose.cyclic.app/api/login",
         loginData,
         { withCredentials: true }
       );
