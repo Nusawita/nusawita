@@ -10,7 +10,11 @@ const auth = require('../../middleware/jwt_auth');
 const router = express.Router();
 
 router.get('/home', auth, (req, res) => {
-    return res.status(200).end();
+    return res.status(200).json({
+        id: req.user.id,
+        username: req.user.username,
+        isAdmin: req.user.isAdmin,
+    });
 });
 
 router.post('/register', validateRegister, handleValidationErrors, (req, res) => userController.register(req, res));
