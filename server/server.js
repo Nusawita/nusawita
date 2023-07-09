@@ -11,6 +11,7 @@ const router = require('./app/routes/v1/route.js');
 const port = process.env.PORT
 
 const bodyParser = require('body-parser');
+
 app.use(cors({
     origin: 'http://localhost:3000',
     methods: ["GET", "POST"],
