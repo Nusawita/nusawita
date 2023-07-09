@@ -50,7 +50,6 @@ class UserController {
   async logout(req, res) {
     //delete cookies
     res.cookie("session_token", "", { expires: new Date() });
-
     res.status(200).json({ message: "Log out success" });
   }
 

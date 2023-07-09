@@ -25,41 +25,26 @@ export const AuthContextProvider = (props) => {
     //Call the check login api here
     try {
       const res = await axios.get(
-        "https://black-centipede-hose.cyclic.app/api/home",
+        "https://clumsy-pink-bedclothes.cyclic.app/api/home",
         { withCredentials: true }
       );
       setIsLoggedIn(true);
-      const storedData = localStorage.getItem("loginCredentials");
-      const parsedData = JSON.parse(storedData);
-      setLoginUser(parsedData.username);
+      const loginData = res.data
+      setLoginUser(loginData.username);
+      setIsAdmin(loginData.isAdmin)
     } catch (error) {
       setIsLoggedIn(false);
     } finally {
       setLoading(false); //after checking done setloading to false
     }
   };
-  //function to check if user is admin
-  const checkAdmin = async (isAdmin) => {
-    try {
-      if (isAdmin) {
-        setIsAdmin(true);
-      } else {
-        setIsAdmin(false);
-      }
-    } catch (error) {
-      //else user is not admin
-      setIsAdmin(false);
-    }
-  };
-
   //function to logout user
   const logoutUser = async () => {
     try {
       //call the logout api
-      await axios.get("https://black-centipede-hose.cyclic.app/api/logout", {
+      const res = await axios.get("https://clumsy-pink-bedclothes.cyclic.app/api/logout", {
         withCredentials: true,
       });
-      localStorage.removeItem("loginCredentials");
       setIsLoggedIn(false); //set the logged_in state to false
       window.location.href = "/"; //Redirect to landing page
     } catch (error) {

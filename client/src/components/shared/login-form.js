@@ -158,17 +158,16 @@ const LoginForm = () => {
 
   //function to fetch the login api
   const fetchLoginApi = async (loginData) => {
-    console.log("fetchApi");
+    // console.log("fetchApi");
     try {
       // call login api
       const res = await axios.post(
-        "https://black-centipede-hose.cyclic.app/api/login",
+        "https://clumsy-pink-bedclothes.cyclic.app/api/login",
         loginData,
         { withCredentials: true }
       );
       //if login success redirect to landing page
       if (res.status === 200) {
-        localStorage.setItem("loginCredentials", JSON.stringify(res.data.data));
         window.location.href = "/";
       }
     } catch (error) {

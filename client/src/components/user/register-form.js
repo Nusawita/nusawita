@@ -259,7 +259,7 @@ const RegisterForm = () => {
       setCheckingUsername(true);
       try {
         const res = await axios.post(
-          "https://black-centipede-hose.cyclic.app/api/check-username",
+          "https://clumsy-pink-bedclothes.cyclic.app/api/check-username",
           { username },
           { withCredentials: true }
         );
@@ -362,7 +362,7 @@ const RegisterForm = () => {
       setCheckingEmail(true);
       try {
         const res = await axios.post(
-          "https://black-centipede-hose.cyclic.app/api/check-email",
+          "https://clumsy-pink-bedclothes.cyclic.app/api/check-email",
           { email },
           { withCredentials: true }
         );
@@ -447,11 +447,10 @@ const RegisterForm = () => {
   }, [confirmPassword]);
 
   const fetchRegisterAPI = async (registerData) => {
-    alert("fetchin");
     try {
       // call login api
       const res = await axios.post(
-        "https://black-centipede-hose.cyclic.app/api/register",
+        "https://clumsy-pink-bedclothes.cyclic.app/api/register",
         registerData,
         { withCredentials: true }
       );
@@ -467,7 +466,7 @@ const RegisterForm = () => {
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
-      console.log(error);
+      // console.log(error);
       if (error.response.status === 401) {
         if (error.response.data.message.username) {
           setInvalid("username");
@@ -489,7 +488,7 @@ const RegisterForm = () => {
     try {
       // call login api
       const res = await axios.post(
-        "https://black-centipede-hose.cyclic.app/api/login",
+        "https://clumsy-pink-bedclothes.cyclic.app/api/login",
         loginData,
         { withCredentials: true }
       );
