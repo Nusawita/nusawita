@@ -367,14 +367,14 @@ const RegisterForm = () => {
           { withCredentials: true }
         );
         if (res.status === 200) {
-          setCheckingEmail(false)
+          setCheckingEmail(false);
           setValid("email");
           setEmailError("");
           hideError("email");
           return;
         }
       } catch (error) {
-        setCheckingEmail(false)
+        setCheckingEmail(false);
         if (error.response.status === 401) {
           setInvalid("email");
           setEmailError("Email exists please use another email");
@@ -564,11 +564,13 @@ const RegisterForm = () => {
           backgroundImage: "url(/images/gapura.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          display: { xs: "none", md: "block" },
         }}
       />
       <Grid
         item
-        xs={4}
+        xs={12}
+        md={4}
         sx={{
           ...ContentMiddle,
           backgroundColor: lightColor,
@@ -577,7 +579,7 @@ const RegisterForm = () => {
         <Box
           onSubmit={handleSubmit}
           component="form"
-          sx={{ width: "70%" }}
+          sx={{ width: { xs: "90%", md: "70%" } }}
           flexDirection="column"
         >
           <Box sx={{ ...ContentMiddle }}>
@@ -702,7 +704,9 @@ const RegisterForm = () => {
               focused={focused.email}
               onFocus={focusHandler.email}
               onBlur={blurHandler.email}
-              helperText={(errorShow.email && emailError)||(checkingEmail && emailError)}
+              helperText={
+                (errorShow.email && emailError) || (checkingEmail && emailError)
+              }
               leftIcon={<Icon icon="ic:round-email" color="black" width="28" />}
               rightIcon={
                 errorShow.email && (
@@ -833,7 +837,7 @@ const RegisterForm = () => {
               </Typography>
             </Typography>
           </Box>
-          <Typography sx={{ ...ContentMiddle }}>
+          <Typography sx={{ p: 2, textAlign: "center" }}>
             By continuing, you agree to NusaWita Company's
           </Typography>
           <Typography align="center">
@@ -843,6 +847,7 @@ const RegisterForm = () => {
             >
               Terms of Use
             </Typography>
+            <span> </span>
             and
             <Typography
               component="span"

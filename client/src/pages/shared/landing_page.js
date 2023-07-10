@@ -32,25 +32,31 @@ export const LandingPage = (props) => {
   return (
     <>
       {/* Top Section */}
-      <Box
-        sx={{
-          width: "100%",
-          backgroundImage: "url(/images/gapuralight.jpg)",
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "bottom",
-        }}
-      >
+      <Box>
         {/* Navbar Sementara */}
         {/* Contact Us Section */}
         <HeaderInformation />
         {/* Button Section */}
         <Header />
-        <Box sx={{ px: 7, pb: 15, pt: 5 }}>
+        <Box
+          sx={{
+            minHeight: "100vh",
+
+            backgroundImage: "url(/images/gapuralight.jpg)",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "bottom",
+            px: 3,
+            overflow: "hidden",
+          }}
+        >
           <Typography
             variant="h1"
             component="h1"
-            sx={{ pt: 7, maxWidth: "70rem", color: colorPalette.primary.main }}
+            sx={{
+              color: colorPalette.primary.main,
+              fontSize: 40,
+            }}
           >
             Lorem Ipsum Dolor Sit Amet Consectetur
           </Typography>
@@ -143,7 +149,7 @@ export const LandingPage = (props) => {
           <LabelSelector text="Landscape" />
           <LabelSelector text="Mountain" />
           <Box sx={{ backgroundColor: "white", px: 2, py: 2 }}>
-            <Button variant="primary" sx={{ width: "14rem" }}>
+            <Button variant="primary" sx={{ width: "8rem" }}>
               <Typography variant="buttonText" component="span">
                 View More
               </Typography>
@@ -170,7 +176,7 @@ export const LandingPage = (props) => {
             Tourism Spot
           </Typography>
         </Box>
-        <Box
+        {/* <Box
           component="div"
           sx={{
             display: "flex",
@@ -206,8 +212,22 @@ export const LandingPage = (props) => {
             bibendum."
             tags={["Beach", "Landscape", "Sunset", "Ocean", "Beautiful"]}
           />
+        </Box> */}
+      </Box>
+
+      <Grid
+        spacing={2}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: { xs: "column", md: "row" },
+          maxWidth: "100vw",
+        }}
+      >
+        <Grid item xs={12}>
           <CustomCard
-            sx={{ mx: 2 }}
+            sx={{ mx: 2, mb: 2 }}
             title="Pantai Pandawa"
             rating="4.9"
             description="Lorem ipsum dolor sit amet consectetur. Ut tortor hendrerit massa
@@ -215,10 +235,65 @@ export const LandingPage = (props) => {
             bibendum."
             tags={["Beach", "Landscape", "Sunset", "Ocean", "Beautiful"]}
           />
-        </Box>
-      </Box>
+        </Grid>
+        <Grid item xs={12}>
+          <CustomCard
+            sx={{ mx: 2, mb: 2 }}
+            title="Pantai Pandawa"
+            rating="4.9"
+            description="Lorem ipsum dolor sit amet consectetur. Ut tortor hendrerit massa
+            tincidunt egestas dui. Sagittis sodales vulputate elit nisl
+            bibendum."
+            tags={["Beach", "Landscape", "Sunset", "Ocean", "Beautiful"]}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <CustomCard
+            sx={{ mx: 2, mb: 2 }}
+            title="Pantai Pandawa"
+            rating="4.9"
+            description="Lorem ipsum dolor sit amet consectetur. Ut tortor hendrerit massa
+            tincidunt egestas dui. Sagittis sodales vulputate elit nisl
+            bibendum."
+            tags={["Beach", "Landscape", "Sunset", "Ocean", "Beautiful"]}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <CustomCard
+            sx={{ mx: 2, mb: 2 }}
+            title="Pantai Pandawa"
+            rating="4.9"
+            description="Lorem ipsum dolor sit amet consectetur. Ut tortor hendrerit massa
+            tincidunt egestas dui. Sagittis sodales vulputate elit nisl
+            bibendum."
+            tags={["Beach", "Landscape", "Sunset", "Ocean", "Beautiful"]}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <CustomCard
+            sx={{ mx: 2, mb: 2 }}
+            title="Pantai Pandawa"
+            rating="4.9"
+            description="Lorem ipsum dolor sit amet consectetur. Ut tortor hendrerit massa
+            tincidunt egestas dui. Sagittis sodales vulputate elit nisl
+            bibendum."
+            tags={["Beach", "Landscape", "Sunset", "Ocean", "Beautiful"]}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <CustomCard
+            sx={{ mx: 2, mb: 2 }}
+            title="Pantai Pandawa"
+            rating="4.9"
+            description="Lorem ipsum dolor sit amet consectetur. Ut tortor hendrerit massa
+            tincidunt egestas dui. Sagittis sodales vulputate elit nisl
+            bibendum."
+            tags={["Beach", "Landscape", "Sunset", "Ocean", "Beautiful"]}
+          />
+        </Grid>
+      </Grid>
 
-      <Box sx={{ mt:20 }}>
+      <Box sx={{ mt: 20 }}>
         <Typography
           variant="h4"
           component="h4"

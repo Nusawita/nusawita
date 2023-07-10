@@ -248,12 +248,24 @@ const LoginForm = () => {
           backgroundImage: "url(/images/gapura.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          display: { xs: "none", md: "block" },
         }}
       />
-      <Grid item xs={4} sx={{ ...ContentMiddle, backgroundColor: lightColor }}>
+      <Grid
+        item
+        xs={12}
+        md={4}
+        sx={{
+          backgroundColor: lightColor,
+          display: { xs: "flex", md: "flex" },
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <Box
           component="form"
-          sx={{ width: "360px" }}
+          sx={{ width: { xs: "90%", md: "70%" } }}
           display="flex"
           flexDirection="column"
           onSubmit={handleFormSubmit}

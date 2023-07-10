@@ -16,11 +16,11 @@ const HeaderInformation = () => {
         backgroundColor: colorPalette.primary.main,
         alignItems: "center",
         width: "100%",
-        display: "inline-flex",
+        display: { xs: "none", md: "flex" },
         justifyContent: "space-between",
       }}
     >
-      <Box sx={{ px:7 }}>
+      <Box sx={{ px: 7 }}>
         {ctxAuth.isLoggedIn ? (
           <Typography variant="button-text" color="white">
             {`Welcome ${ctxAuth.loginUser}`}
