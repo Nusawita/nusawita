@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Button } from "@mui/material";
-import AuthContext from "../../context/auth-context";
+import AuthContext from "../context/auth-context";
 
 export const AdminDashboard = () => {
   const ctxAuth = useContext(AuthContext);

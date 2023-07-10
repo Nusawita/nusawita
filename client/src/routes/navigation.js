@@ -1,4 +1,4 @@
-import { LoginPage } from "../pages/shared/login-page";
+import {LoginPage} from "../pages/login-page"
 import AuthContext from "../context/auth-context";
 import { useContext } from "react";
 import {
@@ -7,9 +7,9 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AdminDashboard } from "../pages/admin/admin-dashboard";
-import { LandingPage } from "../pages/shared/landing_page";
-import { RegisterPages } from "../pages/user/register-page";
+import {AdminDashboard} from "../pages/admin-dashboard"
+import { LandingPage } from "../pages/landing_page";
+import { RegisterPages } from "../pages/register-page";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading

@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
-import { ContentMiddle } from "../../styles/shared-styles";
-import { CustomDatePicker, CustomTextField } from "../UI/custom-UI";
+import { ContentMiddle } from "../../../styles/shared-styles";
+import { CustomDatePicker, CustomTextField } from "../custom-UI";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import axios from "axios";
-import { ErrorVibrateAnimation } from "../animation/custom-animation";
+import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 
 import { Icon } from "@iconify/react";
-import AxiosContext from "../../context/axios_context";
+import AxiosContext from "../../../context/axios_context";
 
 const RegisterForm = () => {
   const api = useContext(AxiosContext).api

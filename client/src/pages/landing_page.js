@@ -3,22 +3,19 @@ import {
   Button,
   Box,
   Typography,
-  ImageList,
-  ImageListItem,
   Grid,
   Container,
 } from "@mui/material";
-import AuthContext from "../../context/auth-context";
-import { ContentMiddle } from "../../styles/shared-styles";
+import AuthContext from "../context/auth-context";
+import { ContentMiddle } from "../styles/shared-styles";
 import { Icon } from "@iconify/react";
 import { useTheme } from "@emotion/react";
-import HeaderInformation from "./HeaderInformation";
-import Header from "./Header";
+import HeaderInformation from "../components/UI/Navbar/HeaderInformation";
+import Header from "../components/UI/Navbar/Header";
 import {
-  CustomCardSm,
   CustomCard,
   LabelSelector,
-} from "../../components/UI/custom-UI";
+} from "../components/UI/custom-UI";
 
 export const LandingPage = (props) => {
   const ctxAuth = useContext(AuthContext);
@@ -137,11 +134,10 @@ export const LandingPage = (props) => {
           component="span"
           sx={{ display: "flex", justifyContent: "center" }}
         >
-          <LabelSelector text="All" />
-          <LabelSelector text="Waterfall" />
-          <LabelSelector text="Beach" />
-          <LabelSelector text="Landscape" />
-          <LabelSelector text="Mountain" />
+          <LabelSelector sx={{ width: "17rem" }} text="All" />
+          <LabelSelector sx={{ width: "17rem" }} text="Bali" />
+          <LabelSelector sx={{ width: "17rem" }} text="Jawa" />
+          <LabelSelector sx={{ width: "17rem" }} text="Kalimantan" />
           <Box sx={{ backgroundColor: "white", px: 2, py: 2 }}>
             <Button variant="primary" sx={{ width: "14rem" }}>
               <Typography variant="buttonText" component="span">
@@ -151,6 +147,7 @@ export const LandingPage = (props) => {
           </Box>
         </Box>
       </Box>
+
       {/* Tourism Spot Section */}
       <Box sx={{ mb: 5 }}>
         <Box
@@ -218,7 +215,7 @@ export const LandingPage = (props) => {
         </Box>
       </Box>
 
-      <Box sx={{ mt:20 }}>
+      <Box sx={{ mt: 20 }}>
         <Typography
           variant="h4"
           component="h4"
@@ -272,6 +269,132 @@ export const LandingPage = (props) => {
             </Grid>
           </Container>
         </Box>
+      </Box>
+
+      <Box
+        sx={{
+          width: "100vw",
+          backgroundColor: colorPalette.primary.main,
+          mt: 20,
+        }}
+      >
+        <Container>
+          <Grid container sx={{ py: 8 }}>
+            <Grid item xs={2.5}>
+              <Box
+                sx={{
+                  width: "155px",
+                  height: "120px",
+                  backgroundImage: "url(/logos/nusawita_logo_circle.png)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+              <Typography variant="body1" component="p" color="white">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Gravida
+                sit et, volutpat velit. Id nisi porttitor lectus elit risus
+                pretium amet.
+              </Typography>
+            </Grid>
+            <Grid item sx={{ pl: 10, pt: 3 }} xs={7}>
+              <Typography variant="body1" component="p" color="white">
+                Contact Us
+              </Typography>
+              <Box component="span" sx={{ pt: 10 }}>
+                <Typography
+                  variant="body1"
+                  component="p"
+                  color="white"
+                  sx={{ mt: 3 }}
+                >
+                  <Box component="span" sx={{ mr: 1 }}>
+                    <Icon icon="ic:baseline-email" width="14" color="white" />
+                  </Box>
+                  help@nusawita.com
+                </Typography>
+                <Typography
+                  variant="body1"
+                  component="p"
+                  color="white"
+                  sx={{ mt: 1 }}
+                >
+                  <Box component="span" sx={{ mr: 1 }}>
+                    <Icon
+                      icon="akar-icons:linkedin-box-fill"
+                      width="14"
+                      color="white"
+                    />
+                  </Box>
+                  NusaWita
+                </Typography>
+                <Typography
+                  variant="body1"
+                  component="p"
+                  color="white"
+                  sx={{ mt: 1 }}
+                >
+                  <Box component="span" sx={{ mr: 1 }}>
+                    <Icon
+                      icon="akar-icons:twitter-fill"
+                      width="14"
+                      color="white"
+                    />
+                  </Box>
+                  @NusaWita
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item>
+              <Typography
+                variant="body1"
+                component="p"
+                color="white"
+                sx={{ mt: 1 }}
+              >
+                Address
+              </Typography>
+              <Typography
+                variant="body1"
+                component="p"
+                color="white"
+                sx={{ mt: 1, maxWidth: "15rem" }}
+              >
+                <Box component="span" sx={{ mr: 1 }}>
+                  <Icon
+                    icon="fa-solid:map-marked-alt"
+                    width="18"
+                    color="white"
+                  />
+                </Box>
+                944 Edgewood Ave South Jacksonville FL 32205-5341
+              </Typography>
+              <Typography
+                variant="body1"
+                component="p"
+                color="white"
+                sx={{ mt: 1, maxWidth: "15rem", mt: 4 }}
+              >
+                Download apps at
+              </Typography>
+              <Typography
+                variant="body1"
+                component="p"
+                color="white"
+                sx={{ mt: 1, maxWidth: "15rem" }}
+              >
+                Google Play
+              </Typography>
+              <Typography
+                variant="body1"
+                component="p"
+                color="white"
+                sx={{ mt: 1, maxWidth: "15rem" }}
+              >
+                PlayStore
+              </Typography>
+            </Grid>
+          </Grid>
+        </Container>
       </Box>
     </>
   );

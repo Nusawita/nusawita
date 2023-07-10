@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import AuthContext from "../../context/auth-context";
+import AuthContext from "../../../context/auth-context";
 import { Icon } from "@iconify/react";
 
 const HeaderInformation = () => {
