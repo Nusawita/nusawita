@@ -79,11 +79,11 @@ export const LabelSelector = (props) => {
     <Box
       tabIndex="0"
       sx={{
+        ...props.sx,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "white",
-        width: "14rem",
         cursor: "pointer",
         ":hover": {
           borderBottom: `2px solid ${colorPalette.primary.main}`,
