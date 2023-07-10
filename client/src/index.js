@@ -6,15 +6,17 @@ import reportWebVitals from "./reportWebVitals";
 import { ThemeProvider } from "@emotion/react";
 import { customTheme } from "./styles/shared-styles";
 import { AuthContextProvider } from "./context/auth-context"; // This is the context for the logged in state
+import { AxiosContextProvider } from "./context/axios_context"; //Context of axios api object
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-
-    <ThemeProvider theme={customTheme}>
+  <ThemeProvider theme={customTheme}>
+    <AxiosContextProvider>
       <AuthContextProvider>
         <App />
       </AuthContextProvider>
-    </ThemeProvider>
+    </AxiosContextProvider>
+  </ThemeProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

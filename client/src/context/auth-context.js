@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
+import AxiosContext from "./axios_context";
+
 
 //Declaration of auth context
 const AuthContext = React.createContext({
@@ -15,6 +17,7 @@ const AuthContext = React.createContext({
 
 //AuthContextProvider wraps the App.js component in the Index.js file so all children of app have access to the AuthContext
 export const AuthContextProvider = (props) => {
+  const api = useContext(AxiosContext).api
   const [isLoggedIn, setIsLoggedIn] = useState(false); //state to store user logged in or not
   const [isAdmin, setIsAdmin] = useState(false); // state to store user is admin or not
   const [loading, setLoading] = useState(true); // state to store loading status
@@ -24,8 +27,8 @@ export const AuthContextProvider = (props) => {
   const checkLoggedIn = async () => {
     //Call the check login api here
     try {
-      const res = await axios.get(
-        "https://clumsy-pink-bedclothes.cyclic.app/api/home",
+      const res = await api.get(
+        "/home",
         { withCredentials: true }
       );
       setIsLoggedIn(true);
@@ -42,7 +45,7 @@ export const AuthContextProvider = (props) => {
   const logoutUser = async () => {
     try {
       //call the logout api
-      const res = await axios.get("https://clumsy-pink-bedclothes.cyclic.app/api/logout", {
+      const res = await api.get("/logout", {
         withCredentials: true,
       });
       setIsLoggedIn(false); //set the logged_in state to false
