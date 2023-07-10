@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle } from "../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField } from "../UI/custom-UI";
@@ -9,8 +9,10 @@ import axios from "axios";
 import { ErrorVibrateAnimation } from "../animation/custom-animation";
 
 import { Icon } from "@iconify/react";
+import AxiosContext from "../../context/axios_context";
 
 const RegisterForm = () => {
+  const api = useContext(AxiosContext).api
   // console.log('rerendeers')
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -258,8 +260,8 @@ const RegisterForm = () => {
       // check username realtime api currently error
       setCheckingUsername(true);
       try {
-        const res = await axios.post(
-          "https://clumsy-pink-bedclothes.cyclic.app/api/check-username",
+        const res = await api.post(
+          "/check-username",
           { username },
           { withCredentials: true }
         );
@@ -361,8 +363,8 @@ const RegisterForm = () => {
       }
       setCheckingEmail(true);
       try {
-        const res = await axios.post(
-          "https://clumsy-pink-bedclothes.cyclic.app/api/check-email",
+        const res = await api.post(
+          "/check-email",
           { email },
           { withCredentials: true }
         );
@@ -449,8 +451,8 @@ const RegisterForm = () => {
   const fetchRegisterAPI = async (registerData) => {
     try {
       // call login api
-      const res = await axios.post(
-        "https://clumsy-pink-bedclothes.cyclic.app/api/register",
+      const res = await api.post(
+        "/register",
         registerData,
         { withCredentials: true }
       );
@@ -487,8 +489,8 @@ const RegisterForm = () => {
   const fetchLoginApi = async (loginData) => {
     try {
       // call login api
-      const res = await axios.post(
-        "https://clumsy-pink-bedclothes.cyclic.app/api/login",
+      const res = await api.post(
+        "/login",
         loginData,
         { withCredentials: true }
       );

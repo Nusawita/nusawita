@@ -1,13 +1,15 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
 import { CustomTextField } from "../UI/custom-UI";
 import { Icon } from "@iconify/react";
 import { ErrorVibrateAnimation } from "../animation/custom-animation";
 import axios from "axios";
+import AxiosContext from "../../context/axios_context";
 
 const LoginForm = () => {
+  const api = useContext(AxiosContext).api;
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -161,11 +163,9 @@ const LoginForm = () => {
     // console.log("fetchApi");
     try {
       // call login api
-      const res = await axios.post(
-        "https://clumsy-pink-bedclothes.cyclic.app/api/login",
-        loginData,
-        { withCredentials: true }
-      );
+      const res = await api.post("/login", loginData, {
+        withCredentials: true,
+      });
       //if login success redirect to landing page
       if (res.status === 200) {
         window.location.href = "/";
