@@ -3,22 +3,19 @@ import {
   Button,
   Box,
   Typography,
-  ImageList,
-  ImageListItem,
   Grid,
   Container,
 } from "@mui/material";
-import AuthContext from "../../context/auth-context";
-import { ContentMiddle } from "../../styles/shared-styles";
+import AuthContext from "../context/auth-context";
+import { ContentMiddle } from "../styles/shared-styles";
 import { Icon } from "@iconify/react";
 import { useTheme } from "@emotion/react";
-import HeaderInformation from "./HeaderInformation";
-import Header from "./Header";
+import HeaderInformation from "../components/UI/Navbar/HeaderInformation";
+import Header from "../components/UI/Navbar/Header";
 import {
-  CustomCardSm,
   CustomCard,
   LabelSelector,
-} from "../../components/UI/custom-UI";
+} from "../components/UI/custom-UI";
 
 export const LandingPage = (props) => {
   const ctxAuth = useContext(AuthContext);

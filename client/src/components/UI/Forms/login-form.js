@@ -1,12 +1,12 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
-import { ContentMiddle, ContentEnd } from "../../styles/shared-styles";
-import { CustomTextField } from "../UI/custom-UI";
+import { ContentMiddle, ContentEnd } from "../../../styles/shared-styles";
+import { CustomTextField } from "../custom-UI";
 import { Icon } from "@iconify/react";
-import { ErrorVibrateAnimation } from "../animation/custom-animation";
+import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import axios from "axios";
-import AxiosContext from "../../context/axios_context";
+import AxiosContext from "../../../context/axios_context";
 
 const LoginForm = () => {
   const api = useContext(AxiosContext).api;
