@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   Button,
   Box,
@@ -6,7 +6,6 @@ import {
   Grid,
   Container,
 } from "@mui/material";
-import AuthContext from "../context/auth-context";
 import { ContentMiddle } from "../styles/shared-styles";
 import { Icon } from "@iconify/react";
 import { useTheme } from "@emotion/react";
@@ -17,9 +16,7 @@ import {
   LabelSelector,
 } from "../components/UI/custom-UI";
 
-export const LandingPage = (props) => {
-  const ctxAuth = useContext(AuthContext);
-  const loggedIn = ctxAuth.isLoggedIn;
+export const LandingPage = () => {
   const theme = useTheme();
   const colorPalette = {
     primary: theme.palette.primary,
@@ -372,7 +369,7 @@ export const LandingPage = (props) => {
                 variant="body1"
                 component="p"
                 color="white"
-                sx={{ mt: 1, maxWidth: "15rem", mt: 4 }}
+                sx={{ maxWidth: "15rem", mt: 4 }}
               >
                 Download apps at
               </Typography>

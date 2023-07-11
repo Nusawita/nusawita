@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect,  } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField } from "../custom-UI";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import axios from "axios";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
+import axios from "../../../axios-instance";
 
 import { Icon } from "@iconify/react";
-import AxiosContext from "../../../context/axios_context";
 
 const RegisterForm = () => {
-  const api = useContext(AxiosContext).api
   // console.log('rerendeers')
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -260,8 +258,8 @@ const RegisterForm = () => {
       // check username realtime api currently error
       setCheckingUsername(true);
       try {
-        const res = await api.post(
-          "/check-username",
+        const res = await axios.post(
+          "check-username",
           { username },
           { withCredentials: true }
         );
@@ -363,8 +361,8 @@ const RegisterForm = () => {
       }
       setCheckingEmail(true);
       try {
-        const res = await api.post(
-          "/check-email",
+        const res = await axios.post(
+          "check-email",
           { email },
           { withCredentials: true }
         );
@@ -451,8 +449,8 @@ const RegisterForm = () => {
   const fetchRegisterAPI = async (registerData) => {
     try {
       // call login api
-      const res = await api.post(
-        "/register",
+      const res = await axios.post(
+        "register",
         registerData,
         { withCredentials: true }
       );
@@ -489,7 +487,7 @@ const RegisterForm = () => {
   const fetchLoginApi = async (loginData) => {
     try {
       // call login api
-      const res = await api.post(
+      const res = await axios.post(
         "/login",
         loginData,
         { withCredentials: true }
@@ -822,7 +820,7 @@ const RegisterForm = () => {
           </ErrorVibrateAnimation>
           <Box sx={{ ...ContentMiddle }}>
             <Button type="submit" variant="primary" size="large">
-              SIGN IN
+              Sign Up
             </Button>
             <Typography variant="subtitle1" sx={{ fontWeight: "500", mt: 2 }}>
               Already Have An Account?
@@ -841,9 +839,9 @@ const RegisterForm = () => {
           <Typography align="center">
             <Typography
               component="span"
-              sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
+              sx={{ color: "#1273EB", fontWeight: "500", pl: 1, pr: 1 }}
             >
-              Terms of Use
+              Terms of Use 
             </Typography>
             and
             <Typography

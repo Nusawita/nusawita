@@ -1,8 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import Cookies from "js-cookie";
-import axios from "axios";
-import AxiosContext from "./axios_context";
-
+import React, { useState, useEffect } from "react";
+import axios from "../axios-instance";
 
 //Declaration of auth context
 const AuthContext = React.createContext({
@@ -11,41 +8,20 @@ const AuthContext = React.createContext({
   loading: false, // state to store loading status
   loginUser: "",
   logoutUser: () => {}, //function to log user out
-  checkAdmin: () => {}, //function to check if logged in user is admin
-  checkLoggedIn: () => {}, //function to check if user logged in or not
 });
 
 //AuthContextProvider wraps the App.js component in the Index.js file so all children of app have access to the AuthContext
 export const AuthContextProvider = (props) => {
-  const api = useContext(AxiosContext).api
   const [isLoggedIn, setIsLoggedIn] = useState(false); //state to store user logged in or not
   const [isAdmin, setIsAdmin] = useState(false); // state to store user is admin or not
   const [loading, setLoading] = useState(true); // state to store loading status
   const [loginUser, setLoginUser] = useState("");
 
-  // function to check if user logged in or not
-  const checkLoggedIn = async () => {
-    //Call the check login api here
-    try {
-      const res = await api.get(
-        "/home",
-        { withCredentials: true }
-      );
-      setIsLoggedIn(true);
-      const loginData = res.data
-      setLoginUser(loginData.username);
-      setIsAdmin(loginData.isAdmin)
-    } catch (error) {
-      setIsLoggedIn(false);
-    } finally {
-      setLoading(false); //after checking done setloading to false
-    }
-  };
   //function to logout user
   const logoutUser = async () => {
     try {
       //call the logout api
-      const res = await api.get("/logout", {
+      await axios.get("/logout", {
         withCredentials: true,
       });
       setIsLoggedIn(false); //set the logged_in state to false
@@ -56,6 +32,21 @@ export const AuthContextProvider = (props) => {
   };
   // Use useEffect hook on checkLoggedIn to check if the user is loggedIn everytime page refreshes
   useEffect(() => {
+    // function to check if user logged in or not
+    const checkLoggedIn = async () => {
+      //Call the check login api here
+      try {
+        const res = await axios.get("/home", { withCredentials: true });
+        setIsLoggedIn(true);
+        const loginData = res.data;
+        setLoginUser(loginData.username);
+        setIsAdmin(loginData.isAdmin);
+      } catch (error) {
+        setIsLoggedIn(false);
+      } finally {
+        setLoading(false); //after checking done setloading to false
+      }
+    };
     // Cookies.remove("session_token"); //remove the session token
     checkLoggedIn();
   }, []);
@@ -67,7 +58,6 @@ export const AuthContextProvider = (props) => {
         isLoggedIn: isLoggedIn,
         logoutUser: logoutUser,
         isAdmin: isAdmin,
-        checkLoggedIn: checkLoggedIn,
         loading: loading,
         loginUser: loginUser,
       }}
