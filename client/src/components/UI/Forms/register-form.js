@@ -412,6 +412,31 @@ const RegisterForm = () => {
         showError("password");
         return;
       }
+      const spaceRegex = /^[^ ]+$/
+      if (!spaceRegex.test(password)) {
+        if (confirmPassword) {
+          setInvalid("confirmPassword");
+          setConfirmPasswordError("Please correctly fill password first");
+          showError("confirmPassword");
+        }
+        setInvalid("password");
+        setPasswordError("Password must not contain spaces");
+        showError("password");
+        return;
+      }
+      const passwordRegex = /(?=.*[A-Z])(?=.*[a-z])(?=.*\d)/
+      if (!passwordRegex.test(password )) {
+        if (confirmPassword) {
+          setInvalid("confirmPassword");
+          setConfirmPasswordError("Please correctly fill password first");
+          showError("confirmPassword");
+        }
+        setInvalid("password");
+        setPasswordError("Password must contain an uppercase character, a lowercase characters, and a number");
+        showError("password");
+        return;
+      }
+
       setValid("password");
       setPasswordError("");
       hideError("password");

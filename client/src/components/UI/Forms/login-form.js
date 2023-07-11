@@ -126,12 +126,13 @@ const LoginForm = () => {
       return true;
     },
     password: () => {
+      const passRegex = /(?=.*[A-Z])(?=.*[a-z])(?=.*\d)^[^ ]+$/
       if (enteredPassword.trim().length === 0) {
         setPasswordError("Password is empty");
         showError("password");
         return false;
       }
-      if (enteredPassword.trim().length < 8) {
+      if (enteredPassword.trim().length < 8 || !passRegex.test(enteredPassword)) {
         setUsernameError("Invalid username or password");
         showError("username");
         setPasswordError("Invalid username or password");
