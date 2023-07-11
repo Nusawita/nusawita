@@ -1,6 +1,5 @@
 import LoginForm from "../components/UI/Forms/login-form";
 import React from "react";
-import { ContentMiddle } from "../styles/shared-styles";
 import { Box } from "@mui/material";
 import Header from "../components/UI/Navbar/Header";
 

@@ -5,7 +5,6 @@ import { CustomDatePicker, CustomTextField } from "../custom-UI";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import axios from "axios";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 
 import { Icon } from "@iconify/react";

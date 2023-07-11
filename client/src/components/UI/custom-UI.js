@@ -1,4 +1,4 @@
-import { React, Children, useState } from "react";
+import { React } from "react";
 import {
   Box,
   useTheme,
@@ -90,7 +90,6 @@ export const LabelSelector = (props) => {
         },
         ":focus": {
           borderBottom: `2px solid ${colorPalette.primary.main}`,
-          alignItems: "flex-start",
           alignItems: "flex-start",
           pt: 2,
         },

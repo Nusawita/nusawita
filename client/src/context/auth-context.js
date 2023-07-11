@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import Cookies from "js-cookie";
-import axios from "axios";
 import AxiosContext from "./axios_context";
 
 
@@ -45,7 +43,7 @@ export const AuthContextProvider = (props) => {
   const logoutUser = async () => {
     try {
       //call the logout api
-      const res = await api.get("/logout", {
+      await api.get("/logout", {
         withCredentials: true,
       });
       setIsLoggedIn(false); //set the logged_in state to false

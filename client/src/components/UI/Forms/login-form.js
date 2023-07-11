@@ -5,7 +5,6 @@ import { ContentMiddle, ContentEnd } from "../../../styles/shared-styles";
 import { CustomTextField } from "../custom-UI";
 import { Icon } from "@iconify/react";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
-import axios from "axios";
 import AxiosContext from "../../../context/axios_context";
 
 const LoginForm = () => {
@@ -16,7 +15,6 @@ const LoginForm = () => {
   const lightColor = theme.palette.light.main;
   const dangerMain = theme.palette.danger.main;
   const primaryMain = theme.palette.primary.main;
-  const errorColor = theme.palette.error.main;
 
   const [enteredUsername, setEnteredUsername] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
