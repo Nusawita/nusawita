@@ -1,14 +1,13 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../../styles/shared-styles";
 import { CustomTextField } from "../custom-UI";
 import { Icon } from "@iconify/react";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
-import AxiosContext from "../../../context/axios_context";
+import axios from "../../../axios-instance";
 
 const LoginForm = () => {
-  const api = useContext(AxiosContext).api;
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -101,22 +100,18 @@ const LoginForm = () => {
   };
 
   useEffect(() => {
-    if (usernameError) {
-      setUsernameError("");
-      hideError("username");
-      setPasswordError("");
-      hideError("password");
-      setAuthError(false);
-    }
+    setUsernameError("");
+    hideError("username");
+    setPasswordError("");
+    hideError("password");
+    setAuthError(false);
   }, [enteredUsername]);
   useEffect(() => {
-    if (passwordError) {
-      setPasswordError("");
-      hideError("password");
-      setPasswordError("");
-      hideError("username");
-      setAuthError(false);
-    }
+    setPasswordError("");
+    hideError("password");
+    setPasswordError("");
+    hideError("username");
+    setAuthError(false);
   }, [enteredPassword]);
 
   const validator = {
@@ -161,7 +156,7 @@ const LoginForm = () => {
     // console.log("fetchApi");
     try {
       // call login api
-      const res = await api.post("/login", loginData, {
+      const res = await axios.post("login", loginData, {
         withCredentials: true,
       });
       //if login success redirect to landing page
