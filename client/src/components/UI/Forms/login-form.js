@@ -23,6 +23,8 @@ const LoginForm = () => {
   const [passwordVisibility, setPasswordVisibility] = useState(false);
   let passwordRef = useRef();
 
+  const [timeoutId, setTimeoutId] = useState(null);
+
   const [focused, setFocused] = useState({
     username: false,
     password: false,
@@ -96,18 +98,20 @@ const LoginForm = () => {
   const handleVisibility = {
     setVisible: () => {
       passwordRef.current.focus();
-      setTimeout(() => {
+      const id = setTimeout(() => {
         passwordRef.current.selectionStart = passwordRef.current.value.length;
         passwordRef.current.selectionEnd = passwordRef.current.value.length;
       }, 0);
+      setTimeoutId(id)
       setPasswordVisibility(true);
     },
     setHidden: () => {
       passwordRef.current.focus();
-      setTimeout(() => {
+      const id = setTimeout(() => {
         passwordRef.current.selectionStart = passwordRef.current.value.length;
         passwordRef.current.selectionEnd = passwordRef.current.value.length;
       }, 0);
+      setTimeoutId(id)
       setPasswordVisibility(false);
     },
   };
@@ -128,6 +132,7 @@ const LoginForm = () => {
     hideError("password");
     setAuthError(false);
   }, [enteredUsername]);
+
   useEffect(() => {
     setPasswordError("");
     hideError("password");
@@ -135,7 +140,13 @@ const LoginForm = () => {
     hideError("username");
     setAuthError(false);
   }, [enteredPassword]);
-
+  //Timeout clear
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [timeoutId]);
+  
   const validator = {
     username: () => {
       if (enteredUsername.trim().length < 8) {
