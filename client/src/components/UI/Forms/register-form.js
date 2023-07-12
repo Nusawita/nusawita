@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField } from "../custom-UI";
@@ -37,10 +37,12 @@ const RegisterForm = () => {
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
+  let passwordRef = useRef();
 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  let passConfirmRef = useRef()
 
   //TO START ERROR ANIMATION
   const [errorAnimation, setErrorAnimation] = useState({
@@ -166,17 +168,21 @@ const RegisterForm = () => {
   const visibilityHandler = {
     password: {
       setVisible: () => {
+        passwordRef.current.focus();
         setPasswordVisible(true);
       },
       setHidden: () => {
+        passwordRef.current.focus();
         setPasswordVisible(false);
       },
     },
     confirmPassword: {
       setVisible: () => {
+        passConfirmRef.current.focus()
         setConfirmPasswordVisible(true);
       },
       setHidden: () => {
+        passConfirmRef.current.focus()
         setConfirmPasswordVisible(false);
       },
     },
@@ -188,7 +194,6 @@ const RegisterForm = () => {
       handleBlur("username");
       if (usernameError) {
         showError("username");
-        startAnimation("username");
       }
     },
     phone: () => {
@@ -201,21 +206,18 @@ const RegisterForm = () => {
       handleBlur("email");
       if (emailError) {
         showError("email");
-        startAnimation("email");
       }
     },
     password: () => {
       handleBlur("password");
       if (passwordError) {
         showError("password");
-        startAnimation("password");
       }
     },
     confirmPassword: () => {
       handleBlur("confirmPassword");
       if (confirmPasswordError) {
         showError("confirmPassword");
-        startAnimation("confirmPassword");
       }
     },
   };
@@ -283,8 +285,8 @@ const RegisterForm = () => {
           return;
         }
       } catch (error) {
-        if(axios.isCancel(error)){
-          return
+        if (axios.isCancel(error)) {
+          return;
         }
         if (error.response.status === 401) {
           setCheckingUsername(false);
@@ -297,8 +299,8 @@ const RegisterForm = () => {
       }
     }, 400);
     return () => {
-      abortController.abort()
-      setCheckingUsername(false)
+      abortController.abort();
+      setCheckingUsername(false);
       clearTimeout(timeout);
     };
   }, [username]);
@@ -380,7 +382,8 @@ const RegisterForm = () => {
       setCheckingEmail(true);
       try {
         const res = await api.post(
-          "check-email", {signal: abortController.signal},
+          "check-email",
+          { signal: abortController.signal },
           { email }
         );
         if (res.status === 200) {
@@ -402,7 +405,7 @@ const RegisterForm = () => {
       }
     }, 400);
     return () => {
-      abortController.abort()
+      abortController.abort();
       clearTimeout(timeout);
     };
   }, [email]);
@@ -765,6 +768,7 @@ const RegisterForm = () => {
             <CustomTextField
               type={passwordVisible ? "text" : "password"}
               fullWidth
+              inputRef={passwordRef}
               label="Password"
               value={password}
               onChange={changeHandler.password}
@@ -816,6 +820,7 @@ const RegisterForm = () => {
             <CustomTextField
               type={confirmPasswordVisible ? "text" : "password"}
               fullWidth
+              inputRef = {passConfirmRef}
               label="Confirm Password"
               value={confirmPassword}
               onChange={changeHandler.confirmPassword}

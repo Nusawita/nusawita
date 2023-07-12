@@ -18,29 +18,43 @@ const LoginForm = () => {
   const [enteredUsername, setEnteredUsername] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
-  const [usernameFocused, setUsernameFocused] = useState(false);
 
   const [passwordError, setPasswordError] = useState("");
   const [passwordVisibility, setPasswordVisibility] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
   let passwordRef = useRef();
 
+  const [focused, setFocused] = useState({
+    username: false,
+    password: false,
+  });
+  const handleFocus = (field) => {
+    setFocused((prev) => ({
+      ...prev,
+      [field]: true,
+    }));
+  };
+  const handleBlur = (field) => {
+    setFocused((prev) => ({
+      ...prev,
+      [field]: false,
+    }));
+  };
   const [authError, setAuthError] = useState(false);
 
   const focusHandler = {
     username: () => {
-      setUsernameFocused(true);
+      handleFocus("username");
     },
     password: () => {
-      setPasswordFocused(true);
+      handleFocus("password");
     },
   };
   const blurHandler = {
     username: () => {
-      setUsernameFocused(false);
+      handleBlur("username");
     },
     password: () => {
-      setPasswordFocused(false);
+      handleBlur("password");
     },
   };
 
@@ -81,12 +95,20 @@ const LoginForm = () => {
 
   const handleVisibility = {
     setVisible: () => {
-      setPasswordVisibility(true);
       passwordRef.current.focus();
+      setTimeout(() => {
+        passwordRef.current.selectionStart = passwordRef.current.value.length;
+        passwordRef.current.selectionEnd = passwordRef.current.value.length;
+      }, 0);
+      setPasswordVisibility(true);
     },
     setHidden: () => {
-      setPasswordVisibility(false);
       passwordRef.current.focus();
+      setTimeout(() => {
+        passwordRef.current.selectionStart = passwordRef.current.value.length;
+        passwordRef.current.selectionEnd = passwordRef.current.value.length;
+      }, 0);
+      setPasswordVisibility(false);
     },
   };
 
@@ -126,13 +148,16 @@ const LoginForm = () => {
       return true;
     },
     password: () => {
-      const passRegex = /(?=.*[A-Z])(?=.*[a-z])(?=.*\d)^[^ ]+$/
+      const passRegex = /(?=.*[A-Z])(?=.*[a-z])(?=.*\d)^[^ ]+$/;
       if (enteredPassword.trim().length === 0) {
         setPasswordError("Password is empty");
         showError("password");
         return false;
       }
-      if (enteredPassword.trim().length < 8 || !passRegex.test(enteredPassword)) {
+      if (
+        enteredPassword.trim().length < 8 ||
+        !passRegex.test(enteredPassword)
+      ) {
         setUsernameError("Invalid username or password");
         showError("username");
         setPasswordError("Invalid username or password");
@@ -289,7 +314,7 @@ const LoginForm = () => {
               onBlur={blurHandler.username}
               value={enteredUsername}
               helperText={errorShow.username && usernameError}
-              focused={usernameFocused}
+              focused={focused.username}
               leftIcon={
                 <Icon icon="ic:round-person" color="black" width="27" />
               }
@@ -309,20 +334,19 @@ const LoginForm = () => {
             onAnimationComplete={handleAnimationComplete.password}
           >
             <CustomTextField
-              inputRef={passwordRef}
               type={passwordVisibility ? "text" : "password"}
               fullWidth
-              sx={{ mb: 2 }}
-              color={errorShow.password && "error"}
+              inputRef={passwordRef}
+              label="Password"
+              value={enteredPassword}
               onChange={changeHandler.password}
               error={errorShow.password}
-              label="Password"
+              color={errorShow.password && "error"}
               variant="outlined"
+              focused={focused.password}
               onFocus={focusHandler.password}
               onBlur={blurHandler.password}
-              value={enteredPassword}
               helperText={errorShow.password && passwordError}
-              focused={passwordFocused}
               leftIcon={
                 <Icon icon="material-symbols:lock" color="black" width="27" />
               }
@@ -354,6 +378,7 @@ const LoginForm = () => {
                   )}
                 </>
               }
+              sx={{ mb: 2 }}
             />
           </ErrorVibrateAnimation>
           <Box sx={{ width: "100%", ...ContentEnd, mb: 5 }}>
