@@ -1,4 +1,4 @@
-import React, { useState, useEffect,  } from "react";
+import React, { useState, useEffect } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField } from "../custom-UI";
@@ -6,7 +6,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
-import axios from "../../../axios-instance";
+import api from "../../../axios-instance";
+import axios from "axios";
 
 import { Icon } from "@iconify/react";
 
@@ -242,10 +243,18 @@ const RegisterForm = () => {
 
   // Run check on value change with delay (wait for user typing)
   useEffect(() => {
+    const abortController = new AbortController();
     const timeout = setTimeout(async () => {
       if (username.trim().length === 0) {
         setInvalid("username");
         setUsernameError("Username cannot be empty");
+        return;
+      }
+      const spaceRegex = /^[^ ]+$/;
+      if (!spaceRegex.test(username)) {
+        setInvalid("username");
+        setUsernameError("Username must not contain space");
+        showError("username");
         return;
       }
 
@@ -258,12 +267,15 @@ const RegisterForm = () => {
       // check username realtime api currently error
       setCheckingUsername(true);
       try {
-        const res = await axios.post(
+        const res = await api.post(
           "check-username",
           { username },
-          { withCredentials: true }
+          {
+            signal: abortController.signal,
+          }
         );
         if (res.status === 200) {
+          console.log(username);
           setCheckingUsername(false);
           setValid("username");
           setUsernameError("");
@@ -271,6 +283,9 @@ const RegisterForm = () => {
           return;
         }
       } catch (error) {
+        if(axios.isCancel(error)){
+          return
+        }
         if (error.response.status === 401) {
           setCheckingUsername(false);
           setInvalid("username");
@@ -282,6 +297,8 @@ const RegisterForm = () => {
       }
     }, 400);
     return () => {
+      abortController.abort()
+      setCheckingUsername(false)
       clearTimeout(timeout);
     };
   }, [username]);
@@ -345,6 +362,7 @@ const RegisterForm = () => {
   }, [phone]);
 
   useEffect(() => {
+    const abortController = new AbortController();
     const timeout = setTimeout(async () => {
       if (email.trim().length === 0) {
         setInvalid("email");
@@ -361,20 +379,19 @@ const RegisterForm = () => {
       }
       setCheckingEmail(true);
       try {
-        const res = await axios.post(
-          "check-email",
-          { email },
-          { withCredentials: true }
+        const res = await api.post(
+          "check-email", {signal: abortController.signal},
+          { email }
         );
         if (res.status === 200) {
-          setCheckingEmail(false)
+          setCheckingEmail(false);
           setValid("email");
           setEmailError("");
           hideError("email");
           return;
         }
       } catch (error) {
-        setCheckingEmail(false)
+        setCheckingEmail(false);
         if (error.response.status === 401) {
           setInvalid("email");
           setEmailError("Email exists please use another email");
@@ -385,6 +402,7 @@ const RegisterForm = () => {
       }
     }, 400);
     return () => {
+      abortController.abort()
       clearTimeout(timeout);
     };
   }, [email]);
@@ -401,6 +419,18 @@ const RegisterForm = () => {
         setPasswordError("Password cannot be empty");
         return;
       }
+      const spaceRegex = /^[^ ]+$/;
+      if (!spaceRegex.test(password)) {
+        if (confirmPassword) {
+          setInvalid("confirmPassword");
+          setConfirmPasswordError("Please correctly fill password first");
+          showError("confirmPassword");
+        }
+        setInvalid("password");
+        setPasswordError("Password must not contain spaces");
+        showError("password");
+        return;
+      }
       if (password.trim().length < 8) {
         if (confirmPassword) {
           setInvalid("confirmPassword");
@@ -409,6 +439,20 @@ const RegisterForm = () => {
         }
         setInvalid("password");
         setPasswordError("Password must be 8 or more characters");
+        showError("password");
+        return;
+      }
+      const passwordRegex = /(?=.*[A-Z])(?=.*[a-z])(?=.*\d)/;
+      if (!passwordRegex.test(password)) {
+        if (confirmPassword) {
+          setInvalid("confirmPassword");
+          setConfirmPasswordError("Please correctly fill password first");
+          showError("confirmPassword");
+        }
+        setInvalid("password");
+        setPasswordError(
+          "Password must contain an uppercase character, a lowercase characters, and a number"
+        );
         showError("password");
         return;
       }
@@ -449,11 +493,9 @@ const RegisterForm = () => {
   const fetchRegisterAPI = async (registerData) => {
     try {
       // call login api
-      const res = await axios.post(
-        "register",
-        registerData,
-        { withCredentials: true }
-      );
+      const res = await api.post("register", registerData, {
+        withCredentials: true,
+      });
       //if login success redirect to landing page
       if (res.status === 201) {
         alert("Succesfully registered");
@@ -487,11 +529,9 @@ const RegisterForm = () => {
   const fetchLoginApi = async (loginData) => {
     try {
       // call login api
-      const res = await axios.post(
-        "/login",
-        loginData,
-        { withCredentials: true }
-      );
+      const res = await api.post("/login", loginData, {
+        withCredentials: true,
+      });
       //if login success redirect to landing page
       if (res.status === 200) {
         localStorage.setItem("loginCredentials", JSON.stringify(res.data.data));
@@ -702,7 +742,9 @@ const RegisterForm = () => {
               focused={focused.email}
               onFocus={focusHandler.email}
               onBlur={blurHandler.email}
-              helperText={(errorShow.email && emailError)||(checkingEmail && emailError)}
+              helperText={
+                (errorShow.email && emailError) || (checkingEmail && emailError)
+              }
               leftIcon={<Icon icon="ic:round-email" color="black" width="28" />}
               rightIcon={
                 errorShow.email && (
@@ -841,7 +883,7 @@ const RegisterForm = () => {
               component="span"
               sx={{ color: "#1273EB", fontWeight: "500", pl: 1, pr: 1 }}
             >
-              Terms of Use 
+              Terms of Use
             </Typography>
             and
             <Typography

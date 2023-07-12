@@ -5,7 +5,7 @@ import { ContentMiddle, ContentEnd } from "../../../styles/shared-styles";
 import { CustomTextField } from "../custom-UI";
 import { Icon } from "@iconify/react";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
-import axios from "../../../axios-instance";
+import api from "../../../axios-instance";
 
 const LoginForm = () => {
   //call theme component
@@ -126,12 +126,13 @@ const LoginForm = () => {
       return true;
     },
     password: () => {
+      const passRegex = /(?=.*[A-Z])(?=.*[a-z])(?=.*\d)^[^ ]+$/
       if (enteredPassword.trim().length === 0) {
         setPasswordError("Password is empty");
         showError("password");
         return false;
       }
-      if (enteredPassword.trim().length < 8) {
+      if (enteredPassword.trim().length < 8 || !passRegex.test(enteredPassword)) {
         setUsernameError("Invalid username or password");
         showError("username");
         setPasswordError("Invalid username or password");
@@ -156,7 +157,7 @@ const LoginForm = () => {
     // console.log("fetchApi");
     try {
       // call login api
-      const res = await axios.post("login", loginData, {
+      const res = await api.post("login", loginData, {
         withCredentials: true,
       });
       //if login success redirect to landing page
