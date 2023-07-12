@@ -277,7 +277,6 @@ const RegisterForm = () => {
           }
         );
         if (res.status === 200) {
-          console.log(username);
           setCheckingUsername(false);
           setValid("username");
           setUsernameError("");
@@ -496,9 +495,7 @@ const RegisterForm = () => {
   const fetchRegisterAPI = async (registerData) => {
     try {
       // call login api
-      const res = await api.post("register", registerData, {
-        withCredentials: true,
-      });
+      const res = await api.post("register", registerData);
       //if login success redirect to landing page
       if (res.status === 201) {
         alert("Succesfully registered");
