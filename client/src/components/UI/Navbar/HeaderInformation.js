@@ -1,6 +1,5 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import AuthContext from "../../../context/auth-context";
 import { Icon } from "@iconify/react";
 
 const HeaderInformation = () => {
@@ -8,8 +7,6 @@ const HeaderInformation = () => {
   const colorPalette = {
     primary: theme.palette.primary,
   };
-  const ctxAuth = useContext(AuthContext);
-
   return (
     <Box
       sx={{
@@ -21,22 +18,9 @@ const HeaderInformation = () => {
       }}
     >
       <Box sx={{ px: 7 }}>
-        <>
-          {ctxAuth.isLoggedIn ? (
-            <Typography variant="button-text" color="white">
-              {`Welcome ${ctxAuth.loginUser}`}
-            </Typography>
-          ) : (
-            <Typography variant="button-text" color="white">
-              Covid - 19 : IMPORTANT INFORMATION
-            </Typography>
-          )}
-          {ctxAuth.isAdmin && (
-            <Typography variant="button-text" component='a' href="/admin/dashboard" color="white" sx={{ px:3 }}>
-              Go to Dashboard
-            </Typography>
-          )}
-        </>
+        <Typography variant="buttonText" color="white">
+          Covid - 19 : IMPORTANT INFORMATION
+        </Typography>
       </Box>
       <Box sx={{ display: "inline-flex", pr: 14 }}>
         <Box sx={{ px: 1, py: 1 }}>
@@ -57,7 +41,7 @@ const HeaderInformation = () => {
             color: "white",
           }}
         >
-          <Typography variant="button-text" color="white">
+          <Typography variant="buttonText" color="white">
             Contact Us
           </Typography>
         </Box>
@@ -72,7 +56,7 @@ const HeaderInformation = () => {
             color: "white",
           }}
         >
-          <Typography variant="button-text" color="white">
+          <Typography variant="buttonText" color="white">
             (1245) 2456 012
           </Typography>
         </Box>
