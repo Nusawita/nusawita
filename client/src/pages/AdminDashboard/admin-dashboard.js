@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import AuthContext from "../../context/auth-context";
 import api from "../../axios-instance";
 
 export const AdminDashboard = () => {
   const ctxAuth = useContext(AuthContext);
-  const [allUser, setAllUser] = useState({});
+  const [allUser, setAllUser] = useState([]);
 
   useEffect(() => {
     const id = setTimeout(async () => {
@@ -14,12 +14,13 @@ export const AdminDashboard = () => {
         const res = await api.get("admin/users", {
           withCredentials: true,
         });
-        console.log(res.data.data);
+        // console.log(res.data.data);
+        setAllUser(res.data.data);
       } catch (error) {
         // if unauthorized then show appropiate error in front
         console.log(error);
       }
-    }, 2000);
+    }, 500);
     return () => {
       clearTimeout(id);
     };
@@ -28,7 +29,15 @@ export const AdminDashboard = () => {
   return (
     <>
       <h1>Admin Page</h1>
-
+      {allUser &&
+        allUser.map((user) => {
+          return (
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h5">{user.username}</Typography>
+              <Typography variant="h5">{user.email}</Typography>
+            </Box>
+          );
+        })}
       <Button onClick={ctxAuth.logoutUser} variant="primary">
         LOGOUT
       </Button>
