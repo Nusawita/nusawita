@@ -107,6 +107,10 @@ class UserService {
             return [null, jsonData];
         }
 
+        if (search == undefined) {
+            search = "";
+        }
+        
         //get all user
         const [allUser, errAllUser] = await this.userRepository.getAllUser(search)
         if (errAllUser != null) {

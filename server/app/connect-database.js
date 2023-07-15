@@ -2,6 +2,11 @@ const Sequelize = require('sequelize');
 require('dotenv').config();
 
 // Create a Sequelize instance and establish the database connection
+// const sequelize = new Sequelize(process.env.PG_DATABASE, process.env.PG_USERNAME, process.env.PG_PASSWORD, {
+//   host: process.env.PG_HOST,
+//   dialect: process.env.PG_DIALECT,
+// });
+
 const sequelize = new Sequelize(process.env.PG_DATABASE, process.env.PG_USERNAME, process.env.PG_PASSWORD, {
   host: process.env.PG_HOST,
   dialect: process.env.PG_DIALECT,

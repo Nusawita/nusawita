@@ -11,11 +11,19 @@ const router = require('./app/routes/v1/route.js');
 const port = process.env.PORT
 
 const bodyParser = require('body-parser');
-app.use(cors({
-    origin: 'http://localhost:3000',
-    methods: ["GET", "POST"],
-    credentials:true,
-  }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000/",
+      "https://nusawita.netlify.app/",
+      "https://localhost:3000/login",
+      "https://localhost:3000/",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended : false }));

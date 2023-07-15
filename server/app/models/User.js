@@ -1,7 +1,7 @@
 const {DataTypes} = require("sequelize");
 const sequelize = require("../connect-database")
 
-// class User extends Model {}
+// class User extends Model {}   
 const User = sequelize.define('user',{
     id: {
         type: DataTypes.INTEGER,
