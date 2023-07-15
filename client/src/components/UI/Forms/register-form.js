@@ -10,6 +10,7 @@ import api from "../../../axios-instance";
 import axios from "axios";
 
 import { Icon } from "@iconify/react";
+import CustomAppbar from "../Appbar/custom-appbar";
 
 const RegisterForm = () => {
   // console.log('rerendeers')
@@ -42,7 +43,7 @@ const RegisterForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  let passConfirmRef = useRef()
+  let passConfirmRef = useRef();
 
   //TO START ERROR ANIMATION
   const [errorAnimation, setErrorAnimation] = useState({
@@ -178,11 +179,11 @@ const RegisterForm = () => {
     },
     confirmPassword: {
       setVisible: () => {
-        passConfirmRef.current.focus()
+        passConfirmRef.current.focus();
         setConfirmPasswordVisible(true);
       },
       setHidden: () => {
-        passConfirmRef.current.focus()
+        passConfirmRef.current.focus();
         setConfirmPasswordVisible(false);
       },
     },
@@ -277,7 +278,6 @@ const RegisterForm = () => {
           }
         );
         if (res.status === 200) {
-          console.log(username);
           setCheckingUsername(false);
           setValid("username");
           setUsernameError("");
@@ -383,8 +383,8 @@ const RegisterForm = () => {
       try {
         const res = await api.post(
           "check-email",
-          { signal: abortController.signal },
-          { email }
+          { email },
+          { signal: abortController.signal }
         );
         if (res.status === 200) {
           setCheckingEmail(false);
@@ -496,9 +496,7 @@ const RegisterForm = () => {
   const fetchRegisterAPI = async (registerData) => {
     try {
       // call login api
-      const res = await api.post("register", registerData, {
-        withCredentials: true,
-      });
+      const res = await api.post("register", registerData);
       //if login success redirect to landing page
       if (res.status === 201) {
         alert("Succesfully registered");
@@ -591,316 +589,324 @@ const RegisterForm = () => {
     }
   };
   return (
-    <Grid
-      container
-      sx={{
-        height: "100%",
-        boxShadow: "0px 10px 15px 3px rgba(226, 226, 226, 0.25)",
-        borderRadius: "10px",
-        overflow: "hidden",
-      }}
-    >
+    <>
       <Grid
-        item
-        xs={8}
+        container
         sx={{
-          backgroundImage: "url(/images/gapura.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <Grid
-        item
-        xs={4}
-        sx={{
-          ...ContentMiddle,
-          backgroundColor: lightColor,
+          height: "100%",
+          boxShadow: "0px 10px 15px 3px rgba(226, 226, 226, 0.25)",
+          borderRadius: "10px",
+          overflow: "hidden",
         }}
       >
-        <Box
-          onSubmit={handleSubmit}
-          component="form"
-          sx={{ width: "70%" }}
-          flexDirection="column"
+        <Grid
+          item
+          xs={8}
+          sx={{
+            backgroundImage: "url(/images/gapura.jpg)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: { xs: "none", md: "block" },
+          }}
+        />
+        <Grid
+          item
+          xs={12}
+          md={4}
+          sx={{
+            ...ContentMiddle,
+            backgroundColor: lightColor,
+          }}
         >
-          <Box sx={{ ...ContentMiddle }}>
-            <Box
-              sx={{
-                width: "155px",
-                height: "120px",
-                backgroundImage: "url(/logos/nusawita_logo_circle.png)",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            />
-          </Box>
-          <Typography
-            variant="h4"
-            component="h4"
-            sx={{ pb: 2, textAlign: "center" }}
+          <Box
+            onSubmit={handleSubmit}
+            component="form"
+            sx={{ width: { xs: "90%", md: "70%" } }}
+            flexDirection="column"
           >
-            Create an Account
-          </Typography>
+            <Box sx={{ ...ContentMiddle }}>
+              <Box
+                sx={{
+                  width: "155px",
+                  height: "120px",
+                  backgroundImage: "url(/logos/nusawita_logo_circle.png)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+            </Box>
+            <Typography
+              variant="h4"
+              component="h4"
+              sx={{ pb: 2, textAlign: "center" }}
+            >
+              Create an Account
+            </Typography>
 
-          <ErrorVibrateAnimation
-            showAnimation={errorAnimation.username}
-            onAnimationComplete={handleAnimationComplete.username}
-          >
-            <CustomTextField
-              type="text"
-              fullWidth
-              color={errorShow.username && "error"}
-              onChange={changeHandler.username}
-              error={errorShow.username}
-              label="Username"
-              variant="outlined"
-              onFocus={focusHandler.username}
-              onBlur={blurHandler.username}
-              value={username}
-              helperText={
-                (errorShow.username && usernameError) ||
-                (checkingUsername && usernameError)
-              }
-              focused={focused.username}
-              leftIcon={
-                <Icon icon="ic:round-person" color="black" width="28" />
-              }
-              rightIcon={
-                errorShow.username && (
-                  <Icon
-                    icon="ep:warning-filled"
-                    color={dangerMain}
-                    width="27"
-                  />
-                )
-              }
-              sx={{ mb: 2 }}
-            />
-          </ErrorVibrateAnimation>
-          <ErrorVibrateAnimation
-            showAnimation={errorAnimation.date}
-            onAnimationComplete={handleAnimationComplete.date}
-          >
-            <CustomDatePicker
-              sx={{ mb: 2 }}
-              label="Birth Date"
-              labelDisplay={dateError && "error"}
-              value={date}
-              display={dateError && "error"}
-              message={
-                dateError && (
-                  <Typography sx={{ color: dangerMain }} variant="caption">
-                    {dateError}
-                  </Typography>
-                )
-              }
-              onChange={(newDate) => {
-                setDate(dayjs(newDate).utc());
-              }}
-            />
-          </ErrorVibrateAnimation>
-          <ErrorVibrateAnimation
-            showAnimation={errorAnimation.phone}
-            onAnimationComplete={handleAnimationComplete.phone}
-          >
-            <CustomTextField
-              fullWidth
-              label="Phone (optional)"
-              value={phone}
-              onChange={changeHandler.phone}
-              error={errorShow.phone}
-              color={errorShow.phone && "error"}
-              variant="outlined"
-              focused={focused.phone}
-              onFocus={focusHandler.phone}
-              onBlur={blurHandler.phone}
-              helperText={errorShow.phone && phoneError}
-              leftIcon={
-                <Icon icon="solar:phone-bold" color="black" width="28" />
-              }
-              rightIcon={
-                errorShow.phone && (
-                  <Icon
-                    icon="ep:warning-filled"
-                    color={dangerMain}
-                    width="27"
-                  />
-                )
-              }
-              sx={{ mb: 2 }}
-            />
-          </ErrorVibrateAnimation>
-          <ErrorVibrateAnimation
-            showAnimation={errorAnimation.email}
-            onAnimationComplete={handleAnimationComplete.email}
-          >
-            <CustomTextField
-              fullWidth
-              label="Email"
-              value={email}
-              onChange={changeHandler.email}
-              error={errorShow.email}
-              color={errorShow.email && "error"}
-              variant="outlined"
-              focused={focused.email}
-              onFocus={focusHandler.email}
-              onBlur={blurHandler.email}
-              helperText={
-                (errorShow.email && emailError) || (checkingEmail && emailError)
-              }
-              leftIcon={<Icon icon="ic:round-email" color="black" width="28" />}
-              rightIcon={
-                errorShow.email && (
-                  <Icon
-                    icon="ep:warning-filled"
-                    color={dangerMain}
-                    width="27"
-                  />
-                )
-              }
-              sx={{ mb: 2 }}
-            />
-          </ErrorVibrateAnimation>
-          <ErrorVibrateAnimation
-            showAnimation={errorAnimation.password}
-            onAnimationComplete={handleAnimationComplete.password}
-          >
-            <CustomTextField
-              type={passwordVisible ? "text" : "password"}
-              fullWidth
-              inputRef={passwordRef}
-              label="Password"
-              value={password}
-              onChange={changeHandler.password}
-              error={errorShow.password}
-              color={errorShow.password && "error"}
-              variant="outlined"
-              focused={focused.password}
-              onFocus={focusHandler.password}
-              onBlur={blurHandler.password}
-              helperText={errorShow.password && passwordError}
-              leftIcon={
-                <Icon icon="material-symbols:lock" color="black" width="28" />
-              }
-              rightIcon={
-                <>
-                  {passwordVisible ? (
-                    <Icon
-                      onClick={visibilityHandler.password.setHidden}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:eye"
-                      color="black"
-                      width="28"
-                    />
-                  ) : (
-                    <Icon
-                      onClick={visibilityHandler.password.setVisible}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:hide"
-                      color="black"
-                      width="28"
-                    />
-                  )}
-                  {errorShow.password && (
+            <ErrorVibrateAnimation
+              showAnimation={errorAnimation.username}
+              onAnimationComplete={handleAnimationComplete.username}
+            >
+              <CustomTextField
+                type="text"
+                fullWidth
+                color={errorShow.username && "error"}
+                onChange={changeHandler.username}
+                error={errorShow.username}
+                label="Username"
+                variant="outlined"
+                onFocus={focusHandler.username}
+                onBlur={blurHandler.username}
+                value={username}
+                helperText={
+                  (errorShow.username && usernameError) ||
+                  (checkingUsername && usernameError)
+                }
+                focused={focused.username}
+                leftIcon={
+                  <Icon icon="ic:round-person" color="black" width="28" />
+                }
+                rightIcon={
+                  errorShow.username && (
                     <Icon
                       icon="ep:warning-filled"
                       color={dangerMain}
                       width="27"
                     />
-                  )}
-                </>
-              }
-              sx={{ mb: 2 }}
-            />
-          </ErrorVibrateAnimation>
-          <ErrorVibrateAnimation
-            showAnimation={errorAnimation.confirmPassword}
-            onAnimationComplete={handleAnimationComplete.confirmPassword}
-          >
-            <CustomTextField
-              type={confirmPasswordVisible ? "text" : "password"}
-              fullWidth
-              inputRef = {passConfirmRef}
-              label="Confirm Password"
-              value={confirmPassword}
-              onChange={changeHandler.confirmPassword}
-              error={errorShow.confirmPassword}
-              color={errorShow.confirmPassword && "error"}
-              variant="outlined"
-              focused={focused.confirmPassword}
-              onFocus={focusHandler.confirmPassword}
-              onBlur={blurHandler.confirmPassword}
-              helperText={errorShow.confirmPassword && confirmPasswordError}
-              leftIcon={
-                <Icon icon="material-symbols:lock" color="black" width="28" />
-              }
-              rightIcon={
-                <>
-                  {confirmPasswordVisible ? (
-                    <Icon
-                      onClick={visibilityHandler.confirmPassword.setHidden}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:eye"
-                      color="black"
-                      width="28"
-                    />
-                  ) : (
-                    <Icon
-                      onClick={visibilityHandler.confirmPassword.setVisible}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:hide"
-                      color="black"
-                      width="28"
-                    />
-                  )}
-                  {errorShow.confirmPassword && (
+                  )
+                }
+                sx={{ mb: 2 }}
+              />
+            </ErrorVibrateAnimation>
+            <ErrorVibrateAnimation
+              showAnimation={errorAnimation.date}
+              onAnimationComplete={handleAnimationComplete.date}
+            >
+              <CustomDatePicker
+                sx={{ mb: 2 }}
+                label="Birth Date"
+                labelDisplay={dateError && "error"}
+                value={date}
+                display={dateError && "error"}
+                message={
+                  dateError && (
+                    <Typography sx={{ color: dangerMain }} variant="caption">
+                      {dateError}
+                    </Typography>
+                  )
+                }
+                onChange={(newDate) => {
+                  setDate(dayjs(newDate).utc());
+                }}
+              />
+            </ErrorVibrateAnimation>
+            <ErrorVibrateAnimation
+              showAnimation={errorAnimation.phone}
+              onAnimationComplete={handleAnimationComplete.phone}
+            >
+              <CustomTextField
+                fullWidth
+                label="Phone (optional)"
+                value={phone}
+                onChange={changeHandler.phone}
+                error={errorShow.phone}
+                color={errorShow.phone && "error"}
+                variant="outlined"
+                focused={focused.phone}
+                onFocus={focusHandler.phone}
+                onBlur={blurHandler.phone}
+                helperText={errorShow.phone && phoneError}
+                leftIcon={
+                  <Icon icon="solar:phone-bold" color="black" width="28" />
+                }
+                rightIcon={
+                  errorShow.phone && (
                     <Icon
                       icon="ep:warning-filled"
                       color={dangerMain}
                       width="27"
                     />
-                  )}
-                </>
-              }
-              sx={{ mb: 2 }}
-            />
-          </ErrorVibrateAnimation>
-          <Box sx={{ ...ContentMiddle }}>
-            <Button type="submit" variant="primary" size="large">
-              Sign Up
-            </Button>
-            <Typography variant="subtitle1" sx={{ fontWeight: "500", mt: 2 }}>
-              Already Have An Account?
+                  )
+                }
+                sx={{ mb: 2 }}
+              />
+            </ErrorVibrateAnimation>
+            <ErrorVibrateAnimation
+              showAnimation={errorAnimation.email}
+              onAnimationComplete={handleAnimationComplete.email}
+            >
+              <CustomTextField
+                fullWidth
+                label="Email"
+                value={email}
+                onChange={changeHandler.email}
+                error={errorShow.email}
+                color={errorShow.email && "error"}
+                variant="outlined"
+                focused={focused.email}
+                onFocus={focusHandler.email}
+                onBlur={blurHandler.email}
+                helperText={
+                  (errorShow.email && emailError) ||
+                  (checkingEmail && emailError)
+                }
+                leftIcon={
+                  <Icon icon="ic:round-email" color="black" width="28" />
+                }
+                rightIcon={
+                  errorShow.email && (
+                    <Icon
+                      icon="ep:warning-filled"
+                      color={dangerMain}
+                      width="27"
+                    />
+                  )
+                }
+                sx={{ mb: 2 }}
+              />
+            </ErrorVibrateAnimation>
+            <ErrorVibrateAnimation
+              showAnimation={errorAnimation.password}
+              onAnimationComplete={handleAnimationComplete.password}
+            >
+              <CustomTextField
+                type={passwordVisible ? "text" : "password"}
+                fullWidth
+                inputRef={passwordRef}
+                label="Password"
+                value={password}
+                onChange={changeHandler.password}
+                error={errorShow.password}
+                color={errorShow.password && "error"}
+                variant="outlined"
+                focused={focused.password}
+                onFocus={focusHandler.password}
+                onBlur={blurHandler.password}
+                helperText={errorShow.password && passwordError}
+                leftIcon={
+                  <Icon icon="material-symbols:lock" color="black" width="28" />
+                }
+                rightIcon={
+                  <>
+                    {passwordVisible ? (
+                      <Icon
+                        onClick={visibilityHandler.password.setHidden}
+                        style={{ cursor: "pointer" }}
+                        icon="mdi:eye"
+                        color="black"
+                        width="28"
+                      />
+                    ) : (
+                      <Icon
+                        onClick={visibilityHandler.password.setVisible}
+                        style={{ cursor: "pointer" }}
+                        icon="mdi:hide"
+                        color="black"
+                        width="28"
+                      />
+                    )}
+                    {errorShow.password && (
+                      <Icon
+                        icon="ep:warning-filled"
+                        color={dangerMain}
+                        width="27"
+                      />
+                    )}
+                  </>
+                }
+                sx={{ mb: 2 }}
+              />
+            </ErrorVibrateAnimation>
+            <ErrorVibrateAnimation
+              showAnimation={errorAnimation.confirmPassword}
+              onAnimationComplete={handleAnimationComplete.confirmPassword}
+            >
+              <CustomTextField
+                type={confirmPasswordVisible ? "text" : "password"}
+                fullWidth
+                inputRef={passConfirmRef}
+                label="Confirm Password"
+                value={confirmPassword}
+                onChange={changeHandler.confirmPassword}
+                error={errorShow.confirmPassword}
+                color={errorShow.confirmPassword && "error"}
+                variant="outlined"
+                focused={focused.confirmPassword}
+                onFocus={focusHandler.confirmPassword}
+                onBlur={blurHandler.confirmPassword}
+                helperText={errorShow.confirmPassword && confirmPasswordError}
+                leftIcon={
+                  <Icon icon="material-symbols:lock" color="black" width="28" />
+                }
+                rightIcon={
+                  <>
+                    {confirmPasswordVisible ? (
+                      <Icon
+                        onClick={visibilityHandler.confirmPassword.setHidden}
+                        style={{ cursor: "pointer" }}
+                        icon="mdi:eye"
+                        color="black"
+                        width="28"
+                      />
+                    ) : (
+                      <Icon
+                        onClick={visibilityHandler.confirmPassword.setVisible}
+                        style={{ cursor: "pointer" }}
+                        icon="mdi:hide"
+                        color="black"
+                        width="28"
+                      />
+                    )}
+                    {errorShow.confirmPassword && (
+                      <Icon
+                        icon="ep:warning-filled"
+                        color={dangerMain}
+                        width="27"
+                      />
+                    )}
+                  </>
+                }
+                sx={{ mb: 2 }}
+              />
+            </ErrorVibrateAnimation>
+            <Box sx={{ ...ContentMiddle }}>
+              <Button type="submit" variant="primary" size="large">
+                Sign Up
+              </Button>
+              <Typography variant="subtitle1" sx={{ fontWeight: "500", mt: 2 }}>
+                Already Have An Account?
+                <Typography
+                  component="a"
+                  href="/login"
+                  sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
+                >
+                  Login
+                </Typography>
+              </Typography>
+            </Box>
+            <Typography sx={{ p: 2, textAlign: "center" }}>
+              By continuing, you agree to NusaWita Company's
+            </Typography>
+            <Typography align="center">
               <Typography
-                component="a"
-                href="/login"
+                component="span"
+                sx={{ color: "#1273EB", fontWeight: "500", pl: 1, pr: 1 }}
+              >
+                Terms of Use
+              </Typography>
+              <span> </span>
+              and
+              <Typography
+                component="span"
                 sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
               >
-                Login
+                Privacy Policy
               </Typography>
             </Typography>
           </Box>
-          <Typography sx={{ ...ContentMiddle }}>
-            By continuing, you agree to NusaWita Company's
-          </Typography>
-          <Typography align="center">
-            <Typography
-              component="span"
-              sx={{ color: "#1273EB", fontWeight: "500", pl: 1, pr: 1 }}
-            >
-              Terms of Use
-            </Typography>
-            and
-            <Typography
-              component="span"
-              sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
-            >
-              Privacy Policy
-            </Typography>
-          </Typography>
-        </Box>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 
