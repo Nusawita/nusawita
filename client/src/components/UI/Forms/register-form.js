@@ -386,8 +386,6 @@ const RegisterForm = () => {
           { signal: abortController.signal }
         );
         if (res.status === 200) {
-          console.log(res.data);
-          console.log(email);
           setCheckingEmail(false);
           setValid("email");
           setEmailError("");
@@ -606,11 +604,13 @@ const RegisterForm = () => {
           backgroundImage: "url(/images/gapura.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          display: { xs: "none", md: "block" },
         }}
       />
       <Grid
         item
-        xs={4}
+        xs={12}
+        md={4}
         sx={{
           ...ContentMiddle,
           backgroundColor: lightColor,
@@ -619,7 +619,7 @@ const RegisterForm = () => {
         <Box
           onSubmit={handleSubmit}
           component="form"
-          sx={{ width: "70%" }}
+          sx={{ width: { xs: "90%", md: "70%" } }}
           flexDirection="column"
         >
           <Box sx={{ ...ContentMiddle }}>
@@ -879,7 +879,7 @@ const RegisterForm = () => {
               </Typography>
             </Typography>
           </Box>
-          <Typography sx={{ ...ContentMiddle }}>
+          <Typography sx={{ p: 2, textAlign: "center" }}>
             By continuing, you agree to NusaWita Company's
           </Typography>
           <Typography align="center">
@@ -889,6 +889,7 @@ const RegisterForm = () => {
             >
               Terms of Use
             </Typography>
+            <span> </span>
             and
             <Typography
               component="span"

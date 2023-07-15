@@ -13,7 +13,7 @@ const HeaderInformation = () => {
         backgroundColor: colorPalette.primary.main,
         alignItems: "center",
         width: "100%",
-        display: "inline-flex",
+        display: { xs: "none", md: "flex" },
         justifyContent: "space-between",
       }}
     >
