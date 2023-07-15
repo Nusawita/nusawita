@@ -6,6 +6,7 @@ import { CustomTextField } from "../custom-UI";
 import { Icon } from "@iconify/react";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
+import CustomAppbar from "../Appbar/custom-appbar";
 
 const LoginForm = () => {
   //call theme component
@@ -102,7 +103,7 @@ const LoginForm = () => {
         passwordRef.current.selectionStart = passwordRef.current.value.length;
         passwordRef.current.selectionEnd = passwordRef.current.value.length;
       }, 0);
-      setTimeoutId(id)
+      setTimeoutId(id);
       setPasswordVisibility(true);
     },
     setHidden: () => {
@@ -111,7 +112,7 @@ const LoginForm = () => {
         passwordRef.current.selectionStart = passwordRef.current.value.length;
         passwordRef.current.selectionEnd = passwordRef.current.value.length;
       }, 0);
-      setTimeoutId(id)
+      setTimeoutId(id);
       setPasswordVisibility(false);
     },
   };
@@ -146,7 +147,7 @@ const LoginForm = () => {
       clearTimeout(timeoutId);
     };
   }, [timeoutId]);
-  
+
   const validator = {
     username: () => {
       if (enteredUsername.trim().length < 8) {
@@ -262,176 +263,178 @@ const LoginForm = () => {
   };
 
   return (
-    <Grid
-      container
-      sx={{
-        height: "100%",
-        boxShadow: "0px 10px 15px 3px rgba(226, 226, 226, 0.25)",
-        borderRadius: "10px",
-        overflow: "hidden",
-      }}
-    >
+    <>
       <Grid
-        item
-        xs={8}
+        container
         sx={{
-          backgroundImage: "url(/images/gapura.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Grid
-        item
-        xs={12}
-        md={4}
-        sx={{
-          backgroundColor: lightColor,
-          display: { xs: "flex", md: "flex" },
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          height: "100%",
+          boxShadow: "0px 10px 15px 3px rgba(226, 226, 226, 0.25)",
+          borderRadius: "10px",
+          overflow: "hidden",
         }}
       >
-        <Box
-          component="form"
-          sx={{ width: { xs: "90%", md: "70%" } }}
-          display="flex"
-          flexDirection="column"
-          onSubmit={handleFormSubmit}
+        <Grid
+          item
+          xs={8}
+          sx={{
+            backgroundImage: "url(/images/gapura.jpg)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: { xs: "none", md: "block" },
+          }}
+        />
+        <Grid
+          item
+          xs={12}
+          md={4}
+          sx={{
+            backgroundColor: lightColor,
+            display: { xs: "flex", md: "flex" },
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          <Box sx={{ ...ContentMiddle }}>
-            <Box
-              sx={{
-                width: "155px",
-                height: "120px",
-                backgroundImage: "url(/logos/nusawita_logo_circle.png)",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            />
-          </Box>
-          <Typography
-            variant="h4"
-            component="h4"
-            sx={{ pb: 2, textAlign: "center" }}
+          <Box
+            component="form"
+            sx={{ width: { xs: "90%", md: "70%" } }}
+            display="flex"
+            flexDirection="column"
+            onSubmit={handleFormSubmit}
           >
-            Login
-          </Typography>
-          {/* <Icon icon="ic:round-person" width="27" /> */}
-          <ErrorVibrateAnimation
-            showAnimation={errorAnimation.username}
-            onAnimationComplete={handleAnimationComplete.username}
-          >
-            <CustomTextField
-              type="text"
-              fullWidth
-              autoFocus
-              sx={{ mb: 2 }}
-              // color={errorShow.username && "error"}
-              onChange={changeHandler.username}
-              error={errorShow.username}
-              label="Username"
-              variant="outlined"
-              onFocus={focusHandler.username}
-              onBlur={blurHandler.username}
-              value={enteredUsername}
-              helperText={errorShow.username && usernameError}
-              focused={focused.username}
-              leftIcon={
-                <Icon icon="ic:round-person" color="black" width="27" />
-              }
-              rightIcon={
-                errorShow.username && (
-                  <Icon
-                    icon="ep:warning-filled"
-                    color={dangerMain}
-                    width="27"
-                  />
-                )
-              }
-            />
-          </ErrorVibrateAnimation>
-          <ErrorVibrateAnimation
-            showAnimation={errorAnimation.password}
-            onAnimationComplete={handleAnimationComplete.password}
-          >
-            <CustomTextField
-              type={passwordVisibility ? "text" : "password"}
-              fullWidth
-              inputRef={passwordRef}
-              label="Password"
-              value={enteredPassword}
-              onChange={changeHandler.password}
-              error={errorShow.password}
-              color={errorShow.password && "error"}
-              variant="outlined"
-              focused={focused.password}
-              onFocus={focusHandler.password}
-              onBlur={blurHandler.password}
-              helperText={errorShow.password && passwordError}
-              leftIcon={
-                <Icon icon="material-symbols:lock" color="black" width="27" />
-              }
-              rightIcon={
-                <>
-                  {passwordVisibility ? (
-                    <Icon
-                      onClick={handleVisibility.setHidden}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:eye"
-                      color="black"
-                      width="27"
-                    />
-                  ) : (
-                    <Icon
-                      onClick={handleVisibility.setVisible}
-                      style={{ cursor: "pointer" }}
-                      icon="mdi:hide"
-                      color="black"
-                      width="27"
-                    />
-                  )}
-                  {errorShow.password && (
+            <Box sx={{ ...ContentMiddle }}>
+              <Box
+                sx={{
+                  width: "155px",
+                  height: "120px",
+                  backgroundImage: "url(/logos/nusawita_logo_circle.png)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+            </Box>
+            <Typography
+              variant="h4"
+              component="h4"
+              sx={{ pb: 2, textAlign: "center" }}
+            >
+              Login
+            </Typography>
+            {/* <Icon icon="ic:round-person" width="27" /> */}
+            <ErrorVibrateAnimation
+              showAnimation={errorAnimation.username}
+              onAnimationComplete={handleAnimationComplete.username}
+            >
+              <CustomTextField
+                type="text"
+                fullWidth
+                autoFocus
+                sx={{ mb: 2 }}
+                // color={errorShow.username && "error"}
+                onChange={changeHandler.username}
+                error={errorShow.username}
+                label="Username"
+                variant="outlined"
+                onFocus={focusHandler.username}
+                onBlur={blurHandler.username}
+                value={enteredUsername}
+                helperText={errorShow.username && usernameError}
+                focused={focused.username}
+                leftIcon={
+                  <Icon icon="ic:round-person" color="black" width="27" />
+                }
+                rightIcon={
+                  errorShow.username && (
                     <Icon
                       icon="ep:warning-filled"
                       color={dangerMain}
                       width="27"
                     />
-                  )}
-                </>
-              }
-              sx={{ mb: 2 }}
-            />
-          </ErrorVibrateAnimation>
-          <Box sx={{ width: "100%", ...ContentEnd, mb: 5 }}>
-            <Typography
-              variant="subtitle1"
-              component="a"
-              href="/"
-              sx={{ color: primaryMain, fontWeight: "500" }}
+                  )
+                }
+              />
+            </ErrorVibrateAnimation>
+            <ErrorVibrateAnimation
+              showAnimation={errorAnimation.password}
+              onAnimationComplete={handleAnimationComplete.password}
             >
-              Forgot Password?
-            </Typography>
-          </Box>
-          <Box sx={{ ...ContentMiddle }}>
-            <Button type="submit" variant="primary" size="large">
-              Login
-            </Button>
-            <Typography variant="subtitle1" sx={{ fontWeight: "500", mt: 2 }}>
-              Dont have an account?
+              <CustomTextField
+                type={passwordVisibility ? "text" : "password"}
+                fullWidth
+                inputRef={passwordRef}
+                label="Password"
+                value={enteredPassword}
+                onChange={changeHandler.password}
+                error={errorShow.password}
+                color={errorShow.password && "error"}
+                variant="outlined"
+                focused={focused.password}
+                onFocus={focusHandler.password}
+                onBlur={blurHandler.password}
+                helperText={errorShow.password && passwordError}
+                leftIcon={
+                  <Icon icon="material-symbols:lock" color="black" width="27" />
+                }
+                rightIcon={
+                  <>
+                    {passwordVisibility ? (
+                      <Icon
+                        onClick={handleVisibility.setHidden}
+                        style={{ cursor: "pointer" }}
+                        icon="mdi:eye"
+                        color="black"
+                        width="27"
+                      />
+                    ) : (
+                      <Icon
+                        onClick={handleVisibility.setVisible}
+                        style={{ cursor: "pointer" }}
+                        icon="mdi:hide"
+                        color="black"
+                        width="27"
+                      />
+                    )}
+                    {errorShow.password && (
+                      <Icon
+                        icon="ep:warning-filled"
+                        color={dangerMain}
+                        width="27"
+                      />
+                    )}
+                  </>
+                }
+                sx={{ mb: 2 }}
+              />
+            </ErrorVibrateAnimation>
+            <Box sx={{ width: "100%", ...ContentEnd, mb: 5 }}>
               <Typography
+                variant="subtitle1"
                 component="a"
-                sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
-                href="/register"
+                href="/"
+                sx={{ color: primaryMain, fontWeight: "500" }}
               >
-                Sign up
+                Forgot Password?
               </Typography>
-            </Typography>
+            </Box>
+            <Box sx={{ ...ContentMiddle }}>
+              <Button type="submit" variant="primary" size="large">
+                Login
+              </Button>
+              <Typography variant="subtitle1" sx={{ fontWeight: "500", mt: 2 }}>
+                Dont have an account?
+                <Typography
+                  component="a"
+                  sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
+                  href="/register"
+                >
+                  Sign up
+                </Typography>
+              </Typography>
+            </Box>
           </Box>
-        </Box>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

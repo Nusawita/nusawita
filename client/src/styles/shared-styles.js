@@ -94,6 +94,8 @@ export const customGlobalTheme = createTheme({
   },
 });
 
+
+
 export const customTheme = createTheme({
   ...customGlobalTheme,
   //Custom component

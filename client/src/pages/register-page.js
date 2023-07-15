@@ -2,6 +2,7 @@ import React from "react";
 import RegisterForm from "../components/UI/Forms/register-form";
 import { Box } from "@mui/material";
 import Header from "../components/UI/Navbar/Header";
+import CustomAppbar from "../components/UI/Appbar/custom-appbar";
 
 export const RegisterPages = () => {
   return (
@@ -10,7 +11,7 @@ export const RegisterPages = () => {
         height: "60rem",
       }}
     >
-      <Header />
+      <CustomAppbar position = 'static' />
       <RegisterForm />
     </Box>
   );
