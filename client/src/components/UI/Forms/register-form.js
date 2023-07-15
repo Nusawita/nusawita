@@ -42,7 +42,7 @@ const RegisterForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  let passConfirmRef = useRef()
+  let passConfirmRef = useRef();
 
   //TO START ERROR ANIMATION
   const [errorAnimation, setErrorAnimation] = useState({
@@ -178,11 +178,11 @@ const RegisterForm = () => {
     },
     confirmPassword: {
       setVisible: () => {
-        passConfirmRef.current.focus()
+        passConfirmRef.current.focus();
         setConfirmPasswordVisible(true);
       },
       setHidden: () => {
-        passConfirmRef.current.focus()
+        passConfirmRef.current.focus();
         setConfirmPasswordVisible(false);
       },
     },
@@ -382,10 +382,12 @@ const RegisterForm = () => {
       try {
         const res = await api.post(
           "check-email",
-          { signal: abortController.signal },
-          { email }
+          { email },
+          { signal: abortController.signal }
         );
         if (res.status === 200) {
+          console.log(res.data);
+          console.log(email);
           setCheckingEmail(false);
           setValid("email");
           setEmailError("");
@@ -817,7 +819,7 @@ const RegisterForm = () => {
             <CustomTextField
               type={confirmPasswordVisible ? "text" : "password"}
               fullWidth
-              inputRef = {passConfirmRef}
+              inputRef={passConfirmRef}
               label="Confirm Password"
               value={confirmPassword}
               onChange={changeHandler.confirmPassword}
