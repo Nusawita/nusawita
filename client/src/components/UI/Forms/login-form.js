@@ -6,7 +6,6 @@ import { CustomTextField } from "../custom-UI";
 import { Icon } from "@iconify/react";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
-import CustomAppbar from "../Appbar/custom-appbar";
 
 const LoginForm = () => {
   //call theme component

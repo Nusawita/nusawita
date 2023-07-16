@@ -10,7 +10,6 @@ import api from "../../../axios-instance";
 import axios from "axios";
 
 import { Icon } from "@iconify/react";
-import CustomAppbar from "../Appbar/custom-appbar";
 
 const RegisterForm = () => {
   // console.log('rerendeers')

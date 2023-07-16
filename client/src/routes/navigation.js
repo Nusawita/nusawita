@@ -7,9 +7,10 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AdminDashboard } from "../pages/AdminDashboard/admin-dashboard";
+import { AdminDashboardLanding } from "../pages/AdminDashboard/admin-dashboard-landing";
 import { LandingPage } from "../pages/LandingPage/landing_page";
 import { RegisterPages } from "../pages/register-page";
+import { AdminDashboardUsers } from "../pages/AdminDashboard/admin-dashboard-users";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading
@@ -24,7 +25,13 @@ export const Navigation = () => {
           <Route
             path="/admin/dashboard"
             element={
-              ctx.isAdmin ? <AdminDashboard /> : <Navigate to="/" replace /> //If user is admin go to dashboard else back to landing page
+              ctx.isAdmin ? <AdminDashboardLanding /> : <Navigate to="/" replace /> //If user is admin go to dashboard else back to landing page
+            }
+          />
+          <Route
+            path="/admin/dashboard/users"
+            element={
+              ctx.isAdmin ? <AdminDashboardUsers /> : <Navigate to="/" replace /> //If user is admin go to dashboard else back to landing page
             }
           />
           <Route

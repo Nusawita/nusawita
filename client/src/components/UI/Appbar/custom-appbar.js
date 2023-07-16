@@ -264,7 +264,7 @@ const CustomAppbar = (props) => {
                   variant="buttonText"
                   component="div"
                   color="black"
-                  sx={{ mx: 5 }}
+                  sx={{ mx: 2 }}
                 >
                   Destinations
                 </Typography>
@@ -275,7 +275,7 @@ const CustomAppbar = (props) => {
                       sx={{
                         border: "none",
                         color: "black",
-                        width: "18rem",
+                        width: "22rem",
                         textTransform: "none",
                       }}
                     >

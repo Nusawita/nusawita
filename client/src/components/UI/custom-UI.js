@@ -285,7 +285,68 @@ export const DrawerItem = (props) => {
           </Typography>
         </ListItemText>
       </ListItemButton>
-      {props.divider === 'bottom' && <Divider/>}
+      {props.divider === "bottom" && <Divider />}
     </>
+  );
+};
+
+export const DashboardCard = (props) => {
+  return (
+    <Box
+      sx={{
+        ...props.sx,
+        border: "0px solid",
+        borderRadius: "5px",
+        width: "100%",
+      }}
+      onClick={props.onClick}
+    >
+      <Box
+        sx={{
+          borderRadius: "5px 5px 0px 0px",
+          p: 2,
+          color: "white",
+          backgroundColor: props.bodyColor,
+        }}
+      >
+        {props.loading ? (
+          <Typography variant="h6" component="h6" sx={{ my:3 }}>
+            Loading...
+          </Typography>
+        ) : (
+          <>
+            <Typography variant="h3" component="h3">
+              {props.number}
+            </Typography>
+            <Typography variant="h6" component="h6">
+              {props.object}
+            </Typography>
+          </>
+        )}
+
+      </Box>
+      <Box
+        sx={{
+          backgroundColor: props.footerColor,
+          borderRadius: "0px 0px 5px 5px",
+        }}
+      >
+        <Box
+          sx={{
+            p: 1,
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight:'1.3rem'
+          }}
+        >
+          <Typography variant="subtitle1" component="p" sx={{ pr: 1 }}>
+            {props.footerText}
+          </Typography>
+          {props.footerIcon}
+        </Box>
+      </Box>
+    </Box>
   );
 };

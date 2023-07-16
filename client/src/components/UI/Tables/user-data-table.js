@@ -13,14 +13,12 @@ import {
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { Icon } from "@iconify/react";
-import api from "../../../axios-instance";
 import { CustomTextField } from "../custom-UI";
 
-const UserDataTable = () => {
+const UserDataTable = (props) => {
   const theme = useTheme();
   const colorPalette = theme.palette;
-
-  const [allUser, setAllUser] = useState([]);
+  const allUser = props.userData;
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
 
@@ -49,31 +47,6 @@ const UserDataTable = () => {
     };
   }, [search, allUser]);
 
-  useEffect(() => {
-    const abortController = new AbortController();
-    const id = setTimeout(async () => {
-      try {
-        // call login api
-        const res = await api.get(
-          "admin/users",
-          {
-            withCredentials: true,
-          },
-          { signal: abortController.signal }
-        );
-        // console.log(res.data.data);
-        setAllUser(res.data.data);
-      } catch (error) {
-        // if unauthorized then show appropiate error in front
-        console.log(error);
-      }
-    }, 300);
-    return () => {
-      abortController.abort();
-      clearTimeout(id);
-    };
-  }, []);
-
   const [page, setPage] = useState(0);
   // const [rowsPerPage, setRowsPerPage] = useState(10);c
   const rowsPerPage = 10;
@@ -90,8 +63,6 @@ const UserDataTable = () => {
         flexGrow: 1,
         p: 3,
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }}
     >
       <Box
@@ -161,13 +132,28 @@ const UserDataTable = () => {
 
         <Table sx={{ pt: 2 }}>
           <TableHead>
-            <TableRow>
-              <TableCell align="left">Username</TableCell>
-              <TableCell align="left">Email</TableCell>
-              <TableCell align="left">Birth Date</TableCell>
-              <TableCell align="left">Phone</TableCell>
-              <TableCell align="left">Status</TableCell>
-            </TableRow>
+            {props.loading ? (
+              <TableRow>
+                <TableCell>
+                  <Typography
+                    sx={{ textAlign: "center", mx: 60, mt: 5 }}
+                    variant="h3"
+                  >
+                    Loading...
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              <>
+                <TableRow>
+                  <TableCell align="left">Username</TableCell>
+                  <TableCell align="left">Email</TableCell>
+                  <TableCell align="left">Birth Date</TableCell>
+                  <TableCell align="left">Phone</TableCell>
+                  <TableCell align="left">Status</TableCell>
+                </TableRow>
+              </>
+            )}
           </TableHead>
           <TableBody>
             {search

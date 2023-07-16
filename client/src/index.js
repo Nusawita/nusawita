@@ -10,9 +10,9 @@ import { AuthContextProvider } from "./context/auth-context"; // This is the con
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <ThemeProvider theme={customTheme}>
-      <AuthContextProvider>
+    <AuthContextProvider>
         <App />
-      </AuthContextProvider>
+    </AuthContextProvider>
   </ThemeProvider>
 );
 
