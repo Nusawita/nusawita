@@ -7,6 +7,10 @@ import {
   Typography,
   Card,
   CardContent,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -230,7 +234,6 @@ export const CustomCardSm = (props) => {
         cursor: "pointer",
         ":hover": { transform: "scale(1.05)" },
         ":focus": { transform: "scale(1.05)" },
-
       }}
     >
       <CardContent>
@@ -259,5 +262,30 @@ export const CustomCardSm = (props) => {
         </Box>
       </CardContent>
     </Card>
+  );
+};
+
+export const DrawerItem = (props) => {
+  return (
+    <>
+      <ListItemButton sx={props.sx} onClick={props.onClick}>
+        <ListItemIcon>{props.icon}</ListItemIcon>
+        <ListItemText>
+          <Typography
+            variant="p"
+            sx={{
+              fontFamily: "Roboto",
+              fontSize: "14px",
+              fontWeight: "400",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {props.item}
+          </Typography>
+        </ListItemText>
+      </ListItemButton>
+      {props.divider === 'bottom' && <Divider/>}
+    </>
   );
 };

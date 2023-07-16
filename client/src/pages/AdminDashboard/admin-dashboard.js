@@ -2,7 +2,7 @@ import React from "react";
 import {
   Box,
 } from "@mui/material";
-import AdminSidebar from "../../components/UI/Navbar/admin-sidebar";
+import AdminSidebar from "../../components/UI/Appbar/admin-sidebar";
 import UserDataTable from "../../components/UI/Tables/user-data-table";
 
 export const AdminDashboard = () => {

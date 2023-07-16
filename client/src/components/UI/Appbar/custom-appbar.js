@@ -16,12 +16,12 @@ import {
   ListItemIcon,
   Container,
   List,
-  ListItem,
   ListItemButton,
   SwipeableDrawer,
 } from "@mui/material";
 import AuthContext from "../../../context/auth-context";
 import { Icon } from "@iconify/react";
+import { DrawerItem } from "../custom-UI";
 
 const CustomAppbar = (props) => {
   const theme = useTheme();
@@ -124,7 +124,7 @@ const CustomAppbar = (props) => {
                 >
                   {ctxAuth.isLoggedIn ? (
                     <Box
-                      sx={{ width: "auto", height: "40rem", px: 3 }}
+                      sx={{ width: "auto", height: "80vh", px: 3 }}
                       role="presentation"
                       onClick={() => {
                         setOpenDrawer(true);
@@ -134,7 +134,7 @@ const CustomAppbar = (props) => {
                       }}
                     >
                       <List>
-                        <ListItem sx={{ py: 2 }}>
+                        <ListItemButton sx={{ py: 2 }}>
                           <ListItemIcon>
                             <Icon
                               icon="ion:person-circle"
@@ -156,116 +156,62 @@ const CustomAppbar = (props) => {
                               {ctxAuth.loginUser}
                             </Typography>
                           </ListItemText>
-                        </ListItem>
+                        </ListItemButton>
                         <Divider />
-
-                        <ListItem sx={{ py: 2 }}>
-                          <ListItemIcon>
+                        <DrawerItem
+                          sx={{ py: 2 }}
+                          icon={
                             <Icon
                               icon="bi:person-fill"
                               color="black"
                               width="24"
                             />
-                          </ListItemIcon>
-                          <ListItemText>
-                            <Typography
-                              variant="p"
-                              sx={{
-                                fontFamily: "Roboto",
-                                fontSize: "14px",
-                                fontWeight: "400",
-                                display: "flex",
-                                alignItems: "center",
-                              }}
-                            >
-                              Edit Profile
-                            </Typography>
-                          </ListItemText>
-                        </ListItem>
-                        <Divider />
-
-                        <ListItem sx={{ py: 2 }}>
-                          <ListItemIcon>
+                          }
+                          item="Edit Profile"
+                          divider="bottom"
+                        />
+                        <DrawerItem
+                          sx={{ py: 2 }}
+                          icon={
                             <Icon icon="bxs:map-pin" color="black" width="24" />
-                          </ListItemIcon>
-                          <ListItemText>
-                            <Typography
-                              variant="p"
-                              sx={{
-                                fontFamily: "Roboto",
-                                fontSize: "14px",
-                                fontWeight: "400",
-                                display: "flex",
-                                alignItems: "center",
-                              }}
-                            >
-                              Destination
-                            </Typography>
-                          </ListItemText>
-                        </ListItem>
-                        <Divider />
+                          }
+                          item="Destinations"
+                          divider="bottom"
+                        />
                         {ctxAuth.isAdmin && (
-                          <>
-                            <ListItemButton
-                              sx={{ py: 2 }}
-                              onClick={() => {
-                                window.location.href = "/admin/dashboard";
-                              }}
-                            >
-                              <ListItemIcon>
-                                <Icon
-                                  icon="ic:round-dashboard"
-                                  color="black"
-                                  width="24"
-                                />
-                              </ListItemIcon>
-                              <ListItemText>
-                                <Typography
-                                  variant="p"
-                                  sx={{
-                                    fontFamily: "Roboto",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  Go to Dashboard
-                                </Typography>
-                              </ListItemText>
-                            </ListItemButton>
-                            <Divider />
-                          </>
+                          <DrawerItem
+                            onClick={() => {
+                              window.location.href = "/admin/dashboard";
+                            }}
+                            sx={{ py: 2 }}
+                            icon={
+                              <Icon
+                                icon="ic:round-dashboard"
+                                color="black"
+                                width="24"
+                              />
+                            }
+                            item="Admin Dashboard"
+                            divider="bottom"
+                          />
                         )}
-
-                        <ListItemButton sx={{ pt: 5 }} onClick={ctxAuth.logoutUser}>
-                          <ListItemIcon>
+                        <DrawerItem
+                          onClick={ctxAuth.logoutUser}
+                          sx={{ pt: 5 }}
+                          icon={
                             <Icon
                               icon="fluent:sign-out-20-filled"
                               color="black"
                               width="24"
                             />
-                          </ListItemIcon>
-                          <ListItemText>
-                            <Typography
-                              variant="p"
-                              sx={{
-                                fontFamily: "Roboto",
-                                fontSize: "14px",
-                                fontWeight: "400",
-                                display: "flex",
-                                alignItems: "center",
-                              }}
-                            >
-                              Sign Out
-                            </Typography>
-                          </ListItemText>
-                        </ListItemButton>
+                          }
+                          item="Sign Out"
+                        />
                       </List>
                     </Box>
                   ) : (
                     <Box
-                      sx={{ width: "auto", height: "40rem" }}
+                      sx={{ width: "auto", height: "80vh" }}
                       role="presentation"
                       onClick={() => {
                         setOpenDrawer(true);
@@ -275,63 +221,32 @@ const CustomAppbar = (props) => {
                       }}
                     >
                       <List>
-                        <ListItemButton
-                          onClick={() => {
-                            window.location.href = "/login";
-                          }}
-                        >
-                          <ListItemIcon>
+                        <DrawerItem
+                          onClick={()=>{window.location.href = '/login'}}
+                          sx={{ py: 2 }}
+                          icon={
                             <Icon
                               icon="ic:round-dashboard"
                               color="black"
                               width="24"
                             />
-                          </ListItemIcon>
-                          <ListItemText>
-                            <Typography
-                              variant="p"
-                              sx={{
-                                fontFamily: "Roboto",
-                                fontSize: "14px",
-                                fontWeight: "400",
-                                display: "flex",
-                                alignItems: "center",
-                              }}
-                            >
-                              Login
-                            </Typography>
-                          </ListItemText>
-                        </ListItemButton>
-                        <Divider />
-
-                        <ListItemButton
-                          onClick={() => {
-                            window.location.href = "/register";
-                          }}
-                        >
-                          <ListItemIcon>
+                          }
+                          item="Sign In"
+                          divider="bottom"
+                        />
+                        <DrawerItem
+                          onClick={()=>{window.location.href = '/register'}}
+                          sx={{ py: 2 }}
+                          icon={
                             <Icon
                               icon="ic:round-dashboard"
                               color="black"
                               width="24"
                             />
-                          </ListItemIcon>
-                          <ListItemText>
-                            <Typography
-                              variant="p"
-                              sx={{
-                                fontFamily: "Roboto",
-                                fontSize: "14px",
-                                fontWeight: "400",
-                                display: "flex",
-                                alignItems: "center",
-                              }}
-                            >
-                              Signup
-                            </Typography>
-                          </ListItemText>
-                        </ListItemButton>
-                        <Divider />
+                          }
+                          item="Sign Up"
+                          divider="bottom"
+                        />                        
                       </List>
                     </Box>
                   )}
