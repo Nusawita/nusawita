@@ -8,7 +8,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AdminDashboard } from "../pages/AdminDashboard/admin-dashboard";
-import { LandingPage } from "../pages/landing_page";
+import { LandingPage } from "../pages/LandingPage/landing_page";
 import { RegisterPages } from "../pages/register-page";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
