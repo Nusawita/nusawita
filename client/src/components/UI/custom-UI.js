@@ -1,4 +1,4 @@
-import { React } from "react";
+import { React, useState } from "react";
 import {
   Box,
   useTheme,
@@ -11,6 +11,15 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  MenuList,
+  MenuItem,
+  Menu,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -285,7 +294,189 @@ export const DrawerItem = (props) => {
           </Typography>
         </ListItemText>
       </ListItemButton>
-      {props.divider === 'bottom' && <Divider/>}
+      {props.divider === "bottom" && <Divider />}
+    </>
+  );
+};
+
+export const DashboardCard = (props) => {
+  return (
+    <Box
+      sx={{
+        ...props.sx,
+        border: "0px solid",
+        borderRadius: "5px",
+        width: "100%",
+      }}
+      onClick={props.onClick}
+    >
+      <Box
+        sx={{
+          borderRadius: "5px 5px 0px 0px",
+          p: 2,
+          color: "white",
+          backgroundColor: props.bodyColor,
+        }}
+      >
+        {props.loading ? (
+          <Typography variant="h6" component="h6" sx={{ my: 3 }}>
+            Loading...
+          </Typography>
+        ) : (
+          <>
+            <Typography variant="h3" component="h3">
+              {props.number}
+            </Typography>
+            <Typography variant="h6" component="h6">
+              {props.object}
+            </Typography>
+          </>
+        )}
+      </Box>
+      <Box
+        sx={{
+          backgroundColor: props.footerColor,
+          borderRadius: "0px 0px 5px 5px",
+        }}
+      >
+        <Box
+          sx={{
+            p: 1,
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "1.3rem",
+          }}
+        >
+          <Typography variant="subtitle1" component="p" sx={{ pr: 1 }}>
+            {props.footerText}
+          </Typography>
+          {props.footerIcon}
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+export const VerifyDialog = (props) => {
+  const title = props.title;
+  const content = props.content;
+  const actions = props.actions;
+  return (
+    <Dialog open={props.open} onClose={props.onClose}>
+      {title && <DialogTitle>{title}</DialogTitle>}
+      {content && (
+        <DialogContent sx={{ ...ContentMiddle }}>{content}</DialogContent>
+      )}
+      {actions && <DialogActions>{actions}</DialogActions>}
+    </Dialog>
+  );
+};
+
+export const AdminUserActions = (props) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+  const handleMenuClose = (event) => {
+    setAnchorEl(null);
+  };
+  const open = Boolean(anchorEl);
+
+  const handleDelete = props.handleDelete;
+  const username = props.user;
+  const handleDialogOpen = () => {
+    setOpenDialog(true);
+  };
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
+  return (
+    <>
+      {props.loadingDelete ? (
+        <VerifyDialog
+          title={`Deleting ${username}...`}
+          content={<CircularProgress />}
+          open={openDialog}
+          onClose={handleDialogClose}
+        />
+      ) : (
+        <VerifyDialog
+          title={`Are you sure you want to delete user ${username}?`}
+          actions={
+            <>
+              <Button onClick={handleDialogClose}>No</Button>
+              <Button onClick={handleDelete}>Yes</Button>
+            </>
+          }
+          open={openDialog}
+          onClose={handleDialogClose}
+        />
+      )}
+
+      <Menu
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleMenuClose}
+      >
+        <MenuList>
+          <MenuItem>
+            <ListItemIcon>
+              <Icon icon="fa-solid:ban" color="black" width="20" />
+            </ListItemIcon>
+            <Typography
+              variant="p"
+              sx={{
+                fontFamily: "Roboto",
+                fontSize: "14px",
+                fontWeight: "400",
+              }}
+            >
+              Ban
+            </Typography>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleDialogOpen}>
+            <ListItemIcon>
+              <Icon icon="mdi:trash" color="black" width="20" />
+            </ListItemIcon>
+            <Typography
+              variant="p"
+              sx={{
+                fontFamily: "Roboto",
+                fontSize: "14px",
+                fontWeight: "400",
+              }}
+            >
+              Delete
+            </Typography>
+          </MenuItem>
+        </MenuList>
+      </Menu>
+      <Button
+        onClick={handleMenuClick}
+        sx={{
+          maxWidth: "0.5rem",
+          ...ContentMiddle,
+          "&:hover": {
+            backgroundColor: "#0086761A",
+          },
+        }}
+      >
+        <Icon icon="tabler:dots" width={24} color="black" />
+      </Button>
     </>
   );
 };
