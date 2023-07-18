@@ -359,6 +359,21 @@ export const DashboardCard = (props) => {
   );
 };
 
+export const VerifyDialog = (props) => {
+  const title = props.title;
+  const content = props.content;
+  const actions = props.actions;
+  return (
+    <Dialog open={props.open} onClose={props.onClose}>
+      {title && <DialogTitle>{title}</DialogTitle>}
+      {content && (
+        <DialogContent sx={{ ...ContentMiddle }}>{content}</DialogContent>
+      )}
+      {actions && <DialogActions>{actions}</DialogActions>}
+    </Dialog>
+  );
+};
+
 export const AdminUserActions = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -380,24 +395,27 @@ export const AdminUserActions = (props) => {
     setOpenDialog(false);
   };
 
-
   return (
     <>
       {props.loadingDelete ? (
-        <Dialog open={openDialog} onClose={handleDialogClose}>
-          <DialogTitle>{`Deleting ${username}...`}</DialogTitle>
-          <DialogContent sx={{ ...ContentMiddle }}>
-            <CircularProgress />
-          </DialogContent>
-        </Dialog>
+        <VerifyDialog
+          title={`Deleting ${username}...`}
+          content={<CircularProgress />}
+          open={openDialog}
+          onClose={handleDialogClose}
+        />
       ) : (
-        <Dialog open={openDialog} onClose={handleDialogClose}>
-          <DialogTitle>{`Are you sure you want to delete user ${username}?`}</DialogTitle>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>No</Button>
-            <Button onClick={handleDelete}>Yes</Button>
-          </DialogActions>
-        </Dialog>
+        <VerifyDialog
+          title={`Are you sure you want to delete user ${username}?`}
+          actions={
+            <>
+              <Button onClick={handleDialogClose}>No</Button>
+              <Button onClick={handleDelete}>Yes</Button>
+            </>
+          }
+          open={openDialog}
+          onClose={handleDialogClose}
+        />
       )}
 
       <Menu

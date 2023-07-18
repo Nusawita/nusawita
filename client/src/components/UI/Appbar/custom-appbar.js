@@ -18,10 +18,13 @@ import {
   List,
   ListItemButton,
   SwipeableDrawer,
+  Drawer,
+  ListItem,
 } from "@mui/material";
 import AuthContext from "../../../context/auth-context";
 import { Icon } from "@iconify/react";
 import { DrawerItem } from "../custom-UI";
+import { ContentMiddle } from "../../../styles/shared-styles";
 
 const CustomAppbar = (props) => {
   const theme = useTheme();
@@ -116,141 +119,154 @@ const CustomAppbar = (props) => {
                 >
                   <Icon icon="ion:menu" width="27" color="black" />
                 </Button>
-                <SwipeableDrawer
-                  anchor="bottom"
+                <Drawer
+                  anchor="right"
                   open={openDrawer}
                   onClose={() => setOpenDrawer(false)}
-                  onOpen={() => setOpenDrawer(true)}
                 >
-                  {ctxAuth.isLoggedIn ? (
+                  <Box sx={{ width: "95vw", px: 3 }} role="presentation">
                     <Box
-                      sx={{ width: "auto", height: "80vh", px: 3 }}
-                      role="presentation"
-                      onClick={() => {
-                        setOpenDrawer(true);
-                      }}
-                      onKeyDown={() => {
-                        setOpenDrawer(false);
+                      sx={{
+                        py: 2,
+                        display: "flex",
+                        justifyContent: "flex-end",
                       }}
                     >
-                      <List>
-                        <ListItemButton sx={{ py: 2 }}>
-                          <ListItemIcon>
-                            <Icon
-                              icon="ion:person-circle"
-                              color="gray"
-                              width="42"
-                            />
-                          </ListItemIcon>
-                          <ListItemText>
-                            <Typography
-                              variant="p"
-                              sx={{
-                                fontFamily: "Roboto",
-                                fontSize: "14px",
-                                fontWeight: "400",
-                                display: "flex",
-                                alignItems: "center",
-                              }}
-                            >
-                              {ctxAuth.loginUser}
-                            </Typography>
-                          </ListItemText>
-                        </ListItemButton>
-                        <Divider />
-                        <DrawerItem
-                          sx={{ py: 2 }}
-                          icon={
-                            <Icon
-                              icon="bi:person-fill"
-                              color="black"
-                              width="24"
-                            />
-                          }
-                          item="Edit Profile"
-                          divider="bottom"
-                        />
-                        <DrawerItem
-                          sx={{ py: 2 }}
-                          icon={
-                            <Icon icon="bxs:map-pin" color="black" width="24" />
-                          }
-                          item="Destinations"
-                          divider="bottom"
-                        />
-                        {ctxAuth.isAdmin && (
+                      <Paper elevation={1}>
+                        <Button
+                          onClick={() => {
+                            setOpenDrawer(false);
+                          }}
+                          sx={{ maxWidth: "1rem", color: "black" }}
+                        >
+                          <Icon icon="ph:x-bold" width={24} />
+                        </Button>
+                      </Paper>
+                    </Box>
+                    {ctxAuth.isLoggedIn ? (
+                      <>
+                        {/* //X Button */}
+                        <List>
+                          <ListItemButton sx={{ py: 2 }}>
+                            <ListItemIcon>
+                              <Icon
+                                icon="ion:person-circle"
+                                color="gray"
+                                width="42"
+                              />
+                            </ListItemIcon>
+                            <ListItemText>
+                              <Typography
+                                variant="p"
+                                sx={{
+                                  fontFamily: "Roboto",
+                                  fontSize: "14px",
+                                  fontWeight: "400",
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                {ctxAuth.loginUser}
+                              </Typography>
+                            </ListItemText>
+                          </ListItemButton>
+                          <Divider />
                           <DrawerItem
-                            onClick={() => {
-                              window.location.href = "/admin/dashboard";
-                            }}
                             sx={{ py: 2 }}
                             icon={
                               <Icon
-                                icon="ic:round-dashboard"
+                                icon="bi:person-fill"
                                 color="black"
                                 width="24"
                               />
                             }
-                            item="Admin Dashboard"
+                            item="Edit Profile"
                             divider="bottom"
                           />
-                        )}
-                        <DrawerItem
-                          onClick={ctxAuth.logoutUser}
-                          sx={{ pt: 5 }}
-                          icon={
-                            <Icon
-                              icon="fluent:sign-out-20-filled"
-                              color="black"
-                              width="24"
+                          <DrawerItem
+                            sx={{ py: 2 }}
+                            icon={
+                              <Icon
+                                icon="bxs:map-pin"
+                                color="black"
+                                width="24"
+                              />
+                            }
+                            item="Destinations"
+                            divider="bottom"
+                          />
+                          {ctxAuth.isAdmin && (
+                            <DrawerItem
+                              onClick={() => {
+                                window.location.href = "/admin/dashboard";
+                              }}
+                              sx={{ py: 2 }}
+                              icon={
+                                <Icon
+                                  icon="ic:round-dashboard"
+                                  color="black"
+                                  width="24"
+                                />
+                              }
+                              item="Admin Dashboard"
+                              divider="bottom"
                             />
-                          }
-                          item="Sign Out"
-                        />
-                      </List>
-                    </Box>
-                  ) : (
-                    <Box
-                      sx={{ width: "auto", height: "80vh" }}
-                      role="presentation"
-                      onClick={() => {
-                        setOpenDrawer(true);
-                      }}
-                      onKeyDown={() => {
-                        setOpenDrawer(false);
-                      }}
-                    >
-                      <List>
-                        <DrawerItem
-                          onClick={()=>{window.location.href = '/login'}}
-                          sx={{ py: 2 }}
-                          icon={
-                            <Icon
-                              icon="ic:round-dashboard"
-                              color="black"
-                              width="24"
-                            />
-                          }
-                          item="Sign In"
-                          divider="bottom"
-                        />
-                        <DrawerItem
-                          onClick={()=>{window.location.href = '/register'}}
-                          sx={{ py: 2 }}
-                          icon={
-                            <Icon
-                              icon="ic:round-dashboard"
-                              color="black"
-                              width="24"
-                            />
-                          }
-                          item="Sign Up"
-                          divider="bottom"
-                        />                        
-                      </List>
-                    </Box>
-                  )}
-                </SwipeableDrawer>
+                          )}
+                          <DrawerItem
+                            onClick={ctxAuth.logoutUser}
+                            sx={{ pt: 5 }}
+                            icon={
+                              <Icon
+                                icon="fluent:sign-out-20-filled"
+                                color="black"
+                                width="24"
+                              />
+                            }
+                            item="Sign Out"
+                          />
+                        </List>
+                      </>
+                    ) : (
+                      <Box
+                        sx={{ width: "100vw" }}
+                        role="presentation"
+                        onClick={() => {
+                          setOpenDrawer(true);
+                        }}
+                        onKeyDown={() => {
+                          setOpenDrawer(false);
+                        }}
+                      >
+                        <List>
+                          <ListItem sx={{ ...ContentMiddle }}>
+                            <Box
+                              sx={{ width: "20rem" }}
+                            >
+                              <Typography variant="h6" sx={{ textAlign:'center' }}>You are not logged in</Typography>
+                              <Box sx={{ display:'flex', justifyContent:'center' }}> 
+                                <Button onClick={()=>{window.location.href = '/login'}} sx={{ mx:2, mt:1, mb:2 }} variant="primary">Login</Button>
+                                <Button onClick={()=>{window.location.href = '/register'}} sx={{ mx:2, mt:1, mb:2 }} variant="secondary">Register</Button>
+                              </Box>
+                            </Box>
+                          </ListItem>
+                          <Divider/>
+                          <DrawerItem
+                            sx={{ py: 2 }}
+                            icon={
+                              <Icon
+                                icon="fa-solid:map-marked-alt"
+                                color="black"
+                                width="24"
+                              />
+                            }
+                            item="Destinations"
+                            divider="bottom"
+                          />
+                        </List>
+                      </Box>
+                    )}
+                  </Box>
+                </Drawer>
               </Paper>
             ) : (
               <Box
