@@ -13,7 +13,8 @@ import {
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { Icon } from "@iconify/react";
-import { CustomTextField } from "../custom-UI";
+import { AdminUserActions, CustomTextField } from "../custom-UI";
+import { ContentMiddle } from "../../../styles/shared-styles";
 
 const UserDataTable = (props) => {
   const theme = useTheme();
@@ -21,10 +22,14 @@ const UserDataTable = (props) => {
   const allUser = props.userData;
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const[searchFocused, setSearchFocused] = useState(false)
+
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
   };
+
+  const handleDelete = props.handleDelete
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -122,6 +127,9 @@ const UserDataTable = (props) => {
               variant="standard"
               label="Search"
               value={search}
+              onFocus = {()=>{setSearchFocused(true)}}
+              onBlur = {()=>{setSearchFocused(false)}}
+              focused = {searchFocused}
               onChange={handleSearchChange}
               leftIcon={
                 <Icon icon="material-symbols:search" color="gray" width="24" />
@@ -151,6 +159,9 @@ const UserDataTable = (props) => {
                   <TableCell align="left">Birth Date</TableCell>
                   <TableCell align="left">Phone</TableCell>
                   <TableCell align="left">Status</TableCell>
+                  {props.includeActions && (
+                    <TableCell align="center">Actions</TableCell>
+                  )}
                 </TableRow>
               </>
             )}
@@ -186,6 +197,11 @@ const UserDataTable = (props) => {
                           </Typography>
                         )}
                       </TableCell>
+                      {props.includeActions && (
+                        <TableCell sx={{ ...ContentMiddle }}>
+                          <AdminUserActions loadingDelete = {props.loadingDelete} handleDelete={()=>{handleDelete(row.id)}} user = {row.username} />
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
               : allUser
@@ -217,6 +233,11 @@ const UserDataTable = (props) => {
                           </Typography>
                         )}
                       </TableCell>
+                      {props.includeActions && (
+                        <TableCell sx={{ ...ContentMiddle }}>
+                          <AdminUserActions loadingDelete = {props.loadingDelete} handleDelete={()=>{handleDelete(row.id)}} user = {row.username}/>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
             {search

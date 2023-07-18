@@ -11,8 +11,29 @@ export const AdminDashboardUsers = () => {
   const colorPalette = theme.palette;
 
   const [userData, setUserData] = useState([]);
-
   const [loading, setLoading] = useState(true);
+  const [loadingDelete, setLoadingDelete] = useState(false)
+  const fetchDeleteApi = async(userId) =>{
+    try {
+      // call login api
+      const res = await api.delete(`/admin/user/${userId}`,{
+        withCredentials: true,
+      });
+      //if login success redirect to landing page
+      if (res.status === 200) {
+        setUserData(userData.filter((user)=>(user.id !== userId)))
+        console.log(userData)
+      }
+    } catch (error) {
+      // if unauthorized then show appropiate error in front
+      console.log('error')
+    }
+    setLoadingDelete(false)
+  }
+  const handleDelete = (row) => {
+    setLoadingDelete(true)
+    fetchDeleteApi(row)
+  };
 
   //Get All User Data
   useEffect(() => {
@@ -49,7 +70,7 @@ export const AdminDashboardUsers = () => {
         justifyContent: "center",
       }}
     >
-      <AdminSidebar />
+      <AdminSidebar activeLink = 'users' />
       <Box
         sx={{
           display: "flex",
@@ -111,7 +132,7 @@ export const AdminDashboardUsers = () => {
           />
         </Box>
 
-        <UserDataTable userData={userData} loading={loading} />
+        <UserDataTable loadingDelete = {loadingDelete} includeActions userData={userData} loading={loading} handleDelete={handleDelete}/>
       </Box>
     </Box>
   );

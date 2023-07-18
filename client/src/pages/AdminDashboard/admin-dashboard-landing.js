@@ -49,7 +49,7 @@ export const AdminDashboardLanding = () => {
         justifyContent: "center",
       }}
     >
-      <AdminSidebar />
+      <AdminSidebar activeLink = 'home'/>
       <Box
         sx={{
           display: "flex",

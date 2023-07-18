@@ -1,4 +1,4 @@
-import { React } from "react";
+import { React, useState } from "react";
 import {
   Box,
   useTheme,
@@ -11,6 +11,15 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  MenuList,
+  MenuItem,
+  Menu,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -310,7 +319,7 @@ export const DashboardCard = (props) => {
         }}
       >
         {props.loading ? (
-          <Typography variant="h6" component="h6" sx={{ my:3 }}>
+          <Typography variant="h6" component="h6" sx={{ my: 3 }}>
             Loading...
           </Typography>
         ) : (
@@ -323,7 +332,6 @@ export const DashboardCard = (props) => {
             </Typography>
           </>
         )}
-
       </Box>
       <Box
         sx={{
@@ -338,7 +346,7 @@ export const DashboardCard = (props) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            minHeight:'1.3rem'
+            minHeight: "1.3rem",
           }}
         >
           <Typography variant="subtitle1" component="p" sx={{ pr: 1 }}>
@@ -348,5 +356,109 @@ export const DashboardCard = (props) => {
         </Box>
       </Box>
     </Box>
+  );
+};
+
+export const AdminUserActions = (props) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+  const handleMenuClose = (event) => {
+    setAnchorEl(null);
+  };
+  const open = Boolean(anchorEl);
+
+  const handleDelete = props.handleDelete;
+  const username = props.user;
+  const handleDialogOpen = () => {
+    setOpenDialog(true);
+  };
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
+
+  return (
+    <>
+      {props.loadingDelete ? (
+        <Dialog open={openDialog} onClose={handleDialogClose}>
+          <DialogTitle>{`Deleting ${username}...`}</DialogTitle>
+          <DialogContent sx={{ ...ContentMiddle }}>
+            <CircularProgress />
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <Dialog open={openDialog} onClose={handleDialogClose}>
+          <DialogTitle>{`Are you sure you want to delete user ${username}?`}</DialogTitle>
+          <DialogActions>
+            <Button onClick={handleDialogClose}>No</Button>
+            <Button onClick={handleDelete}>Yes</Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      <Menu
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleMenuClose}
+      >
+        <MenuList>
+          <MenuItem>
+            <ListItemIcon>
+              <Icon icon="fa-solid:ban" color="black" width="20" />
+            </ListItemIcon>
+            <Typography
+              variant="p"
+              sx={{
+                fontFamily: "Roboto",
+                fontSize: "14px",
+                fontWeight: "400",
+              }}
+            >
+              Ban
+            </Typography>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleDialogOpen}>
+            <ListItemIcon>
+              <Icon icon="mdi:trash" color="black" width="20" />
+            </ListItemIcon>
+            <Typography
+              variant="p"
+              sx={{
+                fontFamily: "Roboto",
+                fontSize: "14px",
+                fontWeight: "400",
+              }}
+            >
+              Delete
+            </Typography>
+          </MenuItem>
+        </MenuList>
+      </Menu>
+      <Button
+        onClick={handleMenuClick}
+        sx={{
+          maxWidth: "0.5rem",
+          ...ContentMiddle,
+          "&:hover": {
+            backgroundColor: "#0086761A",
+          },
+        }}
+      >
+        <Icon icon="tabler:dots" width={24} color="black" />
+      </Button>
+    </>
   );
 };
