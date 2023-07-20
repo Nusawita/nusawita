@@ -44,6 +44,8 @@ const RegisterForm = () => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   let passConfirmRef = useRef();
 
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   //TO START ERROR ANIMATION
   const [errorAnimation, setErrorAnimation] = useState({
     username: false,
@@ -53,6 +55,7 @@ const RegisterForm = () => {
     confirmPassword: false,
   });
 
+  //Focus field state
   const [focused, setFocused] = useState({
     username: false,
     phone: false,
@@ -61,6 +64,7 @@ const RegisterForm = () => {
     confirmPassword: false,
   });
 
+  //FormValidity States
   const [formValidity, setFormValidity] = useState({
     username: false,
     phone: false,
@@ -68,6 +72,8 @@ const RegisterForm = () => {
     password: false,
     confirmPassword: false,
   });
+
+  //Show/Hide error states
   const [errorShow, setErrorShow] = useState({
     username: false,
     phone: false,
@@ -76,12 +82,14 @@ const RegisterForm = () => {
     confirmPassword: false,
   });
 
+  //Start the error animation
   const startAnimation = (field) => {
     setErrorAnimation((prev) => ({
       ...prev,
       [field]: true,
     }));
   };
+  //End the error animation
   const endAnimation = (field) => {
     setErrorAnimation((prev) => ({
       ...prev,
@@ -89,12 +97,15 @@ const RegisterForm = () => {
     }));
   };
 
+  //Set the form field to valid
   const setValid = (field) => {
     setFormValidity((prev) => ({
       ...prev,
       [field]: true,
     }));
   };
+
+  //Set the form field to invalid
   const setInvalid = (field) => {
     setFormValidity((prev) => ({
       ...prev,
@@ -102,12 +113,15 @@ const RegisterForm = () => {
     }));
   };
 
+  //Show Error message
   const showError = (field) => {
     setErrorShow((prev) => ({
       ...prev,
       [field]: true,
     }));
   };
+
+  //Hide error message
   const hideError = (field) => {
     setErrorShow((prev) => ({
       ...prev,
@@ -115,12 +129,15 @@ const RegisterForm = () => {
     }));
   };
 
+  //set Focus on field to true
   const handleFocus = (field) => {
     setFocused((prev) => ({
       ...prev,
       [field]: true,
     }));
   };
+
+  //Set focus on field to false
   const handleBlur = (field) => {
     setFocused((prev) => ({
       ...prev,
@@ -128,6 +145,7 @@ const RegisterForm = () => {
     }));
   };
 
+  //Functions to pass on onFocus
   const focusHandler = {
     username: () => {
       handleFocus("username");
@@ -146,6 +164,7 @@ const RegisterForm = () => {
     },
   };
 
+  //Functions to pass on onChange
   const changeHandler = {
     username: (event) => {
       setUsername(event.target.value);
@@ -165,31 +184,38 @@ const RegisterForm = () => {
       setConfirmPassword(event.target.value);
     },
   };
+
+  //SetPasswordVisible/ not visible
   const visibilityHandler = {
     password: {
       setVisible: () => {
+        //Focus on the field after click eye icon
         passwordRef.current.focus();
         setPasswordVisible(true);
       },
       setHidden: () => {
+        //Focus on the field after click eye icon
         passwordRef.current.focus();
         setPasswordVisible(false);
       },
     },
     confirmPassword: {
       setVisible: () => {
+        //Focus on the field after click eye icon
         passConfirmRef.current.focus();
         setConfirmPasswordVisible(true);
       },
       setHidden: () => {
+        //Focus on the field after click eye icon
         passConfirmRef.current.focus();
         setConfirmPasswordVisible(false);
       },
     },
   };
 
+  //Function to pass on onBlur
   const blurHandler = {
-    // Show empty error on blur
+    // Show error on blur
     username: async () => {
       handleBlur("username");
       if (usernameError) {
@@ -222,6 +248,7 @@ const RegisterForm = () => {
     },
   };
 
+  //End animation functions
   const handleAnimationComplete = {
     username: () => {
       endAnimation("username");
@@ -246,6 +273,7 @@ const RegisterForm = () => {
   // Run check on value change with delay (wait for user typing)
   useEffect(() => {
     const abortController = new AbortController();
+    hideError("username");
     const timeout = setTimeout(async () => {
       if (username.trim().length === 0) {
         setInvalid("username");
@@ -268,6 +296,7 @@ const RegisterForm = () => {
       }
       // check username realtime api currently error
       setCheckingUsername(true);
+      await sleep(1000);
       try {
         const res = await api.post(
           "check-username",
@@ -296,28 +325,13 @@ const RegisterForm = () => {
           return;
         }
       }
-    }, 400);
+    }, 600);
     return () => {
       abortController.abort();
       setCheckingUsername(false);
       clearTimeout(timeout);
     };
   }, [username]);
-
-  useEffect(() => {
-    if (checkingUsername) {
-      hideError("username");
-      setUsernameError("Checking username avaibility...");
-      return;
-    }
-  }, [checkingUsername]);
-  useEffect(() => {
-    if (checkingEmail) {
-      hideError("email");
-      setEmailError("Checking email avaibility...");
-      return;
-    }
-  }, [checkingEmail]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -331,7 +345,7 @@ const RegisterForm = () => {
         setInvalid("date");
         setDateError("Please provide a valid date");
       }
-    }, 400);
+    }, 600);
     return () => {
       clearTimeout(timeout);
     };
@@ -356,13 +370,14 @@ const RegisterForm = () => {
       setValid("phone");
       setPhoneError("");
       hideError("phone");
-    }, 400);
+    }, 600);
     return () => {
       clearTimeout(timeout);
     };
   }, [phone]);
 
   useEffect(() => {
+    hideError('email')
     const abortController = new AbortController();
     const timeout = setTimeout(async () => {
       if (email.trim().length === 0) {
@@ -379,6 +394,7 @@ const RegisterForm = () => {
         return;
       }
       setCheckingEmail(true);
+      await sleep(1000);
       try {
         const res = await api.post(
           "check-email",
@@ -394,6 +410,9 @@ const RegisterForm = () => {
         }
       } catch (error) {
         setCheckingEmail(false);
+        if (axios.isCancel(error)) {
+          return;
+        }
         if (error.response.status === 401) {
           setInvalid("email");
           setEmailError("Email exists please use another email");
@@ -402,7 +421,7 @@ const RegisterForm = () => {
           return;
         }
       }
-    }, 400);
+    }, 600);
     return () => {
       abortController.abort();
       clearTimeout(timeout);
@@ -473,7 +492,7 @@ const RegisterForm = () => {
       setValid("confirmPassword");
       setConfirmPasswordError("");
       hideError("confirmPassword");
-    }, 400);
+    }, 600);
     return () => {
       clearTimeout(timeout);
     };
@@ -486,7 +505,7 @@ const RegisterForm = () => {
         setConfirmPasswordError("Confirm Password cannot be empty");
         hideError("confirmPassword");
       }
-    }, 400);
+    }, 600);
     return () => {
       clearTimeout(timeout);
     };
@@ -526,6 +545,7 @@ const RegisterForm = () => {
     }
   };
 
+
   const fetchLoginApi = async (loginData) => {
     try {
       // call login api
@@ -542,8 +562,11 @@ const RegisterForm = () => {
       alert("server error");
     }
   };
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
+    //To make sure all checks is finished do sleep before submit
+    await sleep(600)
+    //True if all of the fields is valid
     const isFormValid = Object.values(formValidity).every((valid) => valid);
     //IF ALL VALID
     if (isFormValid) {
@@ -649,17 +672,17 @@ const RegisterForm = () => {
               <CustomTextField
                 type="text"
                 fullWidth
-                color={errorShow.username && "error"}
+                color={errorShow.username && !checkingUsername && "error"}
                 onChange={changeHandler.username}
-                error={errorShow.username}
+                error={errorShow.username && !checkingUsername}
                 label="Username"
                 variant="outlined"
                 onFocus={focusHandler.username}
                 onBlur={blurHandler.username}
                 value={username}
                 helperText={
-                  (errorShow.username && usernameError) ||
-                  (checkingUsername && usernameError)
+                  (checkingUsername && "Checking Username Validity...") ||
+                  (errorShow.username && usernameError)
                 }
                 focused={focused.username}
                 leftIcon={
@@ -739,15 +762,15 @@ const RegisterForm = () => {
                 label="Email"
                 value={email}
                 onChange={changeHandler.email}
-                error={errorShow.email}
-                color={errorShow.email && "error"}
+                error={errorShow.email && !checkingEmail}
+                color={errorShow.email && !checkingEmail && "error"}
                 variant="outlined"
                 focused={focused.email}
                 onFocus={focusHandler.email}
                 onBlur={blurHandler.email}
                 helperText={
-                  (errorShow.email && emailError) ||
-                  (checkingEmail && emailError)
+                  (checkingEmail && "Checking Email Validity...") ||
+                  (errorShow.email && emailError)
                 }
                 leftIcon={
                   <Icon icon="ic:round-email" color="black" width="28" />
