@@ -42,13 +42,13 @@ export const customGlobalTheme = createTheme({
     },
     tableHeader: {
       fontSize: "14px",
-      fontWeight:'500',
-      lineHeight:'24px'
+      fontWeight: "500",
+      lineHeight: "24px",
     },
     buttonText: {
       fontSize: "16px",
-      fontWeight:'500',
-      lineHeight:'26px'
+      fontWeight: "500",
+      lineHeight: "26px",
     },
   },
   // COLOR PALETTE
@@ -94,8 +94,6 @@ export const customGlobalTheme = createTheme({
   },
 });
 
-
-
 export const customTheme = createTheme({
   ...customGlobalTheme,
   //Custom component
@@ -138,9 +136,35 @@ export const customTheme = createTheme({
             textTransform: "none",
             borderRadius: "4px",
             "&:hover": {
-              color:customGlobalTheme.palette.primary.dark,
+              color: customGlobalTheme.palette.primary.dark,
               borderColor: customGlobalTheme.palette.primary.dark,
               backgroundColor: "white",
+            },
+            "&:focus": {
+              color: customGlobalTheme.palette.primary.dark,
+              backgroundColor: "white",
+            },
+            "&:active": {
+              color: customGlobalTheme.palette.primary.dark,
+              backgroundColor: "white",
+            },
+            ":disabled": {
+              opacity: 0.5,
+              color: customGlobalTheme.palette.primary.dark,
+            },
+          },
+        },
+        {
+          props: { variant: "error" },
+          style: {
+            backgroundColor: customGlobalTheme.palette.danger.main,
+            border: `1px solid ${customGlobalTheme.palette.danger.main}`,
+            color: 'white',
+            textTransform: "none",
+            borderRadius: "4px",
+            "&:hover": {
+              borderColor: customGlobalTheme.palette.danger.light,
+              backgroundColor: customGlobalTheme.palette.danger.light,
             },
             "&:focus": {
               color: customGlobalTheme.palette.primary.dark,
@@ -183,21 +207,17 @@ export const customTheme = createTheme({
     // TEXT FIELD
     MuiTextField: {
       styleOverrides: {
-        root: {
-  
-        },
+        root: {},
       },
       variants: [
         {
           props: { variant: "outlined" },
           style: {
-          
             textTransform: "none",
             "& .MuiOutlinedInput-root": {
               "& > fieldset": { border: "1px solid #79747E" },
-            }
-          }
-          ,
+            },
+          },
         },
       ],
     },

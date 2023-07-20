@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  CircularProgress,
+  Select,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -363,8 +363,11 @@ export const VerifyDialog = (props) => {
   const title = props.title;
   const content = props.content;
   const actions = props.actions;
+  const open = props.open;
+  const onClose = props.onClose;
+
   return (
-    <Dialog open={props.open} onClose={props.onClose}>
+    <Dialog open={open} onClose={onClose}>
       {title && <DialogTitle>{title}</DialogTitle>}
       {content && (
         <DialogContent sx={{ ...ContentMiddle }}>{content}</DialogContent>
@@ -374,10 +377,80 @@ export const VerifyDialog = (props) => {
   );
 };
 
+export const BanDialog = (props) => {
+  const banDuration = props.banDuration;
+  const handleBanDurationChange = props.handleBanDurationChange;
+  const open = props.open;
+  const onClose = props.onClose;
+  const user = props.user;
+  const handleBan = props.handleBan
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Ban User</DialogTitle>
+      <DialogContent sx={{ ...ContentMiddle }}>
+        <Box>
+          <Typography variant="subtitle1">
+            Ban {user} for
+            {
+              <TextField
+                value={banDuration}
+                onChange={handleBanDurationChange}
+                size="small"
+                type="number"
+                sx={{ maxWidth: "4rem" }}
+              />
+            }{" "}
+            <Typography
+              variant="h6"
+              fontWeight={500}
+              component="span"
+              sx={{ ml: 1 }}
+            >
+              days
+            </Typography>
+          </Typography>
+          <Box sx={{ ...ContentMiddle }}>
+            <Typography>Reason for banning:</Typography>
+            <Select
+              value={"Inappropiate Comment"}
+              size="small"
+              sx={{ minWidth: "15rem" }}
+            >
+              <MenuItem value={"Inappropiate Comment"}>
+                Inappropiate Comment
+              </MenuItem>
+              <MenuItem value={"Spam"}>Spam</MenuItem>
+              <MenuItem value={"Malicious Actions"}>Malicious Actions</MenuItem>
+            </Select>
+          </Box>
+        </Box>
+      </DialogContent>
+      <DialogActions
+        sx={{
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Box>
+          <Button onClick={onClose} sx={{ maxWidth: "4rem" }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleBan}
+            variant="error"
+            sx={{ maxWidth: "4rem", ml: 5 }}
+          >
+            BAN
+          </Button>
+        </Box>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
 export const AdminUserActions = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
-
   const handleMenuClick = (event) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
@@ -386,38 +459,8 @@ export const AdminUserActions = (props) => {
   };
   const open = Boolean(anchorEl);
 
-  const handleDelete = props.handleDelete;
-  const username = props.user;
-  const handleDialogOpen = () => {
-    setOpenDialog(true);
-  };
-  const handleDialogClose = () => {
-    setOpenDialog(false);
-  };
-
   return (
     <>
-      {props.loadingDelete ? (
-        <VerifyDialog
-          title={`Deleting ${username}...`}
-          content={<CircularProgress />}
-          open={openDialog}
-          onClose={handleDialogClose}
-        />
-      ) : (
-        <VerifyDialog
-          title={`Are you sure you want to delete user ${username}?`}
-          actions={
-            <>
-              <Button onClick={handleDialogClose}>No</Button>
-              <Button onClick={handleDelete}>Yes</Button>
-            </>
-          }
-          open={openDialog}
-          onClose={handleDialogClose}
-        />
-      )}
-
       <Menu
         anchorOrigin={{
           vertical: "bottom",
@@ -432,7 +475,7 @@ export const AdminUserActions = (props) => {
         onClose={handleMenuClose}
       >
         <MenuList>
-          <MenuItem>
+          <MenuItem onClick={props.onBanClick}>
             <ListItemIcon>
               <Icon icon="fa-solid:ban" color="black" width="20" />
             </ListItemIcon>
@@ -444,11 +487,11 @@ export const AdminUserActions = (props) => {
                 fontWeight: "400",
               }}
             >
-              Ban
+              BAN
             </Typography>
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleDialogOpen}>
+          <MenuItem onClick={props.onDeleteClick}>
             <ListItemIcon>
               <Icon icon="mdi:trash" color="black" width="20" />
             </ListItemIcon>

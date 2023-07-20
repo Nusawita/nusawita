@@ -1,38 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Box,  Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import AdminSidebar from "../../components/UI/Appbar/admin-sidebar";
 import UserDataTable from "../../components/UI/Tables/user-data-table";
 import { useTheme } from "@emotion/react";
-import { DashboardCard } from "../../components/UI/custom-UI";
+import { DashboardCard} from "../../components/UI/custom-UI";
 import api from "../../axios-instance";
 
 export const AdminDashboardUsers = () => {
   const theme = useTheme();
   const colorPalette = theme.palette;
-
   const [userData, setUserData] = useState([]);
+
   const [loading, setLoading] = useState(true);
-  const [loadingDelete, setLoadingDelete] = useState(false)
-  const fetchDeleteApi = async(userId) =>{
-    try {
-      // call login api
-      const res = await api.delete(`/admin/user/${userId}`,{
-        withCredentials: true,
-      });
-      //if login success redirect to landing page
-      if (res.status === 200) {
-        setUserData(userData.filter((user)=>(user.id !== userId)))
-        console.log(userData)
-      }
-    } catch (error) {
-      // if unauthorized then show appropiate error in front
-      console.log('error')
-    }
-    setLoadingDelete(false)
-  }
-  const handleDelete = (row) => {
-    setLoadingDelete(true)
-    fetchDeleteApi(row)
+
+  const handleDataChange = (newValue) => {
+    setUserData(newValue);
   };
 
   //Get All User Data
@@ -70,7 +52,7 @@ export const AdminDashboardUsers = () => {
         justifyContent: "center",
       }}
     >
-      <AdminSidebar activeLink = 'users' />
+      <AdminSidebar activeLink="users" />
       <Box
         sx={{
           display: "flex",
@@ -103,10 +85,10 @@ export const AdminDashboardUsers = () => {
             sx={{ mt: 2, mr: 5 }}
             bodyColor="#62C91E"
             number={
-                userData.filter((user) => {
-                  return user.ban === 0;
-                }).length
-              }
+              userData.filter((user) => {
+                return user.ban <= 0;
+              }).length
+            }
             object="Active User"
             footerColor={colorPalette.success.dark}
           />
@@ -116,7 +98,7 @@ export const AdminDashboardUsers = () => {
             bodyColor={colorPalette.danger.main}
             number={
               userData.filter((user) => {
-                return user.ban !== 0;
+                return user.ban > 0;
               }).length
             }
             object="Banned User"
@@ -132,7 +114,12 @@ export const AdminDashboardUsers = () => {
           />
         </Box>
 
-        <UserDataTable loadingDelete = {loadingDelete} includeActions userData={userData} loading={loading} handleDelete={handleDelete}/>
+        <UserDataTable
+          onDataChange = {handleDataChange}
+          includeActions
+          userData={userData}
+          loading={loading}
+        />
       </Box>
     </Box>
   );
