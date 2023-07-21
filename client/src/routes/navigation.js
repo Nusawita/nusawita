@@ -1,4 +1,4 @@
-import {LoginPage} from "../pages/login-page"
+import { LoginPage } from "../pages/login-page";
 import AuthContext from "../context/auth-context";
 import { useContext } from "react";
 import {
@@ -20,20 +20,9 @@ export const Navigation = () => {
   return (
     <>
       <Router>
+        {/* User Routes */}
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              ctx.isAdmin ? <AdminDashboardLanding /> : <Navigate to="/" replace /> //If user is admin go to dashboard else back to landing page
-            }
-          />
-          <Route
-            path="/admin/dashboard/users"
-            element={
-              ctx.isAdmin ? <AdminDashboardUsers /> : <Navigate to="/" replace /> //If user is admin go to dashboard else back to landing page
-            }
-          />
           <Route
             path="/login"
             element={
@@ -47,6 +36,29 @@ export const Navigation = () => {
             }
           />
         </Routes>
+        {/* Admin Routes */}
+          <Routes>
+            <Route
+              path="/admin/dashboard"
+              element={
+                ctx.isAdmin ? (
+                  <AdminDashboardLanding />
+                ) : (
+                  <Navigate to="/" replace />
+                ) //If user is admin go to dashboard else back to landing page
+              }
+            />
+            <Route
+              path="/admin/dashboard/users"
+              element={
+                ctx.isAdmin ? (
+                  <AdminDashboardUsers />
+                ) : (
+                  <Navigate to="/" replace />
+                ) //If user is admin go to dashboard else back to landing page
+              }
+            />
+          </Routes>
       </Router>
     </>
   );
