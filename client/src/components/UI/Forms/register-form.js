@@ -5,7 +5,7 @@ import {
   Typography,
   useTheme,
   Button,
-  Container,
+  useMediaQuery,
 } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField, VerifyDialog } from "../custom-UI";
@@ -25,6 +25,7 @@ const RegisterForm = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const theme = useTheme();
+  const smallScreen = useMediaQuery(theme.breakpoints.down("md"));
   // call the colors
   const lightColor = theme.palette.light.main;
   const dangerMain = theme.palette.danger.main;
@@ -300,6 +301,9 @@ const RegisterForm = () => {
 
   // Run check on value change with delay (wait for user typing)
   useEffect(() => {
+    if (submitted) {
+      return;
+    }
     const abortController = new AbortController();
     hideError("username");
     setInvalid("username");
@@ -359,9 +363,12 @@ const RegisterForm = () => {
       setCheckingUsername(false);
       clearTimeout(timeout);
     };
-  }, [username]);
+  }, [username, submitted]);
 
   useEffect(() => {
+    if (submitted) {
+      return;
+    }
     const timeout = setTimeout(() => {
       try {
         const parsed = dayjs(date);
@@ -377,9 +384,12 @@ const RegisterForm = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [date]);
+  }, [date, submitted]);
 
   useEffect(() => {
+    if (submitted) {
+      return;
+    }
     const timeout = setTimeout(() => {
       if (!phone) {
         setValid("phone");
@@ -402,9 +412,12 @@ const RegisterForm = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [phone]);
+  }, [phone, submitted]);
 
   useEffect(() => {
+    if (submitted) {
+      return;
+    }
     hideError("email");
     const abortController = new AbortController();
     const timeout = setTimeout(async () => {
@@ -454,9 +467,12 @@ const RegisterForm = () => {
       abortController.abort();
       clearTimeout(timeout);
     };
-  }, [email]);
+  }, [email, submitted]);
 
   useEffect(() => {
+    if (submitted) {
+      return;
+    }
     const timeout = setTimeout(() => {
       if (password.trim().length === 0) {
         if (confirmPassword) {
@@ -524,9 +540,12 @@ const RegisterForm = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [password, confirmPassword]);
+  }, [password, confirmPassword, submitted]);
 
   useEffect(() => {
+    if (submitted) {
+      return;
+    }
     const timeout = setTimeout(() => {
       if (confirmPassword.trim().length === 0) {
         setInvalid("confirmPassword");
@@ -537,7 +556,7 @@ const RegisterForm = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [confirmPassword]);
+  }, [confirmPassword, submitted]);
 
   const fetchRegisterAPI = async (registerData) => {
     try {
@@ -622,6 +641,7 @@ const RegisterForm = () => {
         ban: 0,
       };
       fetchRegisterAPI(registerData);
+      setSubmitting(false);
       return;
     }
     //Else show error if not already
@@ -667,14 +687,16 @@ const RegisterForm = () => {
         <VerifyDialog
           open={submitted}
           content={
-            <>
-              <Lottie
-                animationData={checkAnimation}
-                style={{
-                  width: "20rem",
-                }}
-              />
-              <Box sx={{ maxWidth: "30rem" }}>
+            <Box sx={{ maxWidth: "30rem" }}>
+              <Box sx={{ ...ContentMiddle }}>
+                <Lottie
+                  animationData={checkAnimation}
+                  style={{
+                    width: smallScreen ? "16rem" : "25rem",
+                  }}
+                />
+              </Box>
+              <Box>
                 <Typography
                   textAlign="center"
                   variant="h6"
@@ -685,7 +707,7 @@ const RegisterForm = () => {
                   embark on a new adventure together!
                 </Typography>
               </Box>
-            </>
+            </Box>
           }
           actions={
             <Box>
@@ -694,7 +716,7 @@ const RegisterForm = () => {
                 variant="primary"
                 sx={{ maxWidth: "2rem", mr: 1 }}
               >
-                Close
+                Login
               </Button>
             </Box>
           }
@@ -970,8 +992,17 @@ const RegisterForm = () => {
               />
             </ErrorVibrateAnimation>
             <Box sx={{ ...ContentMiddle }}>
-              <Button type="submit" variant="primary" size="large">
-                {submitting ? "Registering..." : "Sign Up"}
+              <Button
+                type="submit"
+                variant="primary"
+                size="large"
+                disabled={submitting || submitted ? true : false}
+              >
+                {submitting
+                  ? "Registering..."
+                  : submitted
+                  ? "Registered"
+                  : "Sign Up"}
               </Button>
               <Typography variant="subtitle1" sx={{ fontWeight: "500", mt: 2 }}>
                 Already Have An Account?
