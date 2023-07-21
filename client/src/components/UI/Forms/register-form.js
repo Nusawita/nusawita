@@ -1,13 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
+import {
+  Grid,
+  Box,
+  Typography,
+  useTheme,
+  Button,
+  Container,
+} from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
-import { CustomDatePicker, CustomTextField } from "../custom-UI";
+import { CustomDatePicker, CustomTextField, VerifyDialog } from "../custom-UI";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
 import axios from "axios";
+import Lottie from "lottie-react";
+import checkAnimation from "../../lotties/CheckAnimation.json";
 
 import { Icon } from "@iconify/react";
 
@@ -23,6 +32,8 @@ const RegisterForm = () => {
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [checkingUsername, setCheckingUsername] = useState(false);
+  const checkingUsernameRef = useRef(checkingUsername);
+  checkingUsernameRef.current = checkingUsername;
 
   const [date, setDate] = useState(dayjs("2011-09-28").utc());
   const [dateError, setDateError] = useState("");
@@ -33,6 +44,8 @@ const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [checkingEmail, setCheckingEmail] = useState(false);
+  const checkingEmailRef = useRef(checkingEmail);
+  checkingEmailRef.current = checkingEmail;
 
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -43,6 +56,9 @@ const RegisterForm = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   let passConfirmRef = useRef();
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -72,6 +88,8 @@ const RegisterForm = () => {
     password: false,
     confirmPassword: false,
   });
+  const formValidityRef = useRef(formValidity);
+  formValidityRef.current = formValidity;
 
   //Show/Hide error states
   const [errorShow, setErrorShow] = useState({
@@ -218,32 +236,42 @@ const RegisterForm = () => {
     // Show error on blur
     username: async () => {
       handleBlur("username");
+      if (checkingUsername) {
+        return;
+      }
       if (usernameError) {
         showError("username");
+        // startAnimation('username')
       }
     },
     phone: () => {
       handleBlur("phone");
       if (errorShow.phone) {
-        startAnimation("phone");
+        // startAnimation("phone");
       }
     },
     email: async () => {
       handleBlur("email");
+      if (checkingEmail) {
+        return;
+      }
       if (emailError) {
         showError("email");
+        // startAnimation('email')
       }
     },
     password: () => {
       handleBlur("password");
       if (passwordError) {
         showError("password");
+        // startAnimation('password')
       }
     },
     confirmPassword: () => {
       handleBlur("confirmPassword");
       if (confirmPasswordError) {
         showError("confirmPassword");
+        // startAnimation('confirmPassword')
       }
     },
   };
@@ -274,6 +302,7 @@ const RegisterForm = () => {
   useEffect(() => {
     const abortController = new AbortController();
     hideError("username");
+    setInvalid("username");
     const timeout = setTimeout(async () => {
       if (username.trim().length === 0) {
         setInvalid("username");
@@ -294,7 +323,6 @@ const RegisterForm = () => {
         showError("username");
         return;
       }
-      // check username realtime api currently error
       setCheckingUsername(true);
       await sleep(1000);
       try {
@@ -313,11 +341,11 @@ const RegisterForm = () => {
           return;
         }
       } catch (error) {
+        setCheckingUsername(false);
         if (axios.isCancel(error)) {
           return;
         }
         if (error.response.status === 401) {
-          setCheckingUsername(false);
           setInvalid("username");
           setUsernameError("Username exists please use another username");
           showError("username");
@@ -377,7 +405,7 @@ const RegisterForm = () => {
   }, [phone]);
 
   useEffect(() => {
-    hideError('email')
+    hideError("email");
     const abortController = new AbortController();
     const timeout = setTimeout(async () => {
       if (email.trim().length === 0) {
@@ -517,13 +545,7 @@ const RegisterForm = () => {
       const res = await api.post("register", registerData);
       //if login success redirect to landing page
       if (res.status === 201) {
-        alert("Succesfully registered");
-        //log user in
-        const loginData = {
-          username: registerData.username,
-          password: registerData.password,
-        };
-        fetchLoginApi(loginData);
+        setSubmitted(true);
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
@@ -545,7 +567,6 @@ const RegisterForm = () => {
     }
   };
 
-
   const fetchLoginApi = async (loginData) => {
     try {
       // call login api
@@ -562,12 +583,33 @@ const RegisterForm = () => {
       alert("server error");
     }
   };
-  const handleSubmit = async(event) => {
+  //log user in
+  const logUserIn = () => {
+    const loginData = {
+      username: username,
+      password: password,
+    };
+    fetchLoginApi(loginData);
+  };
+  //Handle register submission
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    //To make sure all checks is finished do sleep before submit
-    await sleep(600)
-    //True if all of the fields is valid
-    const isFormValid = Object.values(formValidity).every((valid) => valid);
+    setSubmitting(true);
+    let isFormValid = Object.values(formValidity).every((valid) => valid);
+    //Check the value of form validity so that if all is valid no sleep is done
+    if (!isFormValid) {
+      //Sleep to wait if validation is still happening
+      await sleep(600);
+      // If checking username duplicate in database happening, sleep to wait for this to finish
+      if (checkingUsernameRef.current || checkingEmailRef.current) {
+        await sleep(1000);
+      }
+      // get the ref to get the value after all the checks complete
+      isFormValid = Object.values(formValidityRef.current).every(
+        (valid) => valid
+      );
+    }
+
     //IF ALL VALID
     if (isFormValid) {
       const registerData = {
@@ -609,6 +651,7 @@ const RegisterForm = () => {
         startAnimation("confirmPassword");
       }
     }
+    setSubmitting(false);
   };
   return (
     <>
@@ -621,6 +664,41 @@ const RegisterForm = () => {
           overflow: "hidden",
         }}
       >
+        <VerifyDialog
+          open={submitted}
+          content={
+            <>
+              <Lottie
+                animationData={checkAnimation}
+                style={{
+                  width: "20rem",
+                }}
+              />
+              <Box sx={{ maxWidth: "30rem" }}>
+                <Typography
+                  textAlign="center"
+                  variant="h6"
+                  component="h6"
+                  fontWeight="500"
+                >
+                  Congratulations! Your registration was successful. Let's
+                  embark on a new adventure together!
+                </Typography>
+              </Box>
+            </>
+          }
+          actions={
+            <Box>
+              <Button
+                onClick={logUserIn}
+                variant="primary"
+                sx={{ maxWidth: "2rem", mr: 1 }}
+              >
+                Close
+              </Button>
+            </Box>
+          }
+        />
         <Grid
           item
           xs={8}
@@ -893,7 +971,7 @@ const RegisterForm = () => {
             </ErrorVibrateAnimation>
             <Box sx={{ ...ContentMiddle }}>
               <Button type="submit" variant="primary" size="large">
-                Sign Up
+                {submitting ? "Registering..." : "Sign Up"}
               </Button>
               <Typography variant="subtitle1" sx={{ fontWeight: "500", mt: 2 }}>
                 Already Have An Account?
@@ -906,20 +984,24 @@ const RegisterForm = () => {
                 </Typography>
               </Typography>
             </Box>
-            <Typography sx={{ p: 2, textAlign: "center" }}>
-              By continuing, you agree to NusaWita Company's
-            </Typography>
-            <Typography align="center">
+            <Typography
+              sx={{ mt: 3, color: "#6F797A" }}
+              textAlign="center"
+              variant="body1"
+              component="p"
+            >
+              By continuing, you agree to NusaWita Company's{" "}
               <Typography
-                component="span"
-                sx={{ color: "#1273EB", fontWeight: "500", pl: 1, pr: 1 }}
+                component="a"
+                href="/"
+                sx={{ color: "#1273EB", fontWeight: "500", pr: 1 }}
               >
                 Terms of Use
               </Typography>
-              <span> </span>
               and
               <Typography
-                component="span"
+                component="a"
+                href="/"
                 sx={{ color: "#1273EB", fontWeight: "500", pl: 1 }}
               >
                 Privacy Policy
