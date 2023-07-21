@@ -328,7 +328,6 @@ const RegisterForm = () => {
         return;
       }
       setCheckingUsername(true);
-      await sleep(1000);
       try {
         const res = await api.post(
           "check-username",
@@ -435,7 +434,6 @@ const RegisterForm = () => {
         return;
       }
       setCheckingEmail(true);
-      await sleep(1000);
       try {
         const res = await api.post(
           "check-email",
