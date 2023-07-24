@@ -5,13 +5,16 @@ import CustomAppbar from "../components/UI/Appbar/custom-appbar";
 
 export const LoginPage = () => {
   return (
-    <Box
-      sx={{
-        height: "100vh",
-      }}
-    >
-      <CustomAppbar position="static" />
-      <LoginForm />
-    </Box>
+    <>
+      <Box
+        sx={{
+          height: "100vh",
+          overflow: "auto",
+        }}
+      >
+        <CustomAppbar position="static" />
+        <LoginForm />
+      </Box>
+    </>
   );
 };

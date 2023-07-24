@@ -7,7 +7,8 @@ export const RegisterPages = () => {
   return (
     <Box
       sx={{
-        height: "60rem",
+        height:'100vh',
+        overflow:'auto'
       }}
     >
       <CustomAppbar position = 'static' />
