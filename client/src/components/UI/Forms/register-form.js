@@ -678,8 +678,6 @@ const RegisterForm = () => {
         sx={{
           height: "100%",
           boxShadow: "0px 10px 15px 3px rgba(226, 226, 226, 0.25)",
-          borderRadius: "10px",
-          overflow: "hidden",
         }}
       >
         <VerifyDialog

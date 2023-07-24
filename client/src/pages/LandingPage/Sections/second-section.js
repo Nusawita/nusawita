@@ -1,7 +1,8 @@
 import React from "react";
-import { Box, Typography, useMediaQuery, Icon } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { ContentMiddle } from "../../../styles/shared-styles";
+import { Icon } from "@iconify/react";
 
 const SecondSection = () => {
   const theme = useTheme();
@@ -11,13 +12,26 @@ const SecondSection = () => {
     primary: theme.palette.primary,
     danger: theme.palette.danger,
   };
+
+  const styles = {
+    outerWrapper: {
+      ...ContentMiddle,
+      width: "100%",
+      mt: 10,
+    },
+    subtext: {
+      textAlign: "center",
+      px: 5,
+      mt: 3,
+    },
+  };
   return (
     <>
-      <Box sx={{ ...ContentMiddle, width: "100%", mt: 10 }}>
+      <Box sx={styles.outerWrapper}>
         {/* title */}
         <Icon
           icon="subway:location-3"
-          width="64"
+          width="80"
           color={colorPalette.primary.main}
         />
         <Typography variant="h3" component="h3">
@@ -36,7 +50,7 @@ const SecondSection = () => {
           morbi quis nec dignissim. Etiam urna justo lectus potenti semper. Orci
           gravida praesent ut dolor amet.
         </Typography>
-        <Box sx={{ mt: 10, width: "100%" }}>
+        <Box sx={styles.subtext}>
           <Typography
             variant={smallScreen ? "h4" : "h3"}
             component={smallScreen ? "h4" : "h3"}
