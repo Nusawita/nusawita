@@ -13,6 +13,8 @@ export const AdminDashboardLanding = () => {
 
   const [userData, setUserData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [banReasons, setBanReasons] = useState([]);
+  const [serverTimestamp, setServerTimestamp] = useState(0);
 
   //Get All User Data
   useEffect(() => {
@@ -29,6 +31,8 @@ export const AdminDashboardLanding = () => {
         );
         // console.log(res.data.data);
         setUserData(res.data.data);
+        setBanReasons(res.data.ban);
+        setServerTimestamp(res.data.time);
       } catch (error) {
         // if unauthorized then show appropiate error in front
         console.log(error);
@@ -49,7 +53,7 @@ export const AdminDashboardLanding = () => {
         justifyContent: "center",
       }}
     >
-      <AdminSidebar activeLink = 'home'/>
+      <AdminSidebar activeLink="home" />
       <Box
         sx={{
           display: "flex",
@@ -121,8 +125,12 @@ export const AdminDashboardLanding = () => {
             </Typography>
           </Paper>
         </Box>
-
-        <UserDataTable userData={userData} loading={loading} />
+        <UserDataTable
+          banReasons={banReasons}
+          userData={userData}
+          loading={loading}
+          serverTimestamp={serverTimestamp}
+        />
       </Box>
     </Box>
   );

@@ -14,23 +14,28 @@ import AuthContext from "../../../context/auth-context";
 
 const AdminSidebar = (props) => {
   const ctxAuth = useContext(AuthContext);
-  const activeLink = props.activeLink
+  const activeLink = props.activeLink;
   return (
     <Box role="presentation">
       <Drawer
         variant="permanent"
         sx={{
-          width: 270,
+          minWidth: 270,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: 270,
             boxSizing: "border-box",
           },
         }}
         anchor="left"
       >
         <Box sx={{ py: 5 }}>
-          <Box sx={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Box
               component="img"
               src="/logos/nusawita.png"
@@ -87,7 +92,12 @@ const AdminSidebar = (props) => {
               Menu Admin
             </Typography>
             <ListItem sx={{ p: 0 }}>
-              <ListItemButton sx={{ backgroundColor:activeLink === 'home' && '#0086761A' }} onClick={()=>{window.location.href = '/admin/dashboard'}}>
+              <ListItemButton
+                sx={{ backgroundColor: activeLink === "home" && "#0086761A" }}
+                onClick={() => {
+                  window.location.href = "/admin/dashboard";
+                }}
+              >
                 <ListItemIcon>
                   <Icon
                     icon="ic:round-dashboard"
@@ -103,7 +113,12 @@ const AdminSidebar = (props) => {
               </ListItemButton>
             </ListItem>
             <ListItem sx={{ p: 0 }}>
-              <ListItemButton sx={{ backgroundColor:activeLink === 'users' && '#0086761A' }} onClick={()=>{window.location.href = '/admin/dashboard/users'}}>
+              <ListItemButton
+                sx={{ backgroundColor: activeLink === "users" && "#0086761A" }}
+                onClick={() => {
+                  window.location.href = "/admin/dashboard/users";
+                }}
+              >
                 <ListItemIcon>
                   <Icon icon="bi:person-fill" color="#0000008F" width="24" />
                 </ListItemIcon>

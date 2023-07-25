@@ -35,10 +35,7 @@ export const Navigation = () => {
               ctx.isLoggedIn ? <Navigate to="/" replace /> : <RegisterPages /> //If user is logged in, redirect to landing page
             }
           />
-        </Routes>
-        {/* Admin Routes */}
-          <Routes>
-            <Route
+                      <Route
               path="/admin/dashboard"
               element={
                 ctx.isAdmin ? (
@@ -58,7 +55,7 @@ export const Navigation = () => {
                 ) //If user is admin go to dashboard else back to landing page
               }
             />
-          </Routes>
+        </Routes>
       </Router>
     </>
   );
