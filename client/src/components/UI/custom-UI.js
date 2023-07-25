@@ -20,6 +20,7 @@ import {
   DialogContent,
   DialogActions,
   Select,
+  Popover,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -30,6 +31,7 @@ import { Icon } from "@iconify/react";
 export const CustomTextField = (props) => {
   return (
     <TextField
+      size={props.size}
       autoFocus={props.autoFocus}
       inputRef={props.inputRef}
       type={props.type}
@@ -379,11 +381,18 @@ export const VerifyDialog = (props) => {
 
 export const BanDialog = (props) => {
   const banDuration = props.banDuration;
+  const banReasons = props.banReasons;
   const handleBanDurationChange = props.handleBanDurationChange;
   const open = props.open;
   const onClose = props.onClose;
   const user = props.user;
-  const handleBan = props.handleBan
+  const handleBan = props.handleBan;
+  const banReason = props.banReason;
+
+  const handleBanReasonChange = (event) => {
+    props.handleBanReasonChange(event.target.value);
+  };
+  // console.log(banReason);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -398,7 +407,7 @@ export const BanDialog = (props) => {
                 onChange={handleBanDurationChange}
                 size="small"
                 type="number"
-                sx={{ maxWidth: "4rem" }}
+                sx={{ maxWidth: "4rem", ml: 1 }}
               />
             }{" "}
             <Typography
@@ -413,15 +422,18 @@ export const BanDialog = (props) => {
           <Box sx={{ ...ContentMiddle }}>
             <Typography>Reason for banning:</Typography>
             <Select
-              value={"Inappropiate Comment"}
+              value={banReason}
+              onChange={handleBanReasonChange}
               size="small"
               sx={{ minWidth: "15rem" }}
             >
-              <MenuItem value={"Inappropiate Comment"}>
-                Inappropiate Comment
-              </MenuItem>
-              <MenuItem value={"Spam"}>Spam</MenuItem>
-              <MenuItem value={"Malicious Actions"}>Malicious Actions</MenuItem>
+              {banReasons.map((reason) => {
+                return (
+                  <MenuItem key={reason.id} value={reason.id}>
+                    {reason.reason}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </Box>
         </Box>
@@ -459,6 +471,8 @@ export const AdminUserActions = (props) => {
   };
   const open = Boolean(anchorEl);
 
+  const isBanned = props.isBanned;
+
   return (
     <>
       <Menu
@@ -475,21 +489,40 @@ export const AdminUserActions = (props) => {
         onClose={handleMenuClose}
       >
         <MenuList>
-          <MenuItem onClick={props.onBanClick}>
-            <ListItemIcon>
-              <Icon icon="fa-solid:ban" color="black" width="20" />
-            </ListItemIcon>
-            <Typography
-              variant="p"
-              sx={{
-                fontFamily: "Roboto",
-                fontSize: "14px",
-                fontWeight: "400",
-              }}
-            >
-              BAN
-            </Typography>
-          </MenuItem>
+          {isBanned ? (
+            <MenuItem onClick={props.onUnbanClick}>
+              <ListItemIcon>
+                <Icon icon="fa-solid:ban" color="black" width="20" />
+              </ListItemIcon>
+              <Typography
+                variant="p"
+                sx={{
+                  fontFamily: "Roboto",
+                  fontSize: "14px",
+                  fontWeight: "400",
+                }}
+              >
+                Unban
+              </Typography>
+            </MenuItem>
+          ) : (
+            <MenuItem onClick={props.onBanClick}>
+              <ListItemIcon>
+                <Icon icon="fa-solid:ban" color="black" width="20" />
+              </ListItemIcon>
+              <Typography
+                variant="p"
+                sx={{
+                  fontFamily: "Roboto",
+                  fontSize: "14px",
+                  fontWeight: "400",
+                }}
+              >
+                BAN
+              </Typography>
+            </MenuItem>
+          )}
+
           <Divider />
           <MenuItem onClick={props.onDeleteClick}>
             <ListItemIcon>
@@ -521,5 +554,76 @@ export const AdminUserActions = (props) => {
         <Icon icon="tabler:dots" width={24} color="black" />
       </Button>
     </>
+  );
+};
+
+export const BannedText = (props) => {
+  const theme = useTheme();
+  const banReason = props.banReason;
+  const banDuration = props.banDuration;
+
+  const banDays = Math.trunc(banDuration);
+  const banHours = Math.trunc((banDuration - banDays) * 24);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handlePopoverOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+  const colorPalette = theme.palette;
+  return (
+    <Box sx={{ overflow: "hidden" }}>
+      <Typography
+        onMouseEnter={handlePopoverOpen}
+        onMouseLeave={handlePopoverClose}
+        color={colorPalette.danger.main}
+        variant="body2"
+        component="p"
+        fontWeight="400"
+      >
+        Banned
+      </Typography>
+      <Popover
+        disableRestoreFocus
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handlePopoverClose}
+        sx={{ pointerEvents: "none" }}
+      >
+        <Card sx={{ maxWidth: "10rem" }}>
+          <CardContent>
+            <Typography variant="'subtitle1">
+              Banned due to
+              <Box component="span" sx={{ color: colorPalette.danger.main }}>
+                {" " + banReason + " "}
+              </Box>{" "}
+              for{" "}
+              <Box component="span" sx={{ color: colorPalette.danger.main }}>
+                {" " + banDays + " "}
+              </Box>
+              Days
+              <Box component="span" sx={{ color: colorPalette.danger.main }}>
+                {" " + banHours + " "}
+              </Box>
+              Hours
+            </Typography>
+          </CardContent>
+        </Card>
+      </Popover>
+    </Box>
   );
 };

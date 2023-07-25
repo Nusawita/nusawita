@@ -3,13 +3,15 @@ import { Box, Typography } from "@mui/material";
 import AdminSidebar from "../../components/UI/Appbar/admin-sidebar";
 import UserDataTable from "../../components/UI/Tables/user-data-table";
 import { useTheme } from "@emotion/react";
-import { DashboardCard} from "../../components/UI/custom-UI";
+import { DashboardCard } from "../../components/UI/custom-UI";
 import api from "../../axios-instance";
 
 export const AdminDashboardUsers = () => {
   const theme = useTheme();
   const colorPalette = theme.palette;
   const [userData, setUserData] = useState([]);
+  const [banReasons, setBanReasons] = useState([]);
+  const [serverTimestamp, setServerTimestamp] = useState(0);
 
   const [loading, setLoading] = useState(true);
 
@@ -32,6 +34,8 @@ export const AdminDashboardUsers = () => {
         );
         // console.log(res.data.data);
         setUserData(res.data.data);
+        setBanReasons(res.data.ban);
+        setServerTimestamp(res.data.time);
       } catch (error) {
         // if unauthorized then show appropiate error in front
         console.log(error);
@@ -49,77 +53,89 @@ export const AdminDashboardUsers = () => {
       sx={{
         display: "flex",
         backgroundColor: "#F4F6F8",
-        justifyContent: "center",
+        justifyContent: "flex-start",
+        overflow: "auto",
+        width: "auto",
       }}
     >
-      <AdminSidebar activeLink="users" />
+      <Box sx={{}}>
+        <AdminSidebar activeLink="users" />
+      </Box>
       <Box
         sx={{
           display: "flex",
           justifyContent: "center",
-          flexDirection: "column",
-          alignItems: "center",
           py: 5,
+
+          width: "100%",
         }}
       >
-        <Box sx={{ width: " 70rem" }}>
-          <Typography variant="h4" component="h4" sx={{ fontWeight: "400" }}>
-            Users Data
-          </Typography>
-          <Typography variant="body1" component="p" sx={{ fontWeight: "400" }}>
-            Home / Users
-          </Typography>
-        </Box>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Box sx={{}}>
+            <Typography variant="h4" component="h4" sx={{ fontWeight: "400" }}>
+              Users Data
+            </Typography>
+            <Typography
+              variant="body1"
+              component="p"
+              sx={{ fontWeight: "400" }}
+            >
+              Home / Users
+            </Typography>
+          </Box>
 
-        <Box
-          sx={{
-            width: " 70rem",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          {/* Dashboard Cards */}
-          <DashboardCard
-            loading={loading}
-            sx={{ mt: 2, mr: 5 }}
-            bodyColor="#62C91E"
-            number={
-              userData.filter((user) => {
-                return user.ban <= 0;
-              }).length
-            }
-            object="Active User"
-            footerColor={colorPalette.success.dark}
-          />
-          <DashboardCard
-            loading={loading}
-            sx={{ mt: 2, mr: 5 }}
-            bodyColor={colorPalette.danger.main}
-            number={
-              userData.filter((user) => {
-                return user.ban > 0;
-              }).length
-            }
-            object="Banned User"
-            footerColor="#773601"
-          />
-          <DashboardCard
-            loading={loading}
-            sx={{ mt: 2 }}
-            bodyColor={colorPalette.info.light}
-            number={userData.length}
-            object="Total Users"
-            footerColor={colorPalette.info.dark}
-          />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            {/* Dashboard Cards */}
+            <DashboardCard
+              loading={loading}
+              sx={{ mt: 2, mr: 5 }}
+              bodyColor="#62C91E"
+              number={
+                userData.filter((user) => {
+                  return (user.ban - serverTimestamp) / 86400000 <= 0;
+                }).length
+              }
+              object="Active User"
+              footerColor={colorPalette.success.dark}
+            />
+            <DashboardCard
+              loading={loading}
+              sx={{ mt: 2, mr: 5 }}
+              bodyColor={colorPalette.danger.main}
+              number={
+                userData.filter((user) => {
+                  return (user.ban - serverTimestamp) / 86400000 > 0;
+                }).length
+              }
+              object="Banned User"
+              footerColor="#773601"
+            />
+            <DashboardCard
+              loading={loading}
+              sx={{ mt: 2 }}
+              bodyColor={colorPalette.info.light}
+              number={userData.length}
+              object="Total Users"
+              footerColor={colorPalette.info.dark}
+            />
+          </Box>
+          <Box sx={{ width: "100%" }}>
+            <UserDataTable
+              onDataChange={handleDataChange}
+              includeActions
+              userData={userData}
+              loading={loading}
+              banReasons={banReasons ? banReasons : ""}
+              serverTimestamp={serverTimestamp}
+            />
+          </Box>
         </Box>
-
-        <UserDataTable
-          onDataChange = {handleDataChange}
-          includeActions
-          userData={userData}
-          loading={loading}
-        />
       </Box>
     </Box>
   );

@@ -3,6 +3,10 @@ import {
   Box,
   Button,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -17,6 +21,7 @@ import { Icon } from "@iconify/react";
 import {
   AdminUserActions,
   BanDialog,
+  BannedText,
   CustomTextField,
   VerifyDialog,
 } from "../custom-UI";
@@ -29,27 +34,52 @@ const UserDataTable = (props) => {
 
   //All props for this table component
   const userData = props.userData; //The data to show on the table
+  const banReasons = props.banReasons;
   const changeData = props.onDataChange; //The function to run when data change
   const loading = props.loading; //The loading state of the table
   const includeActions = props.includeActions; //Include actions column or not
+  const serverTimestamp = props.serverTimestamp;
+  //Data to show on the table
+  const [shownData, setShownData] = useState([]);
 
   //State to store the username of the user being banned or deleted
   const [processedUser, setProcessedUser] = useState({});
 
   //Search functionality variables
   const [search, setSearch] = useState(""); //The value inside the search field
-  const [searchResult, setSearchResult] = useState([]); //The result of the search
   const [searchFocused, setSearchFocused] = useState(false); //The focus state of the search field
+  const [filterValue, setFilterValue] = useState(0);
+
   //Function to run on onChange of search field
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
   };
+  const handleFilterValueChange = (event) => {
+    setFilterValue(event.target.value);
+  };
+
   //After finished typing get the search result to searchResult array
   useEffect(() => {
     const id = setTimeout(() => {
       //If user entered spaces
       if (search.trim().length === 0) {
-        setSearchResult([]);
+        if (filterValue === 0) {
+          setShownData(userData);
+          return;
+        }
+        if (filterValue === 1) {
+          setShownData(
+            userData.filter((user) => {
+              return (user.ban - serverTimestamp) / 86400000 > 0;
+            })
+          );
+        } else {
+          setShownData(
+            userData.filter((user) => {
+              return (user.ban - serverTimestamp) / 86400000 <= 0;
+            })
+          );
+        }
         return;
       }
       //Filter from the initial data (userData)
@@ -60,46 +90,77 @@ const UserDataTable = (props) => {
           user.noTelp.includes(search)
         );
       });
+
       //Set table page back to 0 because now show search result instead of all data
       setPage(0);
       //Feed the search result to the searchResult state
-      setSearchResult(result);
+      if (filterValue === 0) {
+        setShownData(result);
+        return;
+      }
+      if (filterValue === 1) {
+        setShownData(
+          result.filter((user) => {
+            return (user.ban - serverTimestamp) / 86400000 > 0;
+          })
+        );
+      } else {
+        setShownData(
+          result.filter((user) => {
+            return (user.ban - serverTimestamp) / 86400000 <= 0;
+          })
+        );
+      }
     }, 500);
     return () => {
       clearTimeout(id);
     };
-  }, [search, userData]);
+  }, [search, filterValue, userData, serverTimestamp]);
 
   //Ban user functionality variables
   const [banDuration, setBanDuration] = useState(1);
   const [loadingBan, setLoadingBan] = useState(false);
   const [openBanDialog, setOpenBanDialog] = useState(false);
+  const [openUnbanDialog, setOpenUnbanDialog] = useState(false);
+  const [loadingUnban, setLoadingUnban] = useState(false);
+  const [banReason, setBanReason] = useState(1);
   //Function to run on onChange of ban field in the dialog
   const handleBanDurationChange = (event) => {
     setBanDuration(event.target.value);
   };
+  const handleBanReasonChange = (data) => {
+    setBanReason(data);
+  };
 
-
+  const handleUnban = () => {
+    setLoadingUnban(true);
+    setTimeout(() => {
+      fetchBanApi(processedUser.id, 0, null);
+    }, 1000);
+  };
   //Function that calls the ban api
-  const fetchBanApi = async (userId, banDuration) => {
+  const fetchBanApi = async (userId, banDuration, banReasonId) => {
     try {
       const res = await api.put(
         `/admin/user/${userId}/ban`,
-        { ban: banDuration },
+        { ban: banDuration, banReasonId: banReasonId },
         {
           withCredentials: true,
         }
       );
       if (res.status === 200) {
-        // console.log("Succesfully Banned");
         //Make new state to replace existing for real time change
-        const newState = userData.map(obj => {
+        const newState = userData.map((obj) => {
           if (obj.id === userId) {
-            return {...obj, ban: banDuration};
-          }  
+            return {
+              ...obj,
+              ban: serverTimestamp + 86400000 * banDuration,
+              ban_detail: { banReasonId: banReasonId },
+            };
+          }
           return obj;
         });
-    
+
         //feed the new data so the table refreshes
         changeData(newState);
       }
@@ -108,14 +169,15 @@ const UserDataTable = (props) => {
     }
     //When finished set loading ban to false
     setLoadingBan(false);
+    setLoadingUnban(false);
   };
   //Function to handle banning user
   const handleBan = () => {
     //Set loading ban to true
-    setOpenBanDialog(false)
+    setOpenBanDialog(false);
     setLoadingBan(true);
     setTimeout(() => {
-      fetchBanApi(processedUser.id, banDuration);
+      fetchBanApi(processedUser.id, banDuration, banReason);
     }, 1000);
   };
 
@@ -131,7 +193,6 @@ const UserDataTable = (props) => {
       //if success, refresh the userData with the new data (without the deleted user) for real time table change
       if (res.status === 200) {
         changeData(userData.filter((user) => user.id !== userId));
-        // console.log(userData);
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
@@ -155,24 +216,24 @@ const UserDataTable = (props) => {
   // const [rowsPerPage, setRowsPerPage] = useState(10);
   const rowsPerPage = 10; //Max rows of data shown per page
   //Calculate empty rows when data in table not reach 10
-  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - userData.length);
-  const searchEmptyRows = Math.max(
-    0,
-    (1 + page) * rowsPerPage - searchResult.length
-  );
+  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - shownData.length);
 
   return (
     <Box
       component="main"
       sx={{
         flexGrow: 1,
-        p: 3,
+        py: 3,
         display: "flex",
+        width: "100%",
       }}
     >
       {/* The Ban Dialog */}
       <BanDialog
         banDuration={banDuration}
+        banReason={banReason}
+        handleBanReasonChange={handleBanReasonChange}
+        banReasons={props.banReasons}
         handleBanDurationChange={handleBanDurationChange}
         handleBan={handleBan}
         open={openBanDialog}
@@ -219,6 +280,11 @@ const UserDataTable = (props) => {
         content={<CircularProgress />}
         open={loadingBan}
       />
+      <VerifyDialog
+        title={`Unbanning User ${processedUser.username} `}
+        content={<CircularProgress />}
+        open={loadingUnban}
+      />
       <Box
         sx={{
           width: "70rem",
@@ -226,6 +292,32 @@ const UserDataTable = (props) => {
           backgroundColor: "white",
         }}
       >
+        <VerifyDialog
+          title={`Are you sure you want to stop banning user ${processedUser.username}?`}
+          actions={
+            <>
+              <Button
+                onClick={() => {
+                  setOpenUnbanDialog(false);
+                }}
+              >
+                No
+              </Button>
+              <Button
+                onClick={() => {
+                  setOpenUnbanDialog(false);
+                  handleUnban();
+                }}
+              >
+                Yes
+              </Button>
+            </>
+          }
+          open={openUnbanDialog}
+          onClose={() => {
+            setOpenUnbanDialog(false);
+          }}
+        />
         <Typography
           sx={{
             backgroundColor: colorPalette.primary.main,
@@ -239,41 +331,10 @@ const UserDataTable = (props) => {
           User Data Table
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "space-between", py: 1 }}>
-          <Box>
-            <Button
-              sx={{
-                color: "#2196F3",
-                width: "8rem",
-                mx: 1,
-                textTransform: "none",
-              }}
-            >
-              <Icon icon="bi:filter" color="#2196F3" width="24" />
-              <Typography variant="buttonText" component="span" sx={{ px: 1 }}>
-                FILTERS
-              </Typography>
-            </Button>
-            <Button
-              sx={{
-                color: "#2196F3",
-                width: "8rem",
-                mx: 1,
-                textTransform: "none",
-              }}
-            >
-              <Icon
-                icon="material-symbols:download"
-                color="#2196F3"
-                width="24"
-              />
-              <Typography variant="buttonText" component="span" sx={{ px: 1 }}>
-                EXPORT
-              </Typography>
-            </Button>
-          </Box>
-          <Box sx={{ pr: 10 }}>
+          <Box sx={{ pl: 5, py: 2 }}>
             <CustomTextField
-              variant="standard"
+              size="small"
+              variant="outlined"
               label="Search"
               value={search}
               onFocus={() => {
@@ -287,7 +348,43 @@ const UserDataTable = (props) => {
               leftIcon={
                 <Icon icon="material-symbols:search" color="gray" width="24" />
               }
+              sx={{ height: "1rem" }}
             />
+            <Box component="span" sx={{ pl: 5 }}>
+              <FormControl>
+                <InputLabel>Filter</InputLabel>
+                <Select
+                  label="filter"
+                  value={filterValue}
+                  onChange={handleFilterValueChange}
+                  size="small"
+                  sx={{ minWidth: "15rem" }}
+                >
+                  <MenuItem value={0}>All</MenuItem>
+                  <MenuItem value={1}>Banned</MenuItem>
+                  <MenuItem value={2}>Active</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
+          <Box sx={{ mt: 1.5 }}>
+            <Button
+              sx={{
+                color: "#2196F3",
+                width: "8rem",
+                mx: 1,
+                textTransform: "none",
+              }}
+            >
+              <Icon
+                icon="material-symbols:download"
+                color="#2196F3"
+                width="24"
+              />
+              <Typography variant="buttonText" component="span" sx={{ px: 2 }}>
+                EXPORT
+              </Typography>
+            </Button>
           </Box>
         </Box>
 
@@ -322,123 +419,73 @@ const UserDataTable = (props) => {
             )}
           </TableHead>
           <TableBody>
-            {search
-              ? searchResult
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell align="left">{row.username}</TableCell>
-                      <TableCell align="left">{row.email}</TableCell>
-                      <TableCell align="left">{row.dob}</TableCell>
-                      <TableCell align="left">{row.noTelp}</TableCell>
-                      <TableCell align="left">
-                        {row.ban <= 0 ? (
-                          <Typography
-                            color={colorPalette.primary.light}
-                            variant="body2"
-                            component="p"
-                            fontWeight="400"
-                          >
-                            Active
-                          </Typography>
-                        ) : (
-                          <Typography
-                            color={colorPalette.danger.main}
-                            variant="body2"
-                            component="p"
-                            fontWeight="400"
-                          >
-                            Banned
-                          </Typography>
-                        )}
-                      </TableCell>
-                      {includeActions && (
-                        <TableCell sx={{ ...ContentMiddle }}>
-                          <AdminUserActions
-                            onBanClick={() => {
-                              setProcessedUser({
-                                id: row.id,
-                                username: row.username,
-                              });
-                              setOpenBanDialog(true);
-                            }}
-                            onDeleteClick={() => {
-                              setProcessedUser({
-                                id: row.id,
-                                username: row.username,
-                              });
-                              setDeleteDialogOpen(true);
-                            }}
-                            user={row.username}
-                          />
-                        </TableCell>
+            {shownData
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row) => {
+                return (
+                  <TableRow key={row.id}>
+                    <TableCell align="left">{row.username}</TableCell>
+                    <TableCell align="left">{row.email}</TableCell>
+                    <TableCell align="left">{row.dob}</TableCell>
+                    <TableCell align="left">{row.noTelp}</TableCell>
+                    <TableCell align="left">
+                      {(row.ban - serverTimestamp) / 86400000 <= 0 ? (
+                        <Typography
+                          color={colorPalette.primary.light}
+                          variant="body2"
+                          component="p"
+                          fontWeight="400"
+                        >
+                          Active
+                        </Typography>
+                      ) : (
+                        <BannedText
+                          banReason={
+                            row.ban_detail &&
+                            banReasons[row.ban_detail.banReasonId - 1].reason
+                          }
+                          banDuration={(row.ban - serverTimestamp) / 86400000}
+                          username={row.username}
+                        />
                       )}
-                    </TableRow>
-                  ))
-              : userData
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell align="left">{row.username}</TableCell>
-                      <TableCell align="left">{row.email}</TableCell>
-                      <TableCell align="left">{row.dob}</TableCell>
-                      <TableCell align="left">{row.noTelp}</TableCell>
-                      <TableCell align="left">
-                        {row.ban <= 0 ? (
-                          <Typography
-                            color={colorPalette.primary.light}
-                            variant="body2"
-                            component="p"
-                            fontWeight="400"
-                          >
-                            Active
-                          </Typography>
-                        ) : (
-                          <Typography
-                            color={colorPalette.danger.main}
-                            variant="body2"
-                            component="p"
-                            fontWeight="400"
-                          >
-                            Banned
-                          </Typography>
-                        )}
+                    </TableCell>
+                    {includeActions && (
+                      <TableCell sx={{ ...ContentMiddle }}>
+                        <AdminUserActions
+                          isBanned={
+                            (row.ban - serverTimestamp) / 86400000 > 0 && true
+                          }
+                          onBanClick={() => {
+                            setProcessedUser({
+                              id: row.id,
+                              username: row.username,
+                            });
+                            setOpenBanDialog(true);
+                          }}
+                          onUnbanClick={() => {
+                            setProcessedUser({
+                              id: row.id,
+                              username: row.username,
+                            });
+                            setOpenUnbanDialog(true);
+                          }}
+                          onDeleteClick={() => {
+                            setProcessedUser({
+                              id: row.id,
+                              username: row.username,
+                            });
+                            setDeleteDialogOpen(true);
+                          }}
+                          user={row.username}
+                        />
                       </TableCell>
-                      {includeActions && (
-                        <TableCell sx={{ ...ContentMiddle }}>
-                          <AdminUserActions
-                            onBanClick={() => {
-                              setProcessedUser({
-                                id: row.id,
-                                username: row.username,
-                              });
-                              setOpenBanDialog(true);
-                            }}
-                            onDeleteClick={() => {
-                              setProcessedUser({
-                                id: row.id,
-                                username: row.username,
-                              });
-                              setDeleteDialogOpen(true);
-                            }}
-                            user={row.username}
-                          />
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-
-            {search
-              ? searchEmptyRows > 0 && (
-                  <TableRow style={{ height: 53 * searchEmptyRows }}>
-                    <TableCell colSpan={6} />
+                    )}
                   </TableRow>
-                )
-              : emptyRows > 0 && (
-                  <TableRow style={{ height: 53 * emptyRows }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
+                );
+              })}
+            <TableRow style={{ height: 53 * emptyRows }}>
+              <TableCell colSpan={6} />
+            </TableRow>
           </TableBody>
           <TableFooter>
             <TableRow>
@@ -448,7 +495,7 @@ const UserDataTable = (props) => {
                 //   setRowsPerPage(parseInt(event.target.value, 10));
                 //   setPage(0);
                 // }}
-                count={search ? searchResult.length : userData.length}
+                count={shownData.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={(event, newPage) => {
