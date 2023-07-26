@@ -55,86 +55,80 @@ export const AdminDashboardUsers = () => {
         backgroundColor: "#F4F6F8",
         justifyContent: "flex-start",
         overflow: "auto",
-        width: "auto",
       }}
     >
-      <Box sx={{}}>
+      <Box>
         <AdminSidebar activeLink="users" />
       </Box>
       <Box
         sx={{
           display: "flex",
           justifyContent: "center",
-          py: 5,
-
+          my: 5,
+          px: 7,
           width: "100%",
+          flexDirection:'column'
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Box sx={{}}>
-            <Typography variant="h4" component="h4" sx={{ fontWeight: "400" }}>
-              Users Data
-            </Typography>
-            <Typography
-              variant="body1"
-              component="p"
-              sx={{ fontWeight: "400" }}
-            >
-              Home / Users
-            </Typography>
-          </Box>
+        <Box>
+          <Typography variant="h4" component="h4" sx={{ fontWeight: "400" }}>
+            Users Data
+          </Typography>
+          <Typography variant="body1" component="p" sx={{ fontWeight: "400" }}>
+            Home / Users
+          </Typography>
+        </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            {/* Dashboard Cards */}
-            <DashboardCard
-              loading={loading}
-              sx={{ mt: 2, mr: 5 }}
-              bodyColor="#62C91E"
-              number={
-                userData.filter((user) => {
-                  return (user.ban - serverTimestamp) / 86400000 <= 0;
-                }).length
-              }
-              object="Active User"
-              footerColor={colorPalette.success.dark}
-            />
-            <DashboardCard
-              loading={loading}
-              sx={{ mt: 2, mr: 5 }}
-              bodyColor={colorPalette.danger.main}
-              number={
-                userData.filter((user) => {
-                  return (user.ban - serverTimestamp) / 86400000 > 0;
-                }).length
-              }
-              object="Banned User"
-              footerColor="#773601"
-            />
-            <DashboardCard
-              loading={loading}
-              sx={{ mt: 2 }}
-              bodyColor={colorPalette.info.light}
-              number={userData.length}
-              object="Total Users"
-              footerColor={colorPalette.info.dark}
-            />
-          </Box>
-          <Box sx={{ width: "100%" }}>
-            <UserDataTable
-              onDataChange={handleDataChange}
-              includeActions
-              userData={userData}
-              loading={loading}
-              banReasons={banReasons ? banReasons : ""}
-              serverTimestamp={serverTimestamp}
-            />
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          {/* Dashboard Cards */}
+          <DashboardCard
+            loading={loading}
+            sx={{ mt: 2, mr: 5 }}
+            bodyColor="#62C91E"
+            number={
+              userData.filter((user) => {
+                return (user.ban - serverTimestamp) / 86400000 <= 0;
+              }).length
+            }
+            object="Active User"
+            footerColor={colorPalette.success.dark}
+          />
+          <DashboardCard
+            loading={loading}
+            sx={{ mt: 2, mr: 5 }}
+            bodyColor={colorPalette.danger.main}
+            number={
+              userData.filter((user) => {
+                return (user.ban - serverTimestamp) / 86400000 > 0;
+              }).length
+            }
+            object="Banned User"
+            footerColor="#773601"
+          />
+          <DashboardCard
+            loading={loading}
+            sx={{ mt: 2 }}
+            bodyColor={colorPalette.info.light}
+            number={userData.length}
+            object="Total Users"
+            footerColor={colorPalette.info.dark}
+          />
+        </Box>
+        <Box sx={{ width: "100%", mt:5}}>
+          <UserDataTable
+            onDataChange={handleDataChange}
+            includeActions
+            userData={userData}
+            loading={loading}
+            banReasons={banReasons ? banReasons : ""}
+            serverTimestamp={serverTimestamp}
+          />
         </Box>
       </Box>
     </Box>
