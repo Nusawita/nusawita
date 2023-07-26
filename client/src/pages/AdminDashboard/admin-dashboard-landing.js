@@ -50,20 +50,23 @@ export const AdminDashboardLanding = () => {
       sx={{
         display: "flex",
         backgroundColor: "#F4F6F8",
-        justifyContent: "center",
+        justifyContent: "flex-start",
       }}
     >
-      <AdminSidebar activeLink="home" />
+      <Box>
+        <AdminSidebar activeLink="home" />
+      </Box>
       <Box
         sx={{
           display: "flex",
           justifyContent: "center",
           flexDirection: "column",
-          alignItems: "center",
-          py: 5,
+          my: 5,
+          px: 7,
+          width: "100%",
         }}
       >
-        <Box sx={{ width: " 70rem" }}>
+        <Box>
           <Typography variant="h4" component="h4" sx={{ fontWeight: "400" }}>
             Dashboard
           </Typography>
@@ -72,7 +75,7 @@ export const AdminDashboardLanding = () => {
           </Typography>
         </Box>
 
-        <Box sx={{ width: " 70rem", display: "flex", flexDirection: "row" }}>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
           <Box
             display="flex"
             flexDirection="column"
@@ -107,12 +110,10 @@ export const AdminDashboardLanding = () => {
                 <Icon icon="akar-icons:arrow-right" color="white" width={20} />
               }
             />
-
-            <Box></Box>
           </Box>
 
           {/* ActivityHistoryComponent */}
-          <Paper elevation={1} sx={{ width: " 50rem", p: 3 }}>
+          <Paper elevation={1} sx={{ width: "60%", p: 3, flexGrow:1 }}>
             <Typography variant="h4" component="h4" sx={{ fontWeight: "400" }}>
               Activity History
             </Typography>
@@ -125,12 +126,14 @@ export const AdminDashboardLanding = () => {
             </Typography>
           </Paper>
         </Box>
-        <UserDataTable
-          banReasons={banReasons}
-          userData={userData}
-          loading={loading}
-          serverTimestamp={serverTimestamp}
-        />
+        <Box sx={{ width: "100%", mt: 5 }}>
+          <UserDataTable
+            banReasons={banReasons}
+            userData={userData}
+            loading={loading}
+            serverTimestamp={serverTimestamp}
+          />
+        </Box>
       </Box>
     </Box>
   );
