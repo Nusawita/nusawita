@@ -39,6 +39,14 @@ const UserDataTable = (props) => {
   const loading = props.loading; //The loading state of the table
   const includeActions = props.includeActions; //Include actions column or not
   const serverTimestamp = props.serverTimestamp;
+  const columns = [
+    "Username",
+    "Email",
+    "Birth Date",
+    "Phone",
+    "Status",
+  ];
+
   //Data to show on the table
   const [shownData, setShownData] = useState([]);
 
@@ -219,15 +227,7 @@ const UserDataTable = (props) => {
   const emptyRows = Math.max(0, (1 + page) * rowsPerPage - shownData.length);
 
   return (
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        py: 3,
-        display: "flex",
-        width: "100%",
-      }}
-    >
+    <>
       {/* The Ban Dialog */}
       <BanDialog
         banDuration={banDuration}
@@ -285,53 +285,55 @@ const UserDataTable = (props) => {
         content={<CircularProgress />}
         open={loadingUnban}
       />
+      <VerifyDialog
+        title={`Are you sure you want to stop banning user ${processedUser.username}?`}
+        actions={
+          <>
+            <Button
+              onClick={() => {
+                setOpenUnbanDialog(false);
+              }}
+            >
+              No
+            </Button>
+            <Button
+              onClick={() => {
+                setOpenUnbanDialog(false);
+                handleUnban();
+              }}
+            >
+              Yes
+            </Button>
+          </>
+        }
+        open={openUnbanDialog}
+        onClose={() => {
+          setOpenUnbanDialog(false);
+        }}
+      />
+
       <Box
         sx={{
-          width: "70rem",
+          width: "100%",
           borderRadius: "4px",
           backgroundColor: "white",
         }}
       >
-        <VerifyDialog
-          title={`Are you sure you want to stop banning user ${processedUser.username}?`}
-          actions={
-            <>
-              <Button
-                onClick={() => {
-                  setOpenUnbanDialog(false);
-                }}
-              >
-                No
-              </Button>
-              <Button
-                onClick={() => {
-                  setOpenUnbanDialog(false);
-                  handleUnban();
-                }}
-              >
-                Yes
-              </Button>
-            </>
-          }
-          open={openUnbanDialog}
-          onClose={() => {
-            setOpenUnbanDialog(false);
-          }}
-        />
         <Typography
           sx={{
             backgroundColor: colorPalette.primary.main,
-            p: 2,
+            px: 3,
+            py: 1,
             color: "white",
-            borderRadius: "4px",
+            borderRadius: "4px 4px 0px 0px",
           }}
           variant="h6"
           component="h6"
         >
           User Data Table
         </Typography>
-        <Box sx={{ display: "flex", justifyContent: "space-between", py: 1 }}>
-          <Box sx={{ pl: 5, py: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ pl: 5, py: 2,  flexGrow:1 }}>
             <CustomTextField
               size="small"
               variant="outlined"
@@ -348,17 +350,17 @@ const UserDataTable = (props) => {
               leftIcon={
                 <Icon icon="material-symbols:search" color="gray" width="24" />
               }
-              sx={{ height: "1rem" }}
+              sx={{ width:'30%' }}
             />
             <Box component="span" sx={{ pl: 5 }}>
-              <FormControl>
+              <FormControl sx={{ width:'30%' }}>
                 <InputLabel>Filter</InputLabel>
                 <Select
                   label="filter"
                   value={filterValue}
                   onChange={handleFilterValueChange}
                   size="small"
-                  sx={{ minWidth: "15rem" }}
+                  sx={{ width:'100%' }}
                 >
                   <MenuItem value={0}>All</MenuItem>
                   <MenuItem value={1}>Banned</MenuItem>
@@ -406,14 +408,13 @@ const UserDataTable = (props) => {
               // Else show the data to the table
               <>
                 <TableRow>
-                  <TableCell align="left">Username</TableCell>
-                  <TableCell align="left">Email</TableCell>
-                  <TableCell align="left">Birth Date</TableCell>
-                  <TableCell align="left">Phone</TableCell>
-                  <TableCell align="left">Status</TableCell>
-                  {includeActions && (
-                    <TableCell align="center">Actions</TableCell>
-                  )}
+                  {columns.map((column, i) => {
+                    return (
+                      <TableCell key={i} align="left">
+                        {column}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               </>
             )}
@@ -506,7 +507,7 @@ const UserDataTable = (props) => {
           </TableFooter>
         </Table>
       </Box>
-    </Box>
+    </>
   );
 };
 
