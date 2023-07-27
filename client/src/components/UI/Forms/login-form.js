@@ -201,8 +201,19 @@ const LoginForm = () => {
         window.location.href = "/";
       }
     } catch (error) {
+      console.log(error);
       // if unauthorized then show appropiate error in front
       if (error.response.status === 401) {
+        if (error.response.data.message === "User has been banned") {
+          setUsernameError("Your account has been banned");
+          showError("username");
+          setPasswordError("Your account has been banned");
+          showError("password");
+          setAuthError(true);
+          startAnimation("username");
+          startAnimation("password");
+          return
+        }
         setUsernameError("Invalid username or password");
         showError("username");
         setPasswordError("Invalid username or password");
