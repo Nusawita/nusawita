@@ -143,7 +143,7 @@ const TourismTable = (props) => {
             justifyContent: "space-between",
           }}
         >
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ p: 2, flexGrow:1 }}>
             <CustomTextField
               size="small"
               variant="outlined"
@@ -160,17 +160,17 @@ const TourismTable = (props) => {
               leftIcon={
                 <Icon icon="material-symbols:search" color="gray" width="24" />
               }
-              sx={{ height: "1rem" }}
+              sx={{ width:'30%' }}
             />
             <Box component="span" sx={{ px: 2 }}>
-              <FormControl>
+              <FormControl sx={{ width:'30%' }}>
                 <InputLabel>Filter</InputLabel>
                 <Select
                   label="filter"
                   value={filterValue}
                   onChange={handleFilterValueChange}
                   size="small"
-                  sx={{ minWidth: "15rem" }}
+                  sx={{ width:'100%' }}
                 >
                   <MenuItem value={0}>All</MenuItem>
                   <MenuItem value={1}>Bali</MenuItem>
@@ -232,11 +232,13 @@ const TourismTable = (props) => {
                 return (
                   <TableRow key={element.id}>
                     <TableCell>{element.name}</TableCell>
-                    <TableCell sx={{ display: "flex" }}>
-                      <Icon icon="typcn:star" width={20} color="#FFB400" />
-                      <Typography variant="caption">
-                        {element.rating}
-                      </Typography>
+                    <TableCell>
+                      <Box component="span" sx={{ display:'flex' }}>
+                        <Icon icon="typcn:star" width={20} color="#FFB400" />
+                        <Typography variant="caption">
+                          {element.rating}
+                        </Typography>
+                      </Box>
                     </TableCell>
                     <TableCell>{element.location}</TableCell>
                     <TableCell>{element.image}</TableCell>

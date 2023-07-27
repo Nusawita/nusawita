@@ -350,10 +350,10 @@ const UserDataTable = (props) => {
               leftIcon={
                 <Icon icon="material-symbols:search" color="gray" width="24" />
               }
-              sx={{ width:'30%' }}
+              sx={{ width:'25s%' }}
             />
             <Box component="span" sx={{ pl: 5 }}>
-              <FormControl sx={{ width:'30%' }}>
+              <FormControl sx={{ width:'20%' }}>
                 <InputLabel>Filter</InputLabel>
                 <Select
                   label="filter"
