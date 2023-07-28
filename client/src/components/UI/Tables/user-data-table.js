@@ -38,14 +38,7 @@ const UserDataTable = (props) => {
   const changeData = props.onDataChange; //The function to run when data change
   const loading = props.loading; //The loading state of the table
   const includeActions = props.includeActions; //Include actions column or not
-  const serverTimestamp = props.serverTimestamp;
-  const columns = [
-    "Username",
-    "Email",
-    "Birth Date",
-    "Phone",
-    "Status",
-  ];
+  const columns = ["Username", "Email", "Birth Date", "Phone", "Status"];
 
   //Data to show on the table
   const [shownData, setShownData] = useState([]);
@@ -78,13 +71,13 @@ const UserDataTable = (props) => {
         if (filterValue === 1) {
           setShownData(
             userData.filter((user) => {
-              return (user.ban - serverTimestamp) / 86400000 > 0;
+              return user.ban > 0;
             })
           );
         } else {
           setShownData(
             userData.filter((user) => {
-              return (user.ban - serverTimestamp) / 86400000 <= 0;
+              return user.ban <= 0;
             })
           );
         }
@@ -109,13 +102,13 @@ const UserDataTable = (props) => {
       if (filterValue === 1) {
         setShownData(
           result.filter((user) => {
-            return (user.ban - serverTimestamp) / 86400000 > 0;
+            return user.ban > 0;
           })
         );
       } else {
         setShownData(
           result.filter((user) => {
-            return (user.ban - serverTimestamp) / 86400000 <= 0;
+            return user.ban <= 0;
           })
         );
       }
@@ -123,7 +116,7 @@ const UserDataTable = (props) => {
     return () => {
       clearTimeout(id);
     };
-  }, [search, filterValue, userData, serverTimestamp]);
+  }, [search, filterValue, userData]);
 
   //Ban user functionality variables
   const [banDuration, setBanDuration] = useState(1);
@@ -162,7 +155,7 @@ const UserDataTable = (props) => {
           if (obj.id === userId) {
             return {
               ...obj,
-              ban: serverTimestamp + 86400000 * banDuration,
+              ban: banDuration,
               ban_detail: { banReasonId: banReasonId },
             };
           }
@@ -333,7 +326,7 @@ const UserDataTable = (props) => {
           User Data Table
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Box sx={{ pl: 5, py: 2,  flexGrow:1 }}>
+          <Box sx={{ pl: 5, py: 2, flexGrow: 1 }}>
             <CustomTextField
               size="small"
               variant="outlined"
@@ -350,17 +343,17 @@ const UserDataTable = (props) => {
               leftIcon={
                 <Icon icon="material-symbols:search" color="gray" width="24" />
               }
-              sx={{ width:'25s%' }}
+              sx={{ width: "25s%" }}
             />
             <Box component="span" sx={{ pl: 5 }}>
-              <FormControl sx={{ width:'20%' }}>
+              <FormControl sx={{ width: "20%" }}>
                 <InputLabel>Filter</InputLabel>
                 <Select
                   label="filter"
                   value={filterValue}
                   onChange={handleFilterValueChange}
                   size="small"
-                  sx={{ width:'100%' }}
+                  sx={{ width: "100%" }}
                 >
                   <MenuItem value={0}>All</MenuItem>
                   <MenuItem value={1}>Banned</MenuItem>
@@ -423,16 +416,14 @@ const UserDataTable = (props) => {
             {shownData
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
-                const dobRegex = /T00:00:00\.000Z\s*$/
-
                 return (
                   <TableRow key={row.id}>
                     <TableCell align="left">{row.username}</TableCell>
                     <TableCell align="left">{row.email}</TableCell>
-                    <TableCell align="left">{row.dob.replace(dobRegex,'')}</TableCell>
+                    <TableCell align="left">{row.dob}</TableCell>
                     <TableCell align="left">{row.noTelp}</TableCell>
                     <TableCell align="left">
-                      {(row.ban - serverTimestamp) / 86400000 <= 0 ? (
+                      {row.ban <= 0 ? (
                         <Typography
                           color={colorPalette.primary.light}
                           variant="body2"
@@ -447,7 +438,7 @@ const UserDataTable = (props) => {
                             row.ban_detail &&
                             banReasons[row.ban_detail.banReasonId - 1].reason
                           }
-                          banDuration={(row.ban - serverTimestamp) / 86400000}
+                          banDuration={row.ban}
                           username={row.username}
                         />
                       )}
@@ -455,9 +446,7 @@ const UserDataTable = (props) => {
                     {includeActions && (
                       <TableCell sx={{ ...ContentMiddle }}>
                         <AdminUserActions
-                          isBanned={
-                            (row.ban - serverTimestamp) / 86400000 > 0 && true
-                          }
+                          isBanned={row.ban > 0 && true}
                           onBanClick={() => {
                             setProcessedUser({
                               id: row.id,
