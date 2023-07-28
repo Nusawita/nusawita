@@ -12,11 +12,13 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CustomTextField } from "../custom-UI";
 import { Icon } from "@iconify/react";
 import { ContentMiddle } from "../../../styles/shared-styles";
@@ -25,8 +27,14 @@ const TourismTable = (props) => {
   const theme = useTheme();
   const colorPalette = theme.palette;
 
+  // Table Properties
   const columns = props.columns;
-  const data = props.data;
+  const passedData = props.data;
+  const [shownData, setShownData] = useState(passedData);
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 10;
+  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - shownData.length);
+
   const actions = [
     {
       actionName: "More Details",
@@ -60,6 +68,26 @@ const TourismTable = (props) => {
   const handleFilterValueChange = (event) => {
     setFilterValue(event.target.value);
   };
+
+  //Search and filter feature
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if (search.trim().length === 0) {
+        setShownData(passedData);
+        return;
+      }
+      const searchResult = passedData.filter((data) => {
+        return data.name
+          .toLowerCase()
+          .trim()
+          .includes(search.toLowerCase().trim());
+      });
+      setShownData(searchResult);
+    }, 1000);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [search, passedData]);
 
   //Menu handlers
   const [anchorEl, setAnchorEl] = useState(null);
@@ -102,24 +130,6 @@ const TourismTable = (props) => {
               </MenuItem>
             );
           })}
-          {/* <MenuItem>
-            <ListItemIcon>
-              <Icon icon="bxs:detail" width={15} color="black" />
-            </ListItemIcon>
-            <Typography>More Details</Typography>
-          </MenuItem> */}
-          {/* <MenuItem>
-            <ListItemIcon>
-              <Icon icon="bxs:edit" width={15} color="black" />
-            </ListItemIcon>
-            <Typography>Edit</Typography>
-          </MenuItem>
-          <MenuItem>
-            <ListItemIcon>
-              <Icon icon="material-symbols:delete" width={15} color="black" />
-            </ListItemIcon>
-            <Typography>Delete</Typography>
-          </MenuItem> */}
         </MenuList>
       </Menu>
       <Box sx={{ width: "100%" }}>
@@ -143,7 +153,7 @@ const TourismTable = (props) => {
             justifyContent: "space-between",
           }}
         >
-          <Box sx={{ p: 2, flexGrow:1 }}>
+          <Box sx={{ p: 2, flexGrow: 1 }}>
             <CustomTextField
               size="small"
               variant="outlined"
@@ -160,17 +170,17 @@ const TourismTable = (props) => {
               leftIcon={
                 <Icon icon="material-symbols:search" color="gray" width="24" />
               }
-              sx={{ width:'30%' }}
+              sx={{ width: "30%" }}
             />
             <Box component="span" sx={{ px: 2 }}>
-              <FormControl sx={{ width:'30%' }}>
+              <FormControl sx={{ width: "30%" }}>
                 <InputLabel>Filter</InputLabel>
                 <Select
                   label="filter"
                   value={filterValue}
                   onChange={handleFilterValueChange}
                   size="small"
-                  sx={{ width:'100%' }}
+                  sx={{ width: "100%" }}
                 >
                   <MenuItem value={0}>All</MenuItem>
                   <MenuItem value={1}>Bali</MenuItem>
@@ -227,39 +237,65 @@ const TourismTable = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data &&
-              data.map((element) => {
-                return (
-                  <TableRow key={element.id}>
-                    <TableCell>{element.name}</TableCell>
-                    <TableCell>
-                      <Box component="span" sx={{ display:'flex' }}>
-                        <Icon icon="typcn:star" width={20} color="#FFB400" />
-                        <Typography variant="caption">
-                          {element.rating}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{element.location}</TableCell>
-                    <TableCell>{element.image}</TableCell>
-                    <TableCell>
-                      <Button
-                        onClick={handleMenuOpen}
-                        sx={{
-                          maxWidth: "0.5rem",
-                          ...ContentMiddle,
-                          "&:hover": {
-                            backgroundColor: "#0086761A",
-                          },
-                        }}
-                      >
-                        <Icon icon="tabler:dots" width={20} color="#00000099" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+            {shownData &&
+              shownData
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((element) => {
+                  return (
+                    <TableRow key={element.id}>
+                      <TableCell>{element.name}</TableCell>
+                      <TableCell>
+                        <Box component="span" sx={{ display: "flex" }}>
+                          <Icon icon="typcn:star" width={20} color="#FFB400" />
+                          <Typography variant="caption">
+                            {element.rating}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>{element.location}</TableCell>
+                      <TableCell>{element.image}</TableCell>
+                      <TableCell>
+                        <Button
+                          onClick={handleMenuOpen}
+                          sx={{
+                            maxWidth: "0.5rem",
+                            ...ContentMiddle,
+                            "&:hover": {
+                              backgroundColor: "#0086761A",
+                            },
+                          }}
+                        >
+                          <Icon
+                            icon="tabler:dots"
+                            width={20}
+                            color="#00000099"
+                          />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            <TableRow style={{ height: 53 * emptyRows }}>
+              <TableCell colSpan={6} />
+            </TableRow>
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[0]}
+                // onRowsPerPageChange={(event) => {
+                //   setRowsPerPage(parseInt(event.target.value, 10));
+                //   setPage(0);
+                // }}
+                count={shownData.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={(newPage) => {
+                  setPage(newPage);
+                }}
+              />
+            </TableRow>
+          </TableFooter>
         </Table>
       </Box>
     </>

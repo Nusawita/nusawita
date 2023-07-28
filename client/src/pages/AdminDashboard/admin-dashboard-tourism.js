@@ -15,16 +15,23 @@ const AdminDashboardTourism = () => {
     },
     {
       id: 2,
-      name: "Pantai Pandawa",
+      name: "Pantai Kalimantan",
       rating: 4.5,
-      location: "Jl. Pantai Pandawa, Kutuh, Kec. Kuta Sel, Bali",
+      location: "Jl. Pantai Pandawa, Kutuh, Kec. Kuta Sel, Kalimantan",
       image: null,
     },
     {
       id: 3,
-      name: "Pantai Pandawa",
+      name: "Pantai Jawa",
       rating: 4.5,
-      location: "Jl. Pantai Pandawa, Kutuh, Kec. Kuta Sel, Bali",
+      location: "Jl. Pantai Pandawa, Kutuh, Kec. Kuta Sel, Jawa",
+      image: null,
+    },
+    {
+      id: 4,
+      name: "Gunung Bromo",
+      rating: 4.5,
+      location: "Jl. Pantai Pandawa, Kutuh, Kec. Kuta Sel, Jawa",
       image: null,
     },
   ];
