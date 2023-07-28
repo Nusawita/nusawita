@@ -350,10 +350,10 @@ const UserDataTable = (props) => {
               leftIcon={
                 <Icon icon="material-symbols:search" color="gray" width="24" />
               }
-              sx={{ width:'30%' }}
+              sx={{ width:'25s%' }}
             />
             <Box component="span" sx={{ pl: 5 }}>
-              <FormControl sx={{ width:'30%' }}>
+              <FormControl sx={{ width:'20%' }}>
                 <InputLabel>Filter</InputLabel>
                 <Select
                   label="filter"
@@ -423,11 +423,13 @@ const UserDataTable = (props) => {
             {shownData
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
+                const dobRegex = /T00:00:00\.000Z\s*$/
+
                 return (
                   <TableRow key={row.id}>
                     <TableCell align="left">{row.username}</TableCell>
                     <TableCell align="left">{row.email}</TableCell>
-                    <TableCell align="left">{row.dob}</TableCell>
+                    <TableCell align="left">{row.dob.replace(dobRegex,'')}</TableCell>
                     <TableCell align="left">{row.noTelp}</TableCell>
                     <TableCell align="left">
                       {(row.ban - serverTimestamp) / 86400000 <= 0 ? (

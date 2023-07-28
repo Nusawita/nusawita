@@ -130,7 +130,14 @@ const AdminSidebar = (props) => {
               </ListItemButton>
             </ListItem>
             <ListItem sx={{ p: 0 }}>
-              <ListItemButton>
+              <ListItemButton
+                sx={{
+                  backgroundColor: activeLink === "tourism" && "#0086761A",
+                }}
+                onClick={() => {
+                  window.location.href = "/admin/dashboard/tourism/";
+                }}
+              >
                 <ListItemIcon>
                   <Icon
                     icon="fa-solid:map-marked-alt"

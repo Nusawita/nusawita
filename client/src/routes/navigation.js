@@ -11,6 +11,7 @@ import { AdminDashboardLanding } from "../pages/AdminDashboard/admin-dashboard-l
 import { LandingPage } from "../pages/LandingPage/landing_page";
 import { RegisterPages } from "../pages/register-page";
 import { AdminDashboardUsers } from "../pages/AdminDashboard/admin-dashboard-users";
+import AdminDashboardTourism from "../pages/AdminDashboard/admin-dashboard-tourism";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading
@@ -35,26 +36,36 @@ export const Navigation = () => {
               ctx.isLoggedIn ? <Navigate to="/" replace /> : <RegisterPages /> //If user is logged in, redirect to landing page
             }
           />
-                      <Route
-              path="/admin/dashboard"
-              element={
-                ctx.isAdmin ? (
-                  <AdminDashboardLanding />
-                ) : (
-                  <Navigate to="/" replace />
-                ) //If user is admin go to dashboard else back to landing page
-              }
-            />
-            <Route
-              path="/admin/dashboard/users"
-              element={
-                ctx.isAdmin ? (
-                  <AdminDashboardUsers />
-                ) : (
-                  <Navigate to="/" replace />
-                ) //If user is admin go to dashboard else back to landing page
-              }
-            />
+          <Route
+            path="/admin/dashboard"
+            element={
+              ctx.isAdmin ? (
+                <AdminDashboardLanding />
+              ) : (
+                <Navigate to="/" replace />
+              ) //If user is admin go to dashboard else back to landing page
+            }
+          />
+          <Route
+            path="/admin/dashboard/users"
+            element={
+              ctx.isAdmin ? (
+                <AdminDashboardUsers />
+              ) : (
+                <Navigate to="/" replace />
+              ) //If user is admin go to dashboard else back to landing page
+            }
+          />
+          <Route
+            path="/admin/dashboard/tourism"
+            element={
+              ctx.isAdmin ? (
+                <AdminDashboardTourism />
+              ) : (
+                <Navigate to="/" replace />
+              ) //If user is admin go to dashboard else back to landing page
+            }
+          />
         </Routes>
       </Router>
     </>
