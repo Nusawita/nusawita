@@ -423,11 +423,13 @@ const UserDataTable = (props) => {
             {shownData
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
+                const dobRegex = /T00:00:00\.000Z\s*$/
+
                 return (
                   <TableRow key={row.id}>
                     <TableCell align="left">{row.username}</TableCell>
                     <TableCell align="left">{row.email}</TableCell>
-                    <TableCell align="left">{row.dob}</TableCell>
+                    <TableCell align="left">{row.dob.replace(dobRegex,'')}</TableCell>
                     <TableCell align="left">{row.noTelp}</TableCell>
                     <TableCell align="left">
                       {(row.ban - serverTimestamp) / 86400000 <= 0 ? (
