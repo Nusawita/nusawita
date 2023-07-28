@@ -93,7 +93,7 @@ export const AdminDashboardUsers = () => {
             bodyColor="#62C91E"
             number={
               userData.filter((user) => {
-                return (user.ban - serverTimestamp) / 86400000 <= 0;
+                return user.ban / 86400000 <= 0;
               }).length
             }
             object="Active User"
@@ -105,7 +105,7 @@ export const AdminDashboardUsers = () => {
             bodyColor={colorPalette.danger.main}
             number={
               userData.filter((user) => {
-                return (user.ban - serverTimestamp) / 86400000 > 0;
+                return user.ban / 86400000 > 0;
               }).length
             }
             object="Banned User"
