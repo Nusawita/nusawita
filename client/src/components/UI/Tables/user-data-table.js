@@ -42,6 +42,8 @@ const UserDataTable = (props) => {
 
   //Data to show on the table
   const [shownData, setShownData] = useState([]);
+  const dobRegex = /T00:00:00\.000Z\s*$/;
+
 
   //State to store the username of the user being banned or deleted
   const [processedUser, setProcessedUser] = useState({});
@@ -420,7 +422,9 @@ const UserDataTable = (props) => {
                   <TableRow key={row.id}>
                     <TableCell align="left">{row.username}</TableCell>
                     <TableCell align="left">{row.email}</TableCell>
-                    <TableCell align="left">{row.dob}</TableCell>
+                    <TableCell align="left">
+                      {row.dob.replace(dobRegex, "")}
+                    </TableCell>{" "}
                     <TableCell align="left">{row.noTelp}</TableCell>
                     <TableCell align="left">
                       {row.ban <= 0 ? (
