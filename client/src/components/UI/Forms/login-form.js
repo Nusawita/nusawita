@@ -2,10 +2,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../../styles/shared-styles";
-import { CustomTextField } from "../custom-UI";
+import { CustomTextField, VerifyDialog } from "../custom-UI";
 import { Icon } from "@iconify/react";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
+import Lottie from "lottie-react";
+import banAnimation from "../../lotties/BanAnimation.json";
 
 const LoginForm = () => {
   //call theme component
@@ -24,6 +26,10 @@ const LoginForm = () => {
   let passwordRef = useRef();
 
   const [timeoutId, setTimeoutId] = useState(null);
+
+  const [bannedDuration, setBannedDuration] = useState(0);
+  const [bannedReason, setBannedReason] = useState("");
+  const [openBan, setOpenBan] = useState(false);
 
   const [focused, setFocused] = useState({
     username: false,
@@ -196,24 +202,22 @@ const LoginForm = () => {
       const res = await api.post("login", loginData, {
         withCredentials: true,
       });
+      console.log(res);
       //if login success redirect to landing page
       if (res.status === 200) {
         window.location.href = "/";
       }
     } catch (error) {
-      console.log(error);
       // if unauthorized then show appropiate error in front
       if (error.response.status === 401) {
-        if (error.response.data.message === "User has been banned") {
-          setUsernameError("Your account has been banned");
-          showError("username");
-          setPasswordError("Your account has been banned");
-          showError("password");
+        if (error.response.data.ban) {
+          setBannedDuration(error.response.data.ban.banTime);
+          setBannedReason(error.response.data.ban.banReason);
+          setOpenBan(true);
           setAuthError(true);
-          startAnimation("username");
-          startAnimation("password");
-          return
+          return;
         }
+
         setUsernameError("Invalid username or password");
         showError("username");
         setPasswordError("Invalid username or password");
@@ -228,6 +232,10 @@ const LoginForm = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     if (authError) {
+      if(bannedDuration>0){
+        setOpenBan(true)
+        return
+      }
       startAnimation("username");
       startAnimation("password");
       return;
@@ -274,6 +282,52 @@ const LoginForm = () => {
 
   return (
     <>
+      <VerifyDialog
+        open={openBan}
+        onClose={() => {
+          setOpenBan(false);
+        }}
+        content={
+          <Box sx={{ ...ContentMiddle, p: 3 }}>
+            <Lottie
+              animationData={banAnimation}
+              style={{
+                width: "50%",
+              }}
+            />
+            <Typography
+              variant="h6"
+              component="h6"
+              sx={{ fontWeight: "500", textAlign: "center" }}
+            >
+              Unable to log in, your account has been temporarily banned for
+              <Box component="span" color={"#DC3935"}>
+                {` ${Math.trunc(bannedDuration)} days ${Math.trunc(
+                  (bannedDuration - Math.trunc(bannedDuration)) * 24
+                )} hours `}
+              </Box>
+              due to{" "}
+              <Box component="span" color={"#DC3935"}>
+                {" " + bannedReason}
+              </Box>
+            </Typography>
+          </Box>
+        }
+        actions={
+          <Box>
+            <Button
+              onClick={() => {
+                setOpenBan(false);
+              }}
+              size="small"
+              sx={{ maxWidth: "10rem" }}
+              variant="primary"
+            >
+              Close
+            </Button>
+          </Box>
+        }
+      />
       <Grid
         container
         sx={{
