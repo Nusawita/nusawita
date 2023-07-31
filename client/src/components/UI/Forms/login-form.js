@@ -155,7 +155,18 @@ const LoginForm = () => {
 
   const validator = {
     username: () => {
-      if (enteredUsername.trim().length < 8) {
+      const spaceRegex = /^[^ ]+$/;
+      if (!spaceRegex.test(enteredUsername)) {
+        setUsernameError("Invalid username or password");
+        showError("username");
+        setPasswordError("Invalid username or password");
+        showError("password");
+        return;
+      }
+      if (
+        enteredUsername.trim().length < 8 ||
+        enteredUsername.trim().length > 16
+      ) {
         setUsernameError("Invalid username or password");
         showError("username");
         setPasswordError("Invalid username or password");
@@ -232,9 +243,9 @@ const LoginForm = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     if (authError) {
-      if(bannedDuration>0){
-        setOpenBan(true)
-        return
+      if (bannedDuration > 0) {
+        setOpenBan(true);
+        return;
       }
       startAnimation("username");
       startAnimation("password");

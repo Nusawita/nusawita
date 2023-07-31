@@ -323,8 +323,14 @@ const RegisterForm = () => {
 
       if (username.trim().length < 8) {
         setInvalid("username");
-        setUsernameError("Username must be 8 or more characters long");
+        setUsernameError("Username must be between 8-16 characters long");
         showError("username");
+        return;
+      }
+      if(username.trim().length>16){
+        setInvalid('username')
+        setUsernameError('Username must be between 8-16 characters long')
+        showError('username');
         return;
       }
       setCheckingUsername(true);
