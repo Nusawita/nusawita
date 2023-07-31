@@ -686,7 +686,7 @@ const RegisterForm = () => {
         }}
       >
         <VerifyDialog
-          open={true}
+          open={submitted}
           content={
             <Box sx={{ maxWidth: "30rem" }}>
               <Box sx={{ ...ContentMiddle }}>
