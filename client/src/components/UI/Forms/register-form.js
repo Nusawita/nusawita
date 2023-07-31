@@ -5,7 +5,6 @@ import {
   Typography,
   useTheme,
   Button,
-  useMediaQuery,
 } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField, VerifyDialog } from "../custom-UI";
@@ -25,7 +24,7 @@ const RegisterForm = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const theme = useTheme();
-  const smallScreen = useMediaQuery(theme.breakpoints.down("md"));
+  // const smallScreen = useMediaQuery(theme.breakpoints.down("md"));
   // call the colors
   const lightColor = theme.palette.light.main;
   const dangerMain = theme.palette.danger.main;
@@ -327,10 +326,10 @@ const RegisterForm = () => {
         showError("username");
         return;
       }
-      if(username.trim().length>16){
-        setInvalid('username')
-        setUsernameError('Username must be between 8-16 characters long')
-        showError('username');
+      if (username.trim().length > 16) {
+        setInvalid("username");
+        setUsernameError("Username must be between 8-16 characters long");
+        showError("username");
         return;
       }
       setCheckingUsername(true);
@@ -687,14 +686,16 @@ const RegisterForm = () => {
         }}
       >
         <VerifyDialog
-          open={submitted}
+          open={true}
           content={
             <Box sx={{ maxWidth: "30rem" }}>
               <Box sx={{ ...ContentMiddle }}>
                 <Lottie
+                  loop = {0}
                   animationData={checkAnimation}
                   style={{
-                    width: smallScreen ? "16rem" : "25rem",
+                    width: "60%",
+                    height: "60%",
                   }}
                 />
               </Box>
