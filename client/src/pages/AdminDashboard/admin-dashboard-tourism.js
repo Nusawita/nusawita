@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, {useState, useEffect} from "react";
 import AdminSidebar from "../../components/UI/Appbar/admin-sidebar";
 import TourismTable from "../../components/UI/Tables/tourism-table";
+import api from "../../axios-instance";
 
 const AdminDashboardTourism = () => {
   const tableColumns = ["Name", "Rating", "Address", "Image", " "];
@@ -36,6 +37,33 @@ const AdminDashboardTourism = () => {
     },
   ];
 
+  const [tourismData, setTourismData] = useState([])
+    //Get All User Data
+    useEffect(() => {
+      const abortController = new AbortController();
+      const id = setTimeout(async () => {
+        try {
+          // call login api
+          const res = await api.get(
+            "/location",
+            {
+              withCredentials: true,
+            },
+            { signal: abortController.signal }
+          );
+          console.log(res.data)
+          setTourismData(res.data.data);
+        } catch (error) {
+          // if unauthorized then show appropiate error in front
+          console.log(error);
+        }
+      }, 300);
+      return () => {
+        abortController.abort();
+        clearTimeout(id);
+      };
+    }, []);
+
   return (
     <Box
       sx={{
@@ -68,7 +96,7 @@ const AdminDashboardTourism = () => {
         </Box>
 
         <Box sx={{ py: 3, width: "100%" }}>
-          <TourismTable columns={tableColumns} data={dummyData} />
+          <TourismTable columns={tableColumns} data={tourismData} />
         </Box>
       </Box>
     </Box>
