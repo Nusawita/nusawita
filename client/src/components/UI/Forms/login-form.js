@@ -31,6 +31,8 @@ const LoginForm = () => {
   const [bannedReason, setBannedReason] = useState("");
   const [openBan, setOpenBan] = useState(false);
 
+  const [emailVerifyDialogOpen, setEmailVerifyDialogOpen] = useState(false);
+
   const [focused, setFocused] = useState({
     username: false,
     password: false,
@@ -163,16 +165,6 @@ const LoginForm = () => {
         showError("password");
         return;
       }
-      if (
-        enteredUsername.trim().length < 8 ||
-        enteredUsername.trim().length > 16
-      ) {
-        setUsernameError("Invalid username or password");
-        showError("username");
-        setPasswordError("Invalid username or password");
-        showError("password");
-        return false;
-      }
       return true;
     },
     password: () => {
@@ -219,6 +211,7 @@ const LoginForm = () => {
         window.location.href = "/";
       }
     } catch (error) {
+      console.log(error);
       // if unauthorized then show appropiate error in front
       if (error.response.status === 401) {
         if (error.response.data.ban) {
@@ -226,6 +219,10 @@ const LoginForm = () => {
           setBannedReason(error.response.data.ban.banReason);
           setOpenBan(true);
           setAuthError(true);
+          return;
+        }
+        if ((error.response.message = "Unauthorized User")) {
+          setEmailVerifyDialogOpen(true);
           return;
         }
 
@@ -335,6 +332,39 @@ const LoginForm = () => {
               variant="primary"
             >
               Close
+            </Button>
+          </Box>
+        }
+      />
+
+      <VerifyDialog
+        open={emailVerifyDialogOpen}
+        onClose={() => {
+          setEmailVerifyDialogOpen(false);
+        }}
+        content={
+          <>
+            <Typography
+              variant="h6"
+              component="h6"
+              sx={{ fontWeight: "500", textAlign: "center" }}
+            >
+              You haven't verified your email, please check your email for
+              verification before trying to log in.
+            </Typography>
+          </>
+        }
+        actions={
+          <Box>
+            <Button
+              onClick={() => {
+                setEmailVerifyDialogOpen(false);
+              }}
+              size="small"
+              sx={{ maxWidth: "10rem" }}
+              variant="primary"
+            >
+              Understand
             </Button>
           </Box>
         }

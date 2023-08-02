@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Grid,
-  Box,
-  Typography,
-  useTheme,
-  Button,
-} from "@mui/material";
+import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField, VerifyDialog } from "../custom-UI";
 import dayjs from "dayjs";
@@ -561,12 +555,23 @@ const RegisterForm = () => {
     };
   }, [confirmPassword, submitted]);
 
+  const fetchEmailVerificationSendApi = async (email) => {
+    try {
+      const res = await api.put("email-verification", { email });
+      if (res.status === 200) {
+        console.log(res);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const fetchRegisterAPI = async (registerData) => {
     try {
       // call login api
       const res = await api.post("register", registerData);
       //if login success redirect to landing page
       if (res.status === 201) {
+        fetchEmailVerificationSendApi(registerData.email);
         setSubmitted(true);
       }
     } catch (error) {
@@ -691,7 +696,7 @@ const RegisterForm = () => {
             <Box sx={{ maxWidth: "30rem" }}>
               <Box sx={{ ...ContentMiddle }}>
                 <Lottie
-                  loop = {0}
+                  loop={0}
                   animationData={checkAnimation}
                   style={{
                     width: "60%",
@@ -706,21 +711,11 @@ const RegisterForm = () => {
                   component="h6"
                   fontWeight="500"
                 >
-                  Congratulations! Your registration was successful. Let's
-                  embark on a new adventure together!
+                  Email verification had been sent to email {email}. Please
+                  check your email. if you dont receive email, please check your
+                  spam folder.
                 </Typography>
               </Box>
-            </Box>
-          }
-          actions={
-            <Box>
-              <Button
-                onClick={logUserIn}
-                variant="primary"
-                sx={{ maxWidth: "2rem", mr: 1 }}
-              >
-                Login
-              </Button>
             </Box>
           }
         />
