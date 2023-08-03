@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
+import { Grid, Box, Typography, useTheme, Button, Link } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField, VerifyDialog } from "../custom-UI";
 import dayjs from "dayjs";
@@ -8,8 +8,6 @@ import timezone from "dayjs/plugin/timezone";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
 import axios from "axios";
-import Lottie from "lottie-react";
-import checkAnimation from "../../lotties/CheckAnimation.json";
 
 import { Icon } from "@iconify/react";
 
@@ -53,6 +51,22 @@ const RegisterForm = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const [verificationCooldown, setVerificationCooldown] = useState(0);
+  const [verificationRequested, setverificationRequested] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
+
+  useEffect(() => {
+    if (!verificationRequested) {
+      return;
+    }
+    const intervalId = setInterval(() => {
+      setVerificationCooldown((prevCount) => prevCount - 1);
+    }, 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [verificationRequested]);
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -562,7 +576,10 @@ const RegisterForm = () => {
         console.log(res);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      if (error.response.status === 400) {
+        setEmailVerified(true);
+      }
     }
   };
   const fetchRegisterAPI = async (registerData) => {
@@ -692,31 +709,93 @@ const RegisterForm = () => {
       >
         <VerifyDialog
           open={submitted}
+          title={
+            <Typography sx={{ fontWeight: 500, fontSize:'20px' }}>
+              Email Verification
+            </Typography>
+          }
           content={
             <Box sx={{ maxWidth: "30rem" }}>
-              <Box sx={{ ...ContentMiddle }}>
-                <Lottie
-                  loop={0}
-                  animationData={checkAnimation}
-                  style={{
-                    width: "60%",
-                    height: "60%",
-                  }}
-                />
-              </Box>
-              <Box>
-                <Typography
-                  textAlign="center"
-                  variant="h6"
-                  component="h6"
-                  fontWeight="500"
-                >
-                  Email verification had been sent to email {email}. Please
-                  check your email. if you dont receive email, please check your
-                  spam folder.
-                </Typography>
-              </Box>
+              {emailVerified ? (
+                <Box>
+                  <Typography
+                    textAlign="center"
+                    variant="subtitle1"
+                    component="p"
+                    fontWeight="400"
+                  >
+                    You have verified your email, you may proceed to login
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{}}>
+                  <Typography
+                    textAlign="center"
+                    variant="subtitle1"
+                    component="p"
+                    fontWeight="400"
+                  >
+                    Please verify your email address. We've sent an email
+                    verification link to your email. Click the link to verify
+                    your email.
+                  </Typography>
+                  <Typography
+                    sx={{ mt: 3 }}
+                    textAlign="center"
+                    variant="subtitle1"
+                    component="p"
+                    fontWeight="400"
+                  >
+                    Registered Email:{" "}
+                    <Box component="span" sx={{ fontWeight: "600", mt: 5 }}>
+                      {email}
+                    </Box>
+                  </Typography>
+                  <Typography
+                    sx={{ mt: 3 }}
+                    textAlign="center"
+                    variant="subtitle1"
+                    component="p"
+                    fontWeight="400"
+                  >
+                    Not receiving email?{" "}
+                    <Link
+                      onClick={() => {
+                        if (verificationCooldown > 0) {
+                          return;
+                        }
+                        fetchEmailVerificationSendApi(email);
+                        setVerificationCooldown(90);
+                        setverificationRequested(true);
+                      }}
+                      component="button"
+                      color={verificationCooldown > 0 ? "#808080" : "#039BE5"}
+                      fontWeight="500"
+                    >
+                      Click Here{" "}
+                      <Box component="span">
+                        {verificationCooldown > 0
+                          ? `(${verificationCooldown}s)`
+                          : ""}{" "}
+                      </Box>
+                    </Link>{" "}
+                    to resend the verification email
+                  </Typography>
+                </Box>
+              )}
             </Box>
+          }
+          actions={
+            emailVerified && (
+              <Button
+                sx={{ width: "auto" }}
+                href="/login"
+                variant="primary"
+                size="small"
+              >
+                To Login
+              </Button>
+            )
           }
         />
         <Grid

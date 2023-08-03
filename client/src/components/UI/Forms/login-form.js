@@ -20,6 +20,7 @@ const LoginForm = () => {
   const [enteredUsername, setEnteredUsername] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   const [passwordError, setPasswordError] = useState("");
   const [passwordVisibility, setPasswordVisibility] = useState(false);
@@ -32,6 +33,7 @@ const LoginForm = () => {
   const [openBan, setOpenBan] = useState(false);
 
   const [emailVerifyDialogOpen, setEmailVerifyDialogOpen] = useState(false);
+  const [resendVerification, setResendVerification] = useState(false);
 
   const [focused, setFocused] = useState({
     username: false,
@@ -197,6 +199,17 @@ const LoginForm = () => {
     },
   };
 
+  const fetchSendEmailVerificationApi = async (email) => {
+    try {
+      const res = await api.put("email-verification", { email });
+      console.log(email)
+      if (res.status === 200) {
+        setResendVerification(true)
+      }
+    } catch (error) {
+      console.log('bangsat');
+    }
+  };
   //function to fetch the login api
   const fetchLoginApi = async (loginData) => {
     // console.log("fetchApi");
@@ -221,7 +234,8 @@ const LoginForm = () => {
           setAuthError(true);
           return;
         }
-        if ((error.response.message = "Unauthorized User")) {
+        if ((error.response.data.message === "Unauthorized User")) {
+          setUserEmail(error.response.data.data);
           setEmailVerifyDialogOpen(true);
           return;
         }
@@ -338,20 +352,57 @@ const LoginForm = () => {
       />
 
       <VerifyDialog
+        // open={emailVerifyDialogOpen}
         open={emailVerifyDialogOpen}
         onClose={() => {
           setEmailVerifyDialogOpen(false);
         }}
+        title={
+          <Typography component="h6" variant="h6" fontWeight="500">
+            Email not Verified
+          </Typography>
+        }
         content={
           <>
             <Typography
-              variant="h6"
-              component="h6"
-              sx={{ fontWeight: "500", textAlign: "center" }}
+              variant="subtitle1"
+              component="p"
+              sx={{ fontWeight: "400", textAlign: "center" }}
             >
-              You haven't verified your email, please check your email for
-              verification before trying to log in.
+              You haven't verified your email, please click on the verification
+              link sent to your email @
+              <Box component="span" sx={{ fontWeight: "600" }}>
+                {userEmail}
+              </Box>{" "}
+              for verification before trying to log in.
             </Typography>
+            <Typography
+              variant="subtitle1"
+              component="p"
+              sx={{ fontWeight: "400", textAlign: "center", mt: 2 }}
+            >
+              Not receiving email or link expired?
+            </Typography>
+            <Button
+              onClick={() => {
+                const email = userEmail
+                fetchSendEmailVerificationApi(email)
+              }}
+              size="small"
+              sx={{ width: "auto", mt: 1 }}
+              variant="primary"
+            >
+              Resend Verification
+            </Button>
+            {resendVerification && (
+              <Typography
+                variant="subtitle1"
+                component="p"
+                sx={{ fontWeight: "400", textAlign: "center", mt: 1 }}
+              >
+                Successfully resend email
+              </Typography>
+            )}
           </>
         }
         actions={
@@ -361,7 +412,7 @@ const LoginForm = () => {
                 setEmailVerifyDialogOpen(false);
               }}
               size="small"
-              sx={{ maxWidth: "10rem" }}
+              sx={{ width: "auto" }}
               variant="primary"
             >
               Understand

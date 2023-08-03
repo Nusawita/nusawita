@@ -12,6 +12,7 @@ import { LandingPage } from "../pages/LandingPage/landing_page";
 import { RegisterPages } from "../pages/register-page";
 import { AdminDashboardUsers } from "../pages/AdminDashboard/admin-dashboard-users";
 import AdminDashboardTourism from "../pages/AdminDashboard/admin-dashboard-tourism";
+import EmailVerificationPage from "../pages/email-verification-page";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading
@@ -65,6 +66,10 @@ export const Navigation = () => {
                 <Navigate to="/" replace />
               ) //If user is admin go to dashboard else back to landing page
             }
+          />
+          <Route
+            path="/email-verification"
+            element={<EmailVerificationPage />}
           />
         </Routes>
       </Router>
