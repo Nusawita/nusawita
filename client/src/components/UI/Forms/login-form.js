@@ -1,6 +1,6 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
 import React, { useEffect, useState, useRef } from "react";
-import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
+import { Grid, Box, Typography, useTheme, Button, Link } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../../styles/shared-styles";
 import { CustomTextField, VerifyDialog } from "../custom-UI";
 import { Icon } from "@iconify/react";
@@ -34,7 +34,20 @@ const LoginForm = () => {
 
   const [emailVerifyDialogOpen, setEmailVerifyDialogOpen] = useState(false);
   const [resendVerification, setResendVerification] = useState(false);
+  const [verificationCooldown, setVerificationCooldown] = useState(0);
+  const [verificationRequested, setverificationRequested] = useState(false);
 
+  useEffect(() => {
+    if (!verificationRequested) {
+      return;
+    }
+    const intervalId = setInterval(() => {
+      setVerificationCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [verificationRequested]);
   const [focused, setFocused] = useState({
     username: false,
     password: false,
@@ -202,12 +215,12 @@ const LoginForm = () => {
   const fetchSendEmailVerificationApi = async (email) => {
     try {
       const res = await api.put("email-verification", { email });
-      console.log(email)
+      console.log(email);
       if (res.status === 200) {
-        setResendVerification(true)
+        setResendVerification(true);
       }
     } catch (error) {
-      console.log('bangsat');
+      console.log("bangsat");
     }
   };
   //function to fetch the login api
@@ -234,7 +247,7 @@ const LoginForm = () => {
           setAuthError(true);
           return;
         }
-        if ((error.response.data.message === "Unauthorized User")) {
+        if (error.response.data.message === "Unauthorized User") {
           setUserEmail(error.response.data.data);
           setEmailVerifyDialogOpen(true);
           return;
@@ -358,7 +371,7 @@ const LoginForm = () => {
           setEmailVerifyDialogOpen(false);
         }}
         title={
-          <Typography component="h6" variant="h6" fontWeight="500">
+          <Typography sx={{ fontSize:'20px' }} fontWeight="500">
             Email not Verified
           </Typography>
         }
@@ -381,44 +394,31 @@ const LoginForm = () => {
               component="p"
               sx={{ fontWeight: "400", textAlign: "center", mt: 2 }}
             >
-              Not receiving email or link expired?
-            </Typography>
-            <Button
-              onClick={() => {
-                const email = userEmail
-                fetchSendEmailVerificationApi(email)
-              }}
-              size="small"
-              sx={{ width: "auto", mt: 1 }}
-              variant="primary"
-            >
-              Resend Verification
-            </Button>
-            {resendVerification && (
-              <Typography
-                variant="subtitle1"
-                component="p"
-                sx={{ fontWeight: "400", textAlign: "center", mt: 1 }}
+              Not receiving email or link expired?{" "}
+              <Link
+                onClick={() => {
+                  if (verificationCooldown > 0) {
+                    return;
+                  }
+                  fetchSendEmailVerificationApi(userEmail);
+                  setVerificationCooldown(90);
+                  setverificationRequested(true);
+                }}
+                component="button"
+                color={verificationCooldown > 0 ? "#808080" : "#039BE5"}
+                fontWeight="500"
               >
-                Successfully resend email
-              </Typography>
-            )}
+                Click Here{" "}
+                <Box component="span">
+                  {verificationCooldown > 0 ? `(${verificationCooldown}s)` : ""}{" "}
+                </Box>
+              </Link>{" "}
+              to resend verification link
+            </Typography>
+
           </>
         }
-        actions={
-          <Box>
-            <Button
-              onClick={() => {
-                setEmailVerifyDialogOpen(false);
-              }}
-              size="small"
-              sx={{ width: "auto" }}
-              variant="primary"
-            >
-              Understand
-            </Button>
-          </Box>
-        }
+
       />
       <Grid
         container
