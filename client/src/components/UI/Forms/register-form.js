@@ -34,6 +34,9 @@ const RegisterForm = () => {
   const [phoneError, setPhoneError] = useState("");
 
   const [email, setEmail] = useState("");
+  const emailRef = useRef(email);
+  emailRef.current = email;
+
   const [emailError, setEmailError] = useState("");
   const [checkingEmail, setCheckingEmail] = useState(false);
   const checkingEmailRef = useRef(checkingEmail);
@@ -67,6 +70,20 @@ const RegisterForm = () => {
       clearInterval(intervalId);
     };
   }, [verificationRequested]);
+
+  // useEffect(() => {
+  //   const deleteNewUser = async (email) => {
+  //     try {
+  //       const res = await api.post("/delete-new-user", { email });
+  //       console.log(res);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   return () => {
+  //     deleteNewUser(email);
+  //   };
+  // }, []);
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -589,6 +606,13 @@ const RegisterForm = () => {
       //if login success redirect to landing page
       if (res.status === 201) {
         fetchEmailVerificationSendApi(registerData.email);
+        localStorage.setItem(
+          "registerSession",
+          JSON.stringify({
+            email: registerData.email,
+            cooldown: verificationCooldown,
+          })
+        );
         setSubmitted(true);
       }
     } catch (error) {
@@ -710,7 +734,7 @@ const RegisterForm = () => {
         <VerifyDialog
           open={submitted}
           title={
-            <Typography sx={{ fontWeight: 500, fontSize:'20px' }}>
+            <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
               Email Verification
             </Typography>
           }
@@ -780,6 +804,16 @@ const RegisterForm = () => {
                       </Box>
                     </Link>{" "}
                     to resend the verification email
+                  </Typography>
+                  <Typography
+                    sx={{ mt: 3, color: "red" }}
+                    textAlign="center"
+                    variant="subtitle1"
+                    component="p"
+                    fontWeight="400"
+                  >
+                    Please do not close this tab otherwise you might lose
+                    progress
                   </Typography>
                 </Box>
               )}
