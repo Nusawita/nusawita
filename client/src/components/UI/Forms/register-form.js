@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Grid, Box, Typography, useTheme, Button, Link } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField, VerifyDialog } from "../custom-UI";
@@ -8,6 +8,7 @@ import timezone from "dayjs/plugin/timezone";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
 import axios from "axios";
+import AuthContext from "../../../context/auth-context";
 
 import { Icon } from "@iconify/react";
 
@@ -16,6 +17,7 @@ const RegisterForm = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const theme = useTheme();
+  const ctxAuth = useContext(AuthContext);
   // const smallScreen = useMediaQuery(theme.breakpoints.down("md"));
   // call the colors
   const lightColor = theme.palette.light.main;
@@ -34,8 +36,6 @@ const RegisterForm = () => {
   const [phoneError, setPhoneError] = useState("");
 
   const [email, setEmail] = useState("");
-  const emailRef = useRef(email);
-  emailRef.current = email;
 
   const [emailError, setEmailError] = useState("");
   const [checkingEmail, setCheckingEmail] = useState(false);
@@ -55,14 +55,67 @@ const RegisterForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  // Verification states
   const [verificationCooldown, setVerificationCooldown] = useState(0);
   const [verificationRequested, setverificationRequested] = useState(false);
+  const [registerSessionEmail, setRegisterSessionEmail] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
+  const [registrationCancelled, setRegistrationCancelled] = useState(false);
 
+  // Function to call delete api when user cancel registration
+  const fetchDeleteNewUser = async (email) => {
+    try {
+      const res = await api.put("/delete-new-user", { email });
+      if (res.status === 200) {
+        setRegistrationCancelled(true);
+        setSubmitted(false);
+      }
+    } catch (error) {
+      alert("Internal server error");
+    }
+  };
+
+  //Check if user has a register session on each render
   useEffect(() => {
+    //if user have register session this variable contains the email
+    if (ctxAuth.verificationEmail) {
+      const sessionEmail = ctxAuth.verificationEmail;
+      const sessionVerificationCooldown = ctxAuth.verificationCooldown;
+      setSubmitted(true); //Mark user has submitted the form and show verif dialog
+      setRegisterSessionEmail(sessionEmail); //Set email state to the email from the session
+      if (sessionVerificationCooldown > 0) {
+        setVerificationCooldown(Math.trunc(sessionVerificationCooldown / 1000)); // Set the send again cooldown if exists
+        setverificationRequested(true);
+      }
+    }
+  }, [ctxAuth]);
+
+  //Clear register session cookies if email already verified or cancel registration
+  useEffect(() => {
+    if (emailVerified || registrationCancelled) {
+      const fetchClearRegisterSessionApi = async () => {
+        try {
+          const res = await api.get("/logout-temp", {
+            withCredentials: true,
+          });
+          if (res.status === 200) {
+            setSubmitted(false);
+          }
+        } catch (error) {
+          alert("Server error");
+        }
+      };
+      fetchClearRegisterSessionApi();
+    }
+  }, [emailVerified, registrationCancelled]);
+
+  //FUnction to count down timer after requesting verif by clicking click here button
+  useEffect(() => {
+    //If no cooldown is currently up do nothing
     if (!verificationRequested) {
       return;
     }
+    //Else countdown from that cooldown
     const intervalId = setInterval(() => {
       setVerificationCooldown((prevCount) => prevCount - 1);
     }, 1000);
@@ -70,20 +123,6 @@ const RegisterForm = () => {
       clearInterval(intervalId);
     };
   }, [verificationRequested]);
-
-  // useEffect(() => {
-  //   const deleteNewUser = async (email) => {
-  //     try {
-  //       const res = await api.post("/delete-new-user", { email });
-  //       console.log(res);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   return () => {
-  //     deleteNewUser(email);
-  //   };
-  // }, []);
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -444,9 +483,31 @@ const RegisterForm = () => {
   }, [phone, submitted]);
 
   useEffect(() => {
+    //Do email verification if submitted, validate email otherwise
     if (submitted) {
+      //Check if email already verified
+      const fetchEmailCheckApi = async (email) => {
+        try {
+          const res = await api.post("/check-email", { email });
+          //If not verified do nothing
+          if (res.status === 200) {
+            return;
+          }
+        } catch (error) {
+          //If verified server returns 401
+          if (error.response.status === 401) {
+            setEmailVerified(true); //Set email verified to true
+            setEmail(""); //Clear email field
+          }
+        }
+      };
+      // Call check email
+      fetchEmailCheckApi(email);
+      //Return to avoid going to next code
       return;
     }
+
+    // Hide error everytime user types new data
     hideError("email");
     const abortController = new AbortController();
     const timeout = setTimeout(async () => {
@@ -586,16 +647,22 @@ const RegisterForm = () => {
     };
   }, [confirmPassword, submitted]);
 
-  const fetchEmailVerificationSendApi = async (email) => {
+  const fetchEmailVerificationSendApi = async (email, cooldown) => {
     try {
-      const res = await api.put("email-verification", { email });
+      const res = await api.put(
+        "email-verification",
+        { email, cooldown },
+        { withCredentials: true }
+      );
       if (res.status === 200) {
-        console.log(res);
+        return;
       }
     } catch (error) {
-      // console.log(error);
       if (error.response.status === 400) {
         setEmailVerified(true);
+      }
+      if (error.response.status === 500) {
+        alert("Server Error");
       }
     }
   };
@@ -605,19 +672,12 @@ const RegisterForm = () => {
       const res = await api.post("register", registerData);
       //if login success redirect to landing page
       if (res.status === 201) {
-        fetchEmailVerificationSendApi(registerData.email);
-        localStorage.setItem(
-          "registerSession",
-          JSON.stringify({
-            email: registerData.email,
-            cooldown: verificationCooldown,
-          })
-        );
+        fetchEmailVerificationSendApi(registerData.email, 0);
+        setRegisterSessionEmail(registerData.email);
         setSubmitted(true);
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
-      // console.log(error);
       if (error.response.status === 401) {
         if (error.response.data.message.username) {
           setInvalid("username");
@@ -635,30 +695,6 @@ const RegisterForm = () => {
     }
   };
 
-  const fetchLoginApi = async (loginData) => {
-    try {
-      // call login api
-      const res = await api.post("/login", loginData, {
-        withCredentials: true,
-      });
-      //if login success redirect to landing page
-      if (res.status === 200) {
-        localStorage.setItem("loginCredentials", JSON.stringify(res.data.data));
-        window.location.href = "/";
-      }
-    } catch (error) {
-      // if unauthorized then show appropiate error in front
-      alert("server error");
-    }
-  };
-  //log user in
-  const logUserIn = () => {
-    const loginData = {
-      username: username,
-      password: password,
-    };
-    fetchLoginApi(loginData);
-  };
   //Handle register submission
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -724,6 +760,170 @@ const RegisterForm = () => {
   };
   return (
     <>
+      {/* Dialog for when user cancel their registration process */}
+      <VerifyDialog
+        open={registrationCancelled}
+        onClose={() => {
+          setRegistrationCancelled(false);
+        }}
+        title={
+          <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
+            Cancel Registration
+          </Typography>
+        }
+        content={
+          <Box>
+            <Typography
+              textAlign="center"
+              variant="subtitle1"
+              component="p"
+              fontWeight="400"
+            >
+              You have cancelled your registration process
+            </Typography>
+          </Box>
+        }
+        actions={
+          <Button
+            sx={{ width: "auto" }}
+            onClick={() => {
+              setRegistrationCancelled(false);
+            }}
+            variant="primary"
+            size="small"
+          >
+            Close
+          </Button>
+        }
+      />
+      <VerifyDialog
+        open={emailVerified}
+        onClose={() => {
+          setEmailVerified(false);
+        }}
+        title={
+          <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
+            Congratulations
+          </Typography>
+        }
+        content={
+          <Box>
+            <Typography
+              textAlign="center"
+              variant="subtitle1"
+              component="p"
+              fontWeight="400"
+            >
+              You have successfully verified your email, you may proceed to
+              login
+            </Typography>
+          </Box>
+        }
+        actions={
+          <Box>
+            <Button
+              sx={{ width: "auto", mx: 1 }}
+              onClick={() => {
+                setEmailVerified(false);
+              }}
+              variant="primary"
+              size="small"
+            >
+              Close
+            </Button>
+            <Button
+              sx={{ width: "auto" }}
+              href="/login"
+              variant="primary"
+              size="small"
+            >
+              To Login
+            </Button>
+          </Box>
+        }
+      />
+      {/* Dialog for requesting email verification */}
+      <VerifyDialog
+        open={submitted}
+        title={
+          <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
+            Email Verification
+          </Typography>
+        }
+        content={
+          <Box sx={{ maxWidth: "30rem" }}>
+            {
+              <Box sx={{}}>
+                <Typography
+                  textAlign="center"
+                  variant="subtitle1"
+                  component="p"
+                  fontWeight="400"
+                >
+                  Please verify your email address. We've sent an email
+                  verification link to your email. Click the link to verify your
+                  email.
+                </Typography>
+                <Typography
+                  sx={{ mt: 3 }}
+                  textAlign="center"
+                  variant="subtitle1"
+                  component="p"
+                  fontWeight="400"
+                >
+                  Registered Email:{" "}
+                  <Box component="span" sx={{ fontWeight: "600", mt: 5 }}>
+                    {registerSessionEmail}
+                  </Box>
+                </Typography>
+                <Typography
+                  sx={{ mt: 3 }}
+                  textAlign="center"
+                  variant="subtitle1"
+                  component="p"
+                  fontWeight="400"
+                >
+                  Not receiving email?{" "}
+                  <Link
+                    onClick={() => {
+                      if (verificationCooldown > 0) {
+                        return;
+                      }
+                      fetchEmailVerificationSendApi(email, 90);
+                      setVerificationCooldown(90);
+                      setverificationRequested(true);
+                    }}
+                    component="button"
+                    color={verificationCooldown > 0 ? "#808080" : "#039BE5"}
+                    sx={{ cursor: verificationCooldown > 0 && "default" }}
+                    fontWeight="500"
+                  >
+                    Click Here{" "}
+                    <Box component="span">
+                      {verificationCooldown > 0
+                        ? `(${verificationCooldown}s)`
+                        : ""}{" "}
+                    </Box>
+                  </Link>{" "}
+                  to resend the verification email
+                </Typography>
+              </Box>
+            }
+          </Box>
+        }
+        actions={
+          <Button
+            sx={{ width: "auto" }}
+            onClick={() => {
+              fetchDeleteNewUser(registerSessionEmail);
+            }}
+            variant="primary"
+            size="small"
+          >
+            Cancel
+          </Button>
+        }
+      />
       <Grid
         container
         sx={{
@@ -731,107 +931,6 @@ const RegisterForm = () => {
           boxShadow: "0px 10px 15px 3px rgba(226, 226, 226, 0.25)",
         }}
       >
-        <VerifyDialog
-          open={submitted}
-          title={
-            <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
-              Email Verification
-            </Typography>
-          }
-          content={
-            <Box sx={{ maxWidth: "30rem" }}>
-              {emailVerified ? (
-                <Box>
-                  <Typography
-                    textAlign="center"
-                    variant="subtitle1"
-                    component="p"
-                    fontWeight="400"
-                  >
-                    You have verified your email, you may proceed to login
-                  </Typography>
-                </Box>
-              ) : (
-                <Box sx={{}}>
-                  <Typography
-                    textAlign="center"
-                    variant="subtitle1"
-                    component="p"
-                    fontWeight="400"
-                  >
-                    Please verify your email address. We've sent an email
-                    verification link to your email. Click the link to verify
-                    your email.
-                  </Typography>
-                  <Typography
-                    sx={{ mt: 3 }}
-                    textAlign="center"
-                    variant="subtitle1"
-                    component="p"
-                    fontWeight="400"
-                  >
-                    Registered Email:{" "}
-                    <Box component="span" sx={{ fontWeight: "600", mt: 5 }}>
-                      {email}
-                    </Box>
-                  </Typography>
-                  <Typography
-                    sx={{ mt: 3 }}
-                    textAlign="center"
-                    variant="subtitle1"
-                    component="p"
-                    fontWeight="400"
-                  >
-                    Not receiving email?{" "}
-                    <Link
-                      onClick={() => {
-                        if (verificationCooldown > 0) {
-                          return;
-                        }
-                        fetchEmailVerificationSendApi(email);
-                        setVerificationCooldown(90);
-                        setverificationRequested(true);
-                      }}
-                      component="button"
-                      color={verificationCooldown > 0 ? "#808080" : "#039BE5"}
-                      fontWeight="500"
-                    >
-                      Click Here{" "}
-                      <Box component="span">
-                        {verificationCooldown > 0
-                          ? `(${verificationCooldown}s)`
-                          : ""}{" "}
-                      </Box>
-                    </Link>{" "}
-                    to resend the verification email
-                  </Typography>
-                  <Typography
-                    sx={{ mt: 3, color: "red" }}
-                    textAlign="center"
-                    variant="subtitle1"
-                    component="p"
-                    fontWeight="400"
-                  >
-                    Please do not close this tab otherwise you might lose
-                    progress
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          }
-          actions={
-            emailVerified && (
-              <Button
-                sx={{ width: "auto" }}
-                href="/login"
-                variant="primary"
-                size="small"
-              >
-                To Login
-              </Button>
-            )
-          }
-        />
         <Grid
           item
           xs={8}

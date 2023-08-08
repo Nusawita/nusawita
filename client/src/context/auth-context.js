@@ -8,6 +8,8 @@ const AuthContext = React.createContext({
   loading: false, // state to store loading status
   loginUser: "",
   logoutUser: () => {}, //function to log user out
+  verificationCooldown: 0,
+  verificationEmail: "",
 });
 
 //AuthContextProvider wraps the App.js component in the Index.js file so all children of app have access to the AuthContext
@@ -16,6 +18,8 @@ export const AuthContextProvider = (props) => {
   const [isAdmin, setIsAdmin] = useState(false); // state to store user is admin or not
   const [loading, setLoading] = useState(true); // state to store loading status
   const [loginUser, setLoginUser] = useState("");
+  const [verificationCooldown, setVerificationCooldown] = useState(0);
+  const [verificationEmail, setVerificationEmail] = useState("");
 
   //function to logout user
   const logoutUser = async () => {
@@ -27,7 +31,7 @@ export const AuthContextProvider = (props) => {
       setIsLoggedIn(false); //set the logged_in state to false
       window.location.href = "/"; //Redirect to landing page
     } catch (error) {
-      console.log(error);
+      alert('Server Error')
     }
   };
   // Use useEffect hook on checkLoggedIn to check if the user is loggedIn everytime page refreshes
@@ -42,6 +46,15 @@ export const AuthContextProvider = (props) => {
         setLoginUser(loginData.username);
         setIsAdmin(loginData.isAdmin);
       } catch (error) {
+        if (error.response.status === 400) {
+          if (error.response.data.temp_token) {
+            setVerificationEmail(error.response.data.temp_token);
+          }
+          if (error.response.data.cooldown) {
+            setVerificationCooldown(error.response.data.cooldown);
+          }
+          setIsLoggedIn(false)
+        }
         setIsLoggedIn(false);
       } finally {
         setLoading(false); //after checking done setloading to false
@@ -60,6 +73,8 @@ export const AuthContextProvider = (props) => {
         isAdmin: isAdmin,
         loading: loading,
         loginUser: loginUser,
+        verificationCooldown: verificationCooldown,
+        verificationEmail: verificationEmail,
       }}
     >
       {props.children}

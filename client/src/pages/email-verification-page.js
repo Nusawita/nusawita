@@ -37,7 +37,7 @@ const EmailVerificationPage = () => {
 
   const fetchVerifyEmail = async (token) => {
     try {
-      const res = await api.get(`verify-email?token=${token}`);
+      const res = await api.get(`verify-email?token=${token}`, {withCredentials:true});
       console.log(res);
       if (res.status === 200) {
         setSuccessVerify(true);
