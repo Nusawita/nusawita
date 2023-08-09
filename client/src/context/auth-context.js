@@ -127,7 +127,7 @@ export const AuthContextProvider = (props) => {
     fetchDeleteNewUser(verificationEmail);
   };
   //Function to call the clear register session cookie api
-  const fetchClearRegisterSessionApi = async () => {
+  const fetchClearRegisterSessionApi = async (status) => {
     try {
       const res = await api.get("/logout-temp", {
         withCredentials: true,
@@ -169,8 +169,10 @@ export const AuthContextProvider = (props) => {
           console.log(error);
           //If verified server returns 401
           if (error.response.status === 401) {
-            // clear session if email verified
-            fetchClearRegisterSessionApi();
+            // show successfully verified dialog
+            setEmailVerified(true)
+            // remove the popup dialog of verification email
+            setOnRegisterSession(false)
             return;
           }
         }

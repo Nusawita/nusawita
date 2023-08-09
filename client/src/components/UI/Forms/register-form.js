@@ -745,7 +745,10 @@ const RegisterForm = () => {
             </Button>
             <Button
               sx={{ width: "auto" }}
-              href="/login"
+              onClick={() => {
+                ctxAuth.clearRegisterSession();
+                window.location.href = "/login";
+              }}
               variant="primary"
               size="small"
             >
