@@ -3,7 +3,6 @@ import {
   Button,
   Box,
   Typography,
-  Container,
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
@@ -37,7 +36,7 @@ const FirstSection = () => {
       py: 2,
     },
     textWrapper: {
-      mt: 20,
+      mt: 25,
       px: medScreen ? 7 : 2,
       maxWidth: "57rem",
     },

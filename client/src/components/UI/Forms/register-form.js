@@ -55,64 +55,15 @@ const RegisterForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Verification states
-  const [verificationCooldown, setVerificationCooldown] = useState(0);
-  const [verificationRequested, setverificationRequested] = useState(false);
-  const [registerSessionEmail, setRegisterSessionEmail] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [registrationCancelled, setRegistrationCancelled] = useState(false);
-
-  // Function to call delete api when user cancel registration
-  const fetchDeleteNewUser = async (email) => {
-    try {
-      const res = await api.put("/delete-new-user", { email });
-      if (res.status === 200) {
-        setRegistrationCancelled(true);
-        setSubmitted(false);
-      }
-    } catch (error) {
-      alert("Internal server error");
-    }
-  };
-
-  //Check if user has a register session on each render
-  useEffect(() => {
-    //if user have register session this variable contains the email
-    if (ctxAuth.verificationEmail) {
-      const sessionEmail = ctxAuth.verificationEmail;
-      const sessionVerificationCooldown = ctxAuth.verificationCooldown;
-      setSubmitted(true); //Mark user has submitted the form and show verif dialog
-      setRegisterSessionEmail(sessionEmail); //Set email state to the email from the session
-      if (sessionVerificationCooldown > 0) {
-        setVerificationCooldown(Math.trunc(sessionVerificationCooldown / 1000)); // Set the send again cooldown if exists
-        setverificationRequested(true);
-      }
-    }
-  }, [ctxAuth]);
-
-  //Clear register session cookies if email already verified or cancel registration
-  useEffect(() => {
-    if (emailVerified || registrationCancelled) {
-      const fetchClearRegisterSessionApi = async () => {
-        try {
-          const res = await api.get("/logout-temp", {
-            withCredentials: true,
-          });
-          if (res.status === 200) {
-            setSubmitted(false);
-          }
-        } catch (error) {
-          alert("Server error");
-        }
-      };
-      fetchClearRegisterSessionApi();
-    }
-  }, [emailVerified, registrationCancelled]);
+  // Verification cooldown to start countdown from the last cooldown
+  const [verificationCooldown, setVerificationCooldown] = useState(
+    ctxAuth.verificationCooldown
+  );
 
   //FUnction to count down timer after requesting verif by clicking click here button
   useEffect(() => {
     //If no cooldown is currently up do nothing
-    if (!verificationRequested) {
+    if (!ctxAuth.verificationCooldown) {
       return;
     }
     //Else countdown from that cooldown
@@ -122,8 +73,9 @@ const RegisterForm = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [verificationRequested]);
+  }, [ctxAuth.verificationCooldown]);
 
+  // Function to wait for defined duration in ms
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   //TO START ERROR ANIMATION
@@ -485,24 +437,6 @@ const RegisterForm = () => {
   useEffect(() => {
     //Do email verification if submitted, validate email otherwise
     if (submitted) {
-      //Check if email already verified
-      const fetchEmailCheckApi = async (email) => {
-        try {
-          const res = await api.post("/check-email", { email });
-          //If not verified do nothing
-          if (res.status === 200) {
-            return;
-          }
-        } catch (error) {
-          //If verified server returns 401
-          if (error.response.status === 401) {
-            setEmailVerified(true); //Set email verified to true
-            setEmail(""); //Clear email field
-          }
-        }
-      };
-      // Call check email
-      fetchEmailCheckApi(email);
       //Return to avoid going to next code
       return;
     }
@@ -647,33 +581,13 @@ const RegisterForm = () => {
     };
   }, [confirmPassword, submitted]);
 
-  const fetchEmailVerificationSendApi = async (email, cooldown) => {
-    try {
-      const res = await api.put(
-        "email-verification",
-        { email, cooldown },
-        { withCredentials: true }
-      );
-      if (res.status === 200) {
-        return;
-      }
-    } catch (error) {
-      if (error.response.status === 400) {
-        setEmailVerified(true);
-      }
-      if (error.response.status === 500) {
-        alert("Server Error");
-      }
-    }
-  };
   const fetchRegisterAPI = async (registerData) => {
     try {
       // call login api
       const res = await api.post("register", registerData);
       //if login success redirect to landing page
       if (res.status === 201) {
-        fetchEmailVerificationSendApi(registerData.email, 0);
-        setRegisterSessionEmail(registerData.email);
+        ctxAuth.fetchEmailVerificationSendApi(registerData.email, 0);
         setSubmitted(true);
       }
     } catch (error) {
@@ -760,7 +674,7 @@ const RegisterForm = () => {
   };
   return (
     <>
-      {/* Dialog for when user cancel their registration process */}
+      {/* Dialog for when user cancel their registration process
       <VerifyDialog
         open={registrationCancelled}
         onClose={() => {
@@ -795,11 +709,11 @@ const RegisterForm = () => {
             Close
           </Button>
         }
-      />
+      /> */}
       <VerifyDialog
-        open={emailVerified}
+        open={ctxAuth.emailVerified}
         onClose={() => {
-          setEmailVerified(false);
+          ctxAuth.clearRegisterSession();
         }}
         title={
           <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
@@ -824,7 +738,7 @@ const RegisterForm = () => {
             <Button
               sx={{ width: "auto", mx: 1 }}
               onClick={() => {
-                setEmailVerified(false);
+                ctxAuth.clearRegisterSession();
               }}
               variant="primary"
               size="small"
@@ -844,7 +758,7 @@ const RegisterForm = () => {
       />
       {/* Dialog for requesting email verification */}
       <VerifyDialog
-        open={submitted}
+        open={ctxAuth.onRegisterSession}
         title={
           <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
             Email Verification
@@ -873,7 +787,7 @@ const RegisterForm = () => {
                 >
                   Registered Email:{" "}
                   <Box component="span" sx={{ fontWeight: "600", mt: 5 }}>
-                    {registerSessionEmail}
+                    {ctxAuth.verificationEmail}
                   </Box>
                 </Typography>
                 <Typography
@@ -889,9 +803,11 @@ const RegisterForm = () => {
                       if (verificationCooldown > 0) {
                         return;
                       }
-                      fetchEmailVerificationSendApi(email, 90);
+                      ctxAuth.fetchEmailVerificationSendApi(
+                        ctxAuth.verificationEmail,
+                        90
+                      );
                       setVerificationCooldown(90);
-                      setverificationRequested(true);
                     }}
                     component="button"
                     color={verificationCooldown > 0 ? "#808080" : "#039BE5"}
@@ -914,9 +830,7 @@ const RegisterForm = () => {
         actions={
           <Button
             sx={{ width: "auto" }}
-            onClick={() => {
-              fetchDeleteNewUser(registerSessionEmail);
-            }}
+            onClick={ctxAuth.cancelUserRegistration}
             variant="primary"
             size="small"
           >
@@ -1254,5 +1168,4 @@ const RegisterForm = () => {
     </>
   );
 };
-
 export default React.memo(RegisterForm);

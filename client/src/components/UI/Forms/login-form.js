@@ -1,6 +1,6 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useEffect, useState, useRef } from "react";
-import { Grid, Box, Typography, useTheme, Button, Link } from "@mui/material";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../../styles/shared-styles";
 import { CustomTextField, VerifyDialog } from "../custom-UI";
 import { Icon } from "@iconify/react";
@@ -8,8 +8,10 @@ import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
 import Lottie from "lottie-react";
 import banAnimation from "../../lotties/BanAnimation.json";
+import AuthContext from "../../../context/auth-context";
 
 const LoginForm = () => {
+  const authCtx = useContext(AuthContext);
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -33,21 +35,7 @@ const LoginForm = () => {
   const [openBan, setOpenBan] = useState(false);
 
   const [emailVerifyDialogOpen, setEmailVerifyDialogOpen] = useState(false);
-  const [resendVerification, setResendVerification] = useState(false);
-  const [verificationCooldown, setVerificationCooldown] = useState(0);
-  const [verificationRequested, setverificationRequested] = useState(false);
 
-  useEffect(() => {
-    if (!verificationRequested) {
-      return;
-    }
-    const intervalId = setInterval(() => {
-      setVerificationCooldown((prev) => prev - 1);
-    }, 1000);
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [verificationRequested]);
   const [focused, setFocused] = useState({
     username: false,
     password: false,
@@ -212,15 +200,18 @@ const LoginForm = () => {
     },
   };
 
-  const fetchSendEmailVerificationApi = async (email) => {
+  const fetchSendEmailVerificationApi = async (email, cooldown) => {
     try {
-      const res = await api.put("email-verification", { email });
-      console.log(email);
+      const res = await api.put(
+        "email-verification",
+        { email, cooldown },
+        { withCredentials: true }
+      );
       if (res.status === 200) {
-        setResendVerification(true);
+        window.location.href = "register";
       }
     } catch (error) {
-      console.log("bangsat");
+      alert("Server Error");
     }
   };
   //function to fetch the login api
@@ -231,7 +222,6 @@ const LoginForm = () => {
       const res = await api.post("login", loginData, {
         withCredentials: true,
       });
-      console.log(res);
       //if login success redirect to landing page
       if (res.status === 200) {
         window.location.href = "/";
@@ -371,8 +361,8 @@ const LoginForm = () => {
           setEmailVerifyDialogOpen(false);
         }}
         title={
-          <Typography sx={{ fontSize:'20px' }} fontWeight="500">
-            Email not Verified
+          <Typography sx={{ fontSize: "20px" }} fontWeight="500">
+            Unfinished Registration
           </Typography>
         }
         content={
@@ -382,43 +372,27 @@ const LoginForm = () => {
               component="p"
               sx={{ fontWeight: "400", textAlign: "center" }}
             >
-              You haven't verified your email, please click on the verification
-              link sent to your email @
-              <Box component="span" sx={{ fontWeight: "600" }}>
-                {userEmail}
-              </Box>{" "}
-              for verification before trying to log in.
+              You haven't finished your registration process, please finish up your
+              registration process before trying to log in.
             </Typography>
-            <Typography
-              variant="subtitle1"
-              component="p"
-              sx={{ fontWeight: "400", textAlign: "center", mt: 2 }}
-            >
-              Not receiving email or link expired?{" "}
-              <Link
-                onClick={() => {
-                  if (verificationCooldown > 0) {
-                    return;
-                  }
-                  fetchSendEmailVerificationApi(userEmail);
-                  setVerificationCooldown(90);
-                  setverificationRequested(true);
-                }}
-                component="button"
-                color={verificationCooldown > 0 ? "#808080" : "#039BE5"}
-                fontWeight="500"
-              >
-                Click Here{" "}
-                <Box component="span">
-                  {verificationCooldown > 0 ? `(${verificationCooldown}s)` : ""}{" "}
-                </Box>
-              </Link>{" "}
-              to resend verification link
-            </Typography>
-
           </>
         }
-
+        actions={
+          <Button
+            sx={{ width: "auto" }}
+            onClick={() => {
+              if (authCtx.verificationEmail === userEmail) {
+                window.location.href = "register";
+                return;
+              }
+              fetchSendEmailVerificationApi(userEmail, 0);
+            }}
+            variant="primary"
+            size="small"
+          >
+            Continue Registration
+          </Button>
+        }
       />
       <Grid
         container
