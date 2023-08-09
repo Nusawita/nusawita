@@ -369,7 +369,7 @@ export const VerifyDialog = (props) => {
   const onClose = props.onClose;
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} >
       {title && <DialogTitle>{title}</DialogTitle>}
       {content && (
         <DialogContent sx={{ ...ContentMiddle }}>{content}</DialogContent>

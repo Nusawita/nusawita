@@ -4,6 +4,7 @@ import {
   Button,
   FormControl,
   InputLabel,
+  Link,
   ListItemIcon,
   Menu,
   MenuItem,
@@ -19,7 +20,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import { CustomTextField } from "../custom-UI";
+import { CustomTextField, VerifyDialog } from "../custom-UI";
 import { Icon } from "@iconify/react";
 import { ContentMiddle } from "../../../styles/shared-styles";
 
@@ -99,8 +100,30 @@ const TourismTable = (props) => {
   };
   const menuOpen = Boolean(anchorEl);
 
+  const [focusedTourism, setFocusedTourism] = useState({});
+  const [openImage, setOpenImage] = useState(false);
+
   return (
     <>
+      <VerifyDialog
+        open={openImage}
+        onClose={() => {
+          setOpenImage(false);
+        }}
+        content={
+          <>
+            <Box
+              sx={{
+                backgroundImage: `url(${focusedTourism.photo})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                height: "30rem",
+                width: "30rem",
+              }}
+            ></Box>
+          </>
+        }
+      />
       <Menu
         anchorOrigin={{
           vertical: "bottom",
@@ -252,8 +275,24 @@ const TourismTable = (props) => {
                           </Typography>
                         </Box>
                       </TableCell>
-                      <TableCell>{element.location}</TableCell>
-                      <TableCell>{element.image}</TableCell>
+                      <TableCell>{element.address}</TableCell>
+                      <TableCell>
+                        <Link
+                          onClick={() => {
+                            setFocusedTourism(element);
+                            setOpenImage(true);
+                          }}
+                          component="button"
+                          sx={{
+                            fontWeight: "500",
+                            fontSize: "16px",
+                            color: "#039BE5",
+                            cursor:'pointer'
+                          }}
+                        >
+                          View Photo
+                        </Link>
+                      </TableCell>
                       <TableCell>
                         <Button
                           onClick={handleMenuOpen}
