@@ -1,11 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  Grid,
-  Box,
-  Typography,
-  useTheme,
-  Button,
-} from "@mui/material";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { Grid, Box, Typography, useTheme, Button, Link } from "@mui/material";
 import { ContentMiddle } from "../../../styles/shared-styles";
 import { CustomDatePicker, CustomTextField, VerifyDialog } from "../custom-UI";
 import dayjs from "dayjs";
@@ -14,8 +8,7 @@ import timezone from "dayjs/plugin/timezone";
 import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
 import axios from "axios";
-import Lottie from "lottie-react";
-import checkAnimation from "../../lotties/CheckAnimation.json";
+import AuthContext from "../../../context/auth-context";
 
 import { Icon } from "@iconify/react";
 
@@ -24,6 +17,7 @@ const RegisterForm = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const theme = useTheme();
+  const ctxAuth = useContext(AuthContext);
   // const smallScreen = useMediaQuery(theme.breakpoints.down("md"));
   // call the colors
   const lightColor = theme.palette.light.main;
@@ -42,6 +36,7 @@ const RegisterForm = () => {
   const [phoneError, setPhoneError] = useState("");
 
   const [email, setEmail] = useState("");
+
   const [emailError, setEmailError] = useState("");
   const [checkingEmail, setCheckingEmail] = useState(false);
   const checkingEmailRef = useRef(checkingEmail);
@@ -60,6 +55,27 @@ const RegisterForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  // Verification cooldown to start countdown from the last cooldown
+  const [verificationCooldown, setVerificationCooldown] = useState(
+    ctxAuth.verificationCooldown
+  );
+
+  //FUnction to count down timer after requesting verif by clicking click here button
+  useEffect(() => {
+    //If no cooldown is currently up do nothing
+    if (!ctxAuth.verificationCooldown) {
+      return;
+    }
+    //Else countdown from that cooldown
+    const intervalId = setInterval(() => {
+      setVerificationCooldown((prevCount) => prevCount - 1);
+    }, 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [ctxAuth.verificationCooldown]);
+
+  // Function to wait for defined duration in ms
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   //TO START ERROR ANIMATION
@@ -419,9 +435,13 @@ const RegisterForm = () => {
   }, [phone, submitted]);
 
   useEffect(() => {
+    //Do email verification if submitted, validate email otherwise
     if (submitted) {
+      //Return to avoid going to next code
       return;
     }
+
+    // Hide error everytime user types new data
     hideError("email");
     const abortController = new AbortController();
     const timeout = setTimeout(async () => {
@@ -567,11 +587,11 @@ const RegisterForm = () => {
       const res = await api.post("register", registerData);
       //if login success redirect to landing page
       if (res.status === 201) {
+        ctxAuth.fetchEmailVerificationSendApi(registerData.email, 0);
         setSubmitted(true);
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
-      // console.log(error);
       if (error.response.status === 401) {
         if (error.response.data.message.username) {
           setInvalid("username");
@@ -589,30 +609,6 @@ const RegisterForm = () => {
     }
   };
 
-  const fetchLoginApi = async (loginData) => {
-    try {
-      // call login api
-      const res = await api.post("/login", loginData, {
-        withCredentials: true,
-      });
-      //if login success redirect to landing page
-      if (res.status === 200) {
-        localStorage.setItem("loginCredentials", JSON.stringify(res.data.data));
-        window.location.href = "/";
-      }
-    } catch (error) {
-      // if unauthorized then show appropiate error in front
-      alert("server error");
-    }
-  };
-  //log user in
-  const logUserIn = () => {
-    const loginData = {
-      username: username,
-      password: password,
-    };
-    fetchLoginApi(loginData);
-  };
   //Handle register submission
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -678,6 +674,170 @@ const RegisterForm = () => {
   };
   return (
     <>
+      {/* Dialog for when user cancel their registration process
+      <VerifyDialog
+        open={registrationCancelled}
+        onClose={() => {
+          setRegistrationCancelled(false);
+        }}
+        title={
+          <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
+            Cancel Registration
+          </Typography>
+        }
+        content={
+          <Box>
+            <Typography
+              textAlign="center"
+              variant="subtitle1"
+              component="p"
+              fontWeight="400"
+            >
+              You have cancelled your registration process
+            </Typography>
+          </Box>
+        }
+        actions={
+          <Button
+            sx={{ width: "auto" }}
+            onClick={() => {
+              setRegistrationCancelled(false);
+            }}
+            variant="primary"
+            size="small"
+          >
+            Close
+          </Button>
+        }
+      /> */}
+      <VerifyDialog
+        open={ctxAuth.emailVerified}
+        onClose={() => {
+          ctxAuth.clearRegisterSession();
+        }}
+        title={
+          <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
+            Congratulations
+          </Typography>
+        }
+        content={
+          <Box>
+            <Typography
+              textAlign="center"
+              variant="subtitle1"
+              component="p"
+              fontWeight="400"
+            >
+              You have successfully verified your email, you may proceed to
+              login
+            </Typography>
+          </Box>
+        }
+        actions={
+          <Box>
+            <Button
+              sx={{ width: "auto", mx: 1 }}
+              onClick={() => {
+                ctxAuth.clearRegisterSession();
+              }}
+              variant="primary"
+              size="small"
+            >
+              Close
+            </Button>
+            <Button
+              sx={{ width: "auto" }}
+              href="/login"
+              variant="primary"
+              size="small"
+            >
+              To Login
+            </Button>
+          </Box>
+        }
+      />
+      {/* Dialog for requesting email verification */}
+      <VerifyDialog
+        open={ctxAuth.onRegisterSession}
+        title={
+          <Typography sx={{ fontWeight: 500, fontSize: "20px" }}>
+            Email Verification
+          </Typography>
+        }
+        content={
+          <Box sx={{ maxWidth: "30rem" }}>
+            {
+              <Box sx={{}}>
+                <Typography
+                  textAlign="center"
+                  variant="subtitle1"
+                  component="p"
+                  fontWeight="400"
+                >
+                  Please verify your email address. We've sent an email
+                  verification link to your email. Click the link to verify your
+                  email.
+                </Typography>
+                <Typography
+                  sx={{ mt: 3 }}
+                  textAlign="center"
+                  variant="subtitle1"
+                  component="p"
+                  fontWeight="400"
+                >
+                  Registered Email:{" "}
+                  <Box component="span" sx={{ fontWeight: "600", mt: 5 }}>
+                    {ctxAuth.verificationEmail}
+                  </Box>
+                </Typography>
+                <Typography
+                  sx={{ mt: 3 }}
+                  textAlign="center"
+                  variant="subtitle1"
+                  component="p"
+                  fontWeight="400"
+                >
+                  Not receiving email?{" "}
+                  <Link
+                    onClick={() => {
+                      if (verificationCooldown > 0) {
+                        return;
+                      }
+                      ctxAuth.fetchEmailVerificationSendApi(
+                        ctxAuth.verificationEmail,
+                        90
+                      );
+                      setVerificationCooldown(90);
+                    }}
+                    component="button"
+                    color={verificationCooldown > 0 ? "#808080" : "#039BE5"}
+                    sx={{ cursor: verificationCooldown > 0 && "default" }}
+                    fontWeight="500"
+                  >
+                    Click Here{" "}
+                    <Box component="span">
+                      {verificationCooldown > 0
+                        ? `(${verificationCooldown}s)`
+                        : ""}{" "}
+                    </Box>
+                  </Link>{" "}
+                  to resend the verification email
+                </Typography>
+              </Box>
+            }
+          </Box>
+        }
+        actions={
+          <Button
+            sx={{ width: "auto" }}
+            onClick={ctxAuth.cancelUserRegistration}
+            variant="primary"
+            size="small"
+          >
+            Cancel
+          </Button>
+        }
+      />
       <Grid
         container
         sx={{
@@ -685,45 +845,6 @@ const RegisterForm = () => {
           boxShadow: "0px 10px 15px 3px rgba(226, 226, 226, 0.25)",
         }}
       >
-        <VerifyDialog
-          open={submitted}
-          content={
-            <Box sx={{ maxWidth: "30rem" }}>
-              <Box sx={{ ...ContentMiddle }}>
-                <Lottie
-                  loop = {0}
-                  animationData={checkAnimation}
-                  style={{
-                    width: "60%",
-                    height: "60%",
-                  }}
-                />
-              </Box>
-              <Box>
-                <Typography
-                  textAlign="center"
-                  variant="h6"
-                  component="h6"
-                  fontWeight="500"
-                >
-                  Congratulations! Your registration was successful. Let's
-                  embark on a new adventure together!
-                </Typography>
-              </Box>
-            </Box>
-          }
-          actions={
-            <Box>
-              <Button
-                onClick={logUserIn}
-                variant="primary"
-                sx={{ maxWidth: "2rem", mr: 1 }}
-              >
-                Login
-              </Button>
-            </Box>
-          }
-        />
         <Grid
           item
           xs={8}
@@ -1047,5 +1168,4 @@ const RegisterForm = () => {
     </>
   );
 };
-
 export default React.memo(RegisterForm);

@@ -1,5 +1,5 @@
 // THIS IS FILE TO TEST THE CUSTOM UI COMPONENTS
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { Grid, Box, Typography, useTheme, Button } from "@mui/material";
 import { ContentMiddle, ContentEnd } from "../../../styles/shared-styles";
 import { CustomTextField, VerifyDialog } from "../custom-UI";
@@ -8,8 +8,10 @@ import { ErrorVibrateAnimation } from "../../animation/custom-animation";
 import api from "../../../axios-instance";
 import Lottie from "lottie-react";
 import banAnimation from "../../lotties/BanAnimation.json";
+import AuthContext from "../../../context/auth-context";
 
 const LoginForm = () => {
+  const authCtx = useContext(AuthContext);
   //call theme component
   const theme = useTheme();
   // call the colors
@@ -20,6 +22,7 @@ const LoginForm = () => {
   const [enteredUsername, setEnteredUsername] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   const [passwordError, setPasswordError] = useState("");
   const [passwordVisibility, setPasswordVisibility] = useState(false);
@@ -30,6 +33,8 @@ const LoginForm = () => {
   const [bannedDuration, setBannedDuration] = useState(0);
   const [bannedReason, setBannedReason] = useState("");
   const [openBan, setOpenBan] = useState(false);
+
+  const [emailVerifyDialogOpen, setEmailVerifyDialogOpen] = useState(false);
 
   const [focused, setFocused] = useState({
     username: false,
@@ -163,16 +168,6 @@ const LoginForm = () => {
         showError("password");
         return;
       }
-      if (
-        enteredUsername.trim().length < 8 ||
-        enteredUsername.trim().length > 16
-      ) {
-        setUsernameError("Invalid username or password");
-        showError("username");
-        setPasswordError("Invalid username or password");
-        showError("password");
-        return false;
-      }
       return true;
     },
     password: () => {
@@ -205,6 +200,20 @@ const LoginForm = () => {
     },
   };
 
+  const fetchSendEmailVerificationApi = async (email, cooldown) => {
+    try {
+      const res = await api.put(
+        "email-verification",
+        { email, cooldown },
+        { withCredentials: true }
+      );
+      if (res.status === 200) {
+        window.location.href = "register";
+      }
+    } catch (error) {
+      alert("Server Error");
+    }
+  };
   //function to fetch the login api
   const fetchLoginApi = async (loginData) => {
     // console.log("fetchApi");
@@ -213,12 +222,12 @@ const LoginForm = () => {
       const res = await api.post("login", loginData, {
         withCredentials: true,
       });
-      console.log(res);
       //if login success redirect to landing page
       if (res.status === 200) {
         window.location.href = "/";
       }
     } catch (error) {
+      console.log(error);
       // if unauthorized then show appropiate error in front
       if (error.response.status === 401) {
         if (error.response.data.ban) {
@@ -226,6 +235,11 @@ const LoginForm = () => {
           setBannedReason(error.response.data.ban.banReason);
           setOpenBan(true);
           setAuthError(true);
+          return;
+        }
+        if (error.response.data.message === "Unauthorized User") {
+          setUserEmail(error.response.data.data);
+          setEmailVerifyDialogOpen(true);
           return;
         }
 
@@ -337,6 +351,47 @@ const LoginForm = () => {
               Close
             </Button>
           </Box>
+        }
+      />
+
+      <VerifyDialog
+        // open={emailVerifyDialogOpen}
+        open={emailVerifyDialogOpen}
+        onClose={() => {
+          setEmailVerifyDialogOpen(false);
+        }}
+        title={
+          <Typography sx={{ fontSize: "20px" }} fontWeight="500">
+            Unfinished Registration
+          </Typography>
+        }
+        content={
+          <>
+            <Typography
+              variant="subtitle1"
+              component="p"
+              sx={{ fontWeight: "400", textAlign: "center" }}
+            >
+              You haven't finished your registration process, please finish up your
+              registration process before trying to log in.
+            </Typography>
+          </>
+        }
+        actions={
+          <Button
+            sx={{ width: "auto" }}
+            onClick={() => {
+              if (authCtx.verificationEmail === userEmail) {
+                window.location.href = "register";
+                return;
+              }
+              fetchSendEmailVerificationApi(userEmail, 0);
+            }}
+            variant="primary"
+            size="small"
+          >
+            Continue Registration
+          </Button>
         }
       />
       <Grid

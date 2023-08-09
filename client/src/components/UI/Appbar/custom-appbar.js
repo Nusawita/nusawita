@@ -17,9 +17,11 @@ import {
   Container,
   List,
   ListItemButton,
-  SwipeableDrawer,
   Drawer,
   ListItem,
+  Alert,
+  AlertTitle,
+  Link,
 } from "@mui/material";
 import AuthContext from "../../../context/auth-context";
 import { Icon } from "@iconify/react";
@@ -239,17 +241,41 @@ const CustomAppbar = (props) => {
                       >
                         <List>
                           <ListItem sx={{ ...ContentMiddle }}>
-                            <Box
-                              sx={{ width: "20rem" }}
-                            >
-                              <Typography variant="h6" sx={{ textAlign:'center' }}>You are not logged in</Typography>
-                              <Box sx={{ display:'flex', justifyContent:'center' }}> 
-                                <Button onClick={()=>{window.location.href = '/login'}} sx={{ mx:2, mt:1, mb:2 }} variant="primary">Login</Button>
-                                <Button onClick={()=>{window.location.href = '/register'}} sx={{ mx:2, mt:1, mb:2 }} variant="secondary">Register</Button>
+                            <Box sx={{ width: "20rem" }}>
+                              <Typography
+                                variant="h6"
+                                sx={{ textAlign: "center" }}
+                              >
+                                You are not logged in
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Button
+                                  onClick={() => {
+                                    window.location.href = "/login";
+                                  }}
+                                  sx={{ mx: 2, mt: 1, mb: 2 }}
+                                  variant="primary"
+                                >
+                                  Login
+                                </Button>
+                                <Button
+                                  onClick={() => {
+                                    window.location.href = "/register";
+                                  }}
+                                  sx={{ mx: 2, mt: 1, mb: 2 }}
+                                  variant="secondary"
+                                >
+                                  Register
+                                </Button>
                               </Box>
                             </Box>
                           </ListItem>
-                          <Divider/>
+                          <Divider />
                           <DrawerItem
                             sx={{ py: 2 }}
                             icon={
@@ -453,6 +479,16 @@ const CustomAppbar = (props) => {
               </Box>
             )}
           </Toolbar>
+          {ctxAuth.onRegisterSession && (
+            <Alert severity="warning">
+              <AlertTitle>You have an ongoing registration process</AlertTitle>
+              Go to{" "}
+              <Link color={"#039BE5"} fontWeight="500" href="/register">
+                Sign Up
+              </Link>{" "}
+              to continue your registration process
+            </Alert>
+          )}
         </AppBar>
       </Box>
     </>
