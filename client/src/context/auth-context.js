@@ -86,6 +86,8 @@ export const AuthContextProvider = (props) => {
       if (res.status === 200) {
         //Give cooldown on successfull send email
         setVerificationCooldown(cooldown);
+        setOnRegisterSession(true);
+        setVerificationEmail(email);
       }
     } catch (error) {
       //400 means email is already verified

@@ -53,7 +53,6 @@ const RegisterForm = () => {
   let passConfirmRef = useRef();
 
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   // Verification cooldown to start countdown from the last cooldown
   const [verificationCooldown, setVerificationCooldown] = useState(
@@ -316,7 +315,7 @@ const RegisterForm = () => {
 
   // Run check on value change with delay (wait for user typing)
   useEffect(() => {
-    if (submitted) {
+    if (ctxAuth.onRegisterSession) {
       return;
     }
     const abortController = new AbortController();
@@ -383,10 +382,10 @@ const RegisterForm = () => {
       setCheckingUsername(false);
       clearTimeout(timeout);
     };
-  }, [username, submitted]);
+  }, [username, ctxAuth.onRegisterSession]);
 
   useEffect(() => {
-    if (submitted) {
+    if (ctxAuth.onRegisterSession) {
       return;
     }
     const timeout = setTimeout(() => {
@@ -404,10 +403,10 @@ const RegisterForm = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [date, submitted]);
+  }, [date, ctxAuth.onRegisterSession]);
 
   useEffect(() => {
-    if (submitted) {
+    if (ctxAuth.onRegisterSession) {
       return;
     }
     const timeout = setTimeout(() => {
@@ -432,11 +431,11 @@ const RegisterForm = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [phone, submitted]);
+  }, [phone, ctxAuth.onRegisterSession]);
 
   useEffect(() => {
-    //Do email verification if submitted, validate email otherwise
-    if (submitted) {
+    //Do email verification if ctxAuth.onRegisterSession, validate email otherwise
+    if (ctxAuth.onRegisterSession) {
       //Return to avoid going to next code
       return;
     }
@@ -490,10 +489,10 @@ const RegisterForm = () => {
       abortController.abort();
       clearTimeout(timeout);
     };
-  }, [email, submitted]);
+  }, [email, ctxAuth.onRegisterSession]);
 
   useEffect(() => {
-    if (submitted) {
+    if (ctxAuth.onRegisterSession) {
       return;
     }
     const timeout = setTimeout(() => {
@@ -563,10 +562,10 @@ const RegisterForm = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [password, confirmPassword, submitted]);
+  }, [password, confirmPassword, ctxAuth.onRegisterSession]);
 
   useEffect(() => {
-    if (submitted) {
+    if (ctxAuth.onRegisterSession) {
       return;
     }
     const timeout = setTimeout(() => {
@@ -579,7 +578,7 @@ const RegisterForm = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [confirmPassword, submitted]);
+  }, [confirmPassword, ctxAuth.onRegisterSession]);
 
   const fetchRegisterAPI = async (registerData) => {
     try {
@@ -588,7 +587,6 @@ const RegisterForm = () => {
       //if login success redirect to landing page
       if (res.status === 201) {
         ctxAuth.fetchEmailVerificationSendApi(registerData.email, 0);
-        setSubmitted(true);
       }
     } catch (error) {
       // if unauthorized then show appropiate error in front
@@ -1120,11 +1118,13 @@ const RegisterForm = () => {
                 type="submit"
                 variant="primary"
                 size="large"
-                disabled={submitting || submitted ? true : false}
+                disabled={
+                  submitting || ctxAuth.onRegisterSession ? true : false
+                }
               >
                 {submitting
                   ? "Registering..."
-                  : submitted
+                  : ctxAuth.onRegisterSession
                   ? "Registered"
                   : "Sign Up"}
               </Button>
