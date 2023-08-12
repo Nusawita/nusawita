@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  Divider,
   Grid,
   Paper,
   Typography,
@@ -139,11 +140,7 @@ const ProfilePage = () => {
                     sx={{ mt: 3 }}
                     size="small"
                     label="Phone Number"
-                    value={
-                      userData.noTelp === ""
-                        ? "No Phone Number"
-                        : userData.noTelp
-                    }
+                    value={userData.noTelp === "" ? "None" : userData.noTelp}
                     variant="outlined"
                   />
                   <CustomTextField
@@ -166,6 +163,15 @@ const ProfilePage = () => {
                 </Box>
               </Grid>
             </Grid>
+            <Divider sx={{ mt: 5 }} />
+          </Box>
+          {/* Recent reviews section */}
+          <Box sx={{ mt: 2, width: "90%" }}>
+            <Box>
+              <Typography variant="h5" component="h5" fontWeight={400}>
+                Recent Reviews
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </>
