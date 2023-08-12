@@ -31,6 +31,7 @@ import { Icon } from "@iconify/react";
 export const CustomTextField = (props) => {
   return (
     <TextField
+      disabled={props.disabled}
       size={props.size}
       autoFocus={props.autoFocus}
       inputRef={props.inputRef}
@@ -369,7 +370,7 @@ export const VerifyDialog = (props) => {
   const onClose = props.onClose;
 
   return (
-    <Dialog open={open} onClose={onClose} >
+    <Dialog open={open} onClose={onClose}>
       {title && <DialogTitle>{title}</DialogTitle>}
       {content && (
         <DialogContent sx={{ ...ContentMiddle }}>{content}</DialogContent>
