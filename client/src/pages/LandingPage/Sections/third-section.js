@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Box, Typography, Grid, useMediaQuery } from "@mui/material";
+import { Button, Box, Typography, useMediaQuery } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useTheme } from "@emotion/react";
 import { CustomCard, LabelSelector } from "../../../components/UI/custom-UI";
@@ -26,9 +26,9 @@ const ThirdSection = () => {
       >
         <Typography
           color="white"
-          variant="h5"
-          component="h5"
-          sx={{ px: 4, py: 20 }}
+          variant={smallScreen ? "h4" : "h2"}
+          component={smallScreen ? "h4" : "h2"}
+          sx={{ px: 4, py: 20, maxWidth: '50%' }}
         >
           Lorem ipsum dolor sit amet consectetur.
         </Typography>
@@ -71,8 +71,7 @@ const ThirdSection = () => {
           </Typography>
         </Box>
 
-        <Grid
-          spacing={2}
+        <Box
           sx={{
             display: "flex",
             justifyContent: "center",
@@ -117,7 +116,7 @@ const ThirdSection = () => {
               bibendum."
             tags={["Beach", "Landscape", "Sunset", "Ocean", "Beautiful"]}
           />
-        </Grid>
+        </Box>
       </Box>
     </>
   );
