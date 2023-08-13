@@ -13,6 +13,7 @@ import { RegisterPages } from "../pages/register-page";
 import { AdminDashboardUsers } from "../pages/AdminDashboard/admin-dashboard-users";
 import AdminDashboardTourism from "../pages/AdminDashboard/admin-dashboard-tourism";
 import EmailVerificationPage from "../pages/email-verification-page";
+import ProfilePage from "../pages/profile-page";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading
@@ -70,6 +71,12 @@ export const Navigation = () => {
           <Route
             path="/email-verification"
             element={<EmailVerificationPage />}
+          />
+          <Route
+            path="/profile"
+            element={
+              ctx.isLoggedIn ? <ProfilePage /> : <Navigate to="/" replace />
+            }
           />
         </Routes>
       </Router>

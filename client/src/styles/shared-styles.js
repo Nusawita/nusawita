@@ -159,7 +159,7 @@ export const customTheme = createTheme({
           style: {
             backgroundColor: customGlobalTheme.palette.danger.main,
             border: `1px solid ${customGlobalTheme.palette.danger.main}`,
-            color: 'white',
+            color: "white",
             textTransform: "none",
             borderRadius: "4px",
             "&:hover": {
@@ -206,9 +206,6 @@ export const customTheme = createTheme({
     },
     // TEXT FIELD
     MuiTextField: {
-      styleOverrides: {
-        root: {},
-      },
       variants: [
         {
           props: { variant: "outlined" },
@@ -216,6 +213,10 @@ export const customTheme = createTheme({
             textTransform: "none",
             "& .MuiOutlinedInput-root": {
               "& > fieldset": { border: "1px solid #79747E" },
+            },
+
+            "& .MuiInputBase-input.Mui-disabled": {
+              WebkitTextFillColor: "#000000",
             },
           },
         },
