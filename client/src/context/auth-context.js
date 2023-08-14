@@ -42,7 +42,6 @@ export const AuthContextProvider = (props) => {
         setLoginUser(loginData.username);
         setIsAdmin(loginData.isAdmin);
       } catch (error) {
-        console.log(error);
         //If temp token exists give user register session
         if (error.response.data.temp_token) {
           //Set session email

@@ -9,7 +9,6 @@ import {
   Paper,
   useMediaQuery,
   ListItemText,
-  Menu,
   MenuList,
   MenuItem,
   Divider,
@@ -21,6 +20,8 @@ import {
   Alert,
   AlertTitle,
   Link,
+  Popper,
+  ClickAwayListener,
 } from "@mui/material";
 import AuthContext from "../../../context/auth-context";
 import { Icon } from "@iconify/react";
@@ -43,7 +44,7 @@ const CustomAppbar = (props) => {
     setOpenDrawer(true);
   };
 
-  const handleMenuClose = (even) => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
@@ -51,7 +52,7 @@ const CustomAppbar = (props) => {
 
   return (
     <>
-      <Menu
+      <Popper
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "center",
@@ -62,96 +63,103 @@ const CustomAppbar = (props) => {
         }}
         open={open}
         anchorEl={anchorEl}
-        onClose={handleMenuClose}
       >
-        <MenuList
-          sx={{
-            textTransform: "none",
-            minWidth: "12rem",
-          }}
-        >
-          <MenuItem>
-            <Typography
-              variant="p"
+        <ClickAwayListener onClickAway={handleMenuClose}>
+          <Paper elevation={2} sx={{ mt:4 }}>
+            <MenuList
               sx={{
-                fontFamily: "Roboto",
-                fontSize: "14px",
-                fontWeight: "400",
+                textTransform: "none",
+                minWidth: "12rem",
               }}
             >
-              {ctxAuth.loginUser}
-            </Typography>
-          </MenuItem>
-          <Divider />
-          {ctxAuth.isAdmin && (
-            <MenuItem
-              onClick={() => {
-                window.location.href = "/admin/dashboard";
-              }}
-            >
-              <ListItemIcon>
-                <Icon icon="ic:round-dashboard" color="black" width="24" />
-              </ListItemIcon>
-              <ListItemText>
+              <MenuItem>
                 <Typography
                   variant="p"
                   sx={{
                     fontFamily: "Roboto",
                     fontSize: "14px",
                     fontWeight: "400",
-                    display: "flex",
-                    alignItems: "center",
                   }}
                 >
-                  Dashboard
+                  {ctxAuth.loginUser}
                 </Typography>
-              </ListItemText>
-            </MenuItem>
-          )}
-          <MenuItem
-            onClick={() => {
-              window.location.href = "/profile";
-            }}
-          >
-            <ListItemIcon>
-              <Icon icon="bi:person-fill" color="black" width="24" />
-            </ListItemIcon>
-            <ListItemText>
-              <Typography
-                variant="p"
-                sx={{
-                  fontFamily: "Roboto",
-                  fontSize: "14px",
-                  fontWeight: "400",
-                  display: "flex",
-                  alignItems: "center",
+              </MenuItem>
+              <Divider />
+              {ctxAuth.isAdmin && (
+                <MenuItem
+                  onClick={() => {
+                    window.location.href = "/admin/dashboard";
+                  }}
+                >
+                  <ListItemIcon>
+                    <Icon icon="ic:round-dashboard" color="black" width="24" />
+                  </ListItemIcon>
+                  <ListItemText>
+                    <Typography
+                      variant="p"
+                      sx={{
+                        fontFamily: "Roboto",
+                        fontSize: "14px",
+                        fontWeight: "400",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      Dashboard
+                    </Typography>
+                  </ListItemText>
+                </MenuItem>
+              )}
+              <MenuItem
+                onClick={() => {
+                  window.location.href = "/profile";
                 }}
               >
-                Profile
-              </Typography>
-            </ListItemText>
-          </MenuItem>
-          <MenuItem onClick={ctxAuth.logoutUser}>
-            <ListItemIcon>
-              <Icon icon="fluent:sign-out-20-filled" color="black" width="24" />
-            </ListItemIcon>
-            <ListItemText>
-              <Typography
-                variant="p"
-                sx={{
-                  fontFamily: "Roboto",
-                  fontSize: "14px",
-                  fontWeight: "400",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                Sign Out
-              </Typography>
-            </ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Menu>
+                <ListItemIcon>
+                  <Icon icon="bi:person-fill" color="black" width="24" />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    variant="p"
+                    sx={{
+                      fontFamily: "Roboto",
+                      fontSize: "14px",
+                      fontWeight: "400",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Profile
+                  </Typography>
+                </ListItemText>
+              </MenuItem>
+              <MenuItem onClick={ctxAuth.logoutUser}>
+                <ListItemIcon>
+                  <Icon
+                    icon="fluent:sign-out-20-filled"
+                    color="black"
+                    width="24"
+                  />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    variant="p"
+                    sx={{
+                      fontFamily: "Roboto",
+                      fontSize: "14px",
+                      fontWeight: "400",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Sign Out
+                  </Typography>
+                </ListItemText>
+              </MenuItem>
+            </MenuList>
+          </Paper>
+        </ClickAwayListener>
+      </Popper>
       <Box>
         <AppBar
           sx={{ display: "flex", flexGrow: 1, position: "static" }}

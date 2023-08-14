@@ -72,6 +72,7 @@ export const CustomDatePicker = (props) => {
     <Box sx={{ ...props.sx }}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
+          disabled={props.disabled}
           sx={{
             width: "100%",
           }}
