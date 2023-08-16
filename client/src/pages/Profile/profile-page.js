@@ -1,9 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
-import CustomAppbar from "../components/UI/Appbar/custom-appbar";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import CustomAppbar from "../../components/UI/Appbar/custom-appbar";
 import {
   Alert,
   AlertTitle,
-  Backdrop,
   Box,
   Button,
   Card,
@@ -11,21 +10,23 @@ import {
   CircularProgress,
   Divider,
   Grid,
-  Paper,
   Typography,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
-import { ContentMiddle } from "../styles/shared-styles";
+import { ContentMiddle } from "../../styles/shared-styles";
 import { useTheme } from "@emotion/react";
 import {
   CustomDatePicker,
   CustomTextField,
-  VerifyDialog,
-} from "../components/UI/custom-UI";
-import api from "../axios-instance";
+} from "../../components/UI/custom-UI";
+import api from "../../axios-instance";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import AuthContext from "../../context/auth-context";
+import ProfileFeedbacks from "./components/profle-feedbacks";
+import { ErrorVibrateAnimation } from "../../components/animation/custom-animation";
+import MyProfile from "./components/my-profile";
 
 const ProfilePage = () => {
   const theme = useTheme();
@@ -33,7 +34,6 @@ const ProfilePage = () => {
   const [userData, setUserData] = useState({});
   const [dataCheckpoint, setDataCheckpoint] = useState({});
   const [loading, setLoading] = useState(true);
-  const [viewOnly, setViewOnly] = useState(true);
   const [countdown, setCountdown] = useState(10);
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -42,30 +42,47 @@ const ProfilePage = () => {
     phone: "",
     dob: "",
   });
-  let usernameRef = useRef();
+  const [animationRun, setAnimationRun] = useState({
+    username: false,
+    noTelp: false,
+    dob: false,
+  });
+  const startAnimation = (field, boolean) => {
+    setAnimationRun((prev) => ({
+      ...prev,
+      [field]: boolean,
+    }));
+  };
 
-  const [submitingNewData, setSubmittingNewData] = useState(false);
-  const [dataChanged, setDataChanged] = useState(false);
+  let usernameRef = useRef();
+  const authCtx = useContext(AuthContext);
 
   //Dialog States
-  const [verifyCancelDialog, setVerifyCancelDialog] = useState(false);
-  const [verifySaveDialog, setVerifySaveDialog] = useState(false);
+  //States: '', editing, verifyingSave, verifyingCancel, success
+  const [editingStates, setEditingStates] = useState("");
 
+  //Fetch the get profile data api
   const getUserProfile = async () => {
     console.log("Api Calls");
     try {
       const res = await api.get("/profile", { withCredentials: true });
+      // If success change profile:
       if (res.status === 200) {
+        //Set user data to new data to reflect change in profile page
         setUserData(res.data.data);
+        //Change the date format from the response to show on datepicker
         setUserData((prev) => ({
           ...prev,
           dob: dayjs(res.data.data.dob).utc(),
         }));
+        //Set the data checkpoint to new data
         setDataCheckpoint(res.data.data);
+        //Change the date format from the response to show on datepicker
         setDataCheckpoint((prev) => ({
           ...prev,
           dob: dayjs(res.data.data.dob).utc(),
         }));
+        //Set loading to false
         setLoading(false);
       }
     } catch (error) {
@@ -73,12 +90,16 @@ const ProfilePage = () => {
     }
   };
 
+  //Fetch the edit profile api
   const fetchEditProfileApi = async (data) => {
+    // Sleep is for debugging to visualize the loading
     // const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    //Newdata to pass to the api, this is needed because the date need to be reformatted
     const newData = {
       username: data.username,
       email: data.email,
       noTelp: data.noTelp,
+      //Reformat date as this is the backend format
       dob: data.dob.format("YYYY-MM-DD"),
     };
     // await sleep(3000);
@@ -87,10 +108,10 @@ const ProfilePage = () => {
         withCredentials: true,
       });
       if (res.status === 200) {
+        //Set the data checkpoint to new data
         setDataCheckpoint(data);
-        setViewOnly(true);
-        setSubmittingNewData(false);
-        setDataChanged(true);
+        //Enter the success edit mode to show the success notification
+        setEditingStates("success");
       }
     } catch (error) {
       alert("Server Error");
@@ -98,14 +119,17 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    //If data loaded or contains value
-    if (userData.username || !viewOnly) {
+    //If data loaded or contains value or user in edit mode
+    if (userData.username || editingStates) {
       return;
     }
+    // Else get the data
     getUserProfile();
-  }, [userData, viewOnly]);
+  }, [userData, editingStates]);
 
+  //Function to change the userData to new data when editing profile data
   const onDataChange = (field, value) => {
+    //Not allowing typing other than numbers for phone
     if (field === "noTelp") {
       const numberRegex = /\D/g;
       value = value.replace(numberRegex, "");
@@ -115,6 +139,8 @@ const ProfilePage = () => {
       [field]: value,
     }));
   };
+
+  //Function to change the error message if error present when editing
   const changeErrorState = (field, value) => {
     setErrorStates((prev) => ({
       ...prev,
@@ -123,14 +149,16 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    if (!viewOnly) {
+    if (editingStates === "editing") {
       usernameRef.current.focus();
       return;
     }
-  }, [viewOnly]);
+  }, [editingStates]);
 
+  //Form validation when user change their username in edit mode
   useEffect(() => {
-    if (viewOnly) {
+    //If not in edit mode do nothing
+    if (editingStates !== "editing") {
       return;
     }
     //Check duplicate username function
@@ -138,6 +166,8 @@ const ProfilePage = () => {
       try {
         const res = await api.post("/check-username", { username });
         if (res.status === 200) {
+          //If duplicate does not return, entered username is valid, clear the error
+          changeErrorState("username", "");
           return;
         }
       } catch (error) {
@@ -149,18 +179,24 @@ const ProfilePage = () => {
     };
     //Do form validation
     const timeoutId = setTimeout(() => {
+      //Dont validate if data is the same
       if (userData.username === dataCheckpoint.username) {
         return;
       }
+      //If username empty
       if (userData.username.trim().length === 0) {
         changeErrorState("username", "Username cannot be empty");
         return;
       }
+
+      //If username contains spaces
       const spaceRegex = /^[^ ]+$/;
       if (!spaceRegex.test(userData.username)) {
         changeErrorState("username", "Username must not contain spaces");
         return;
       }
+
+      //Username must be between 8-16 characters
       if (
         userData.username.trim().length < 8 ||
         userData.username.trim().length > 16
@@ -171,19 +207,21 @@ const ProfilePage = () => {
         );
         return;
       }
+      //If reach this function no username error detected, check for duplicates now
       checkUsernameDuplicate(userData.username);
-      changeErrorState("username", "");
     }, 600);
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [userData.username, dataCheckpoint.username, viewOnly]);
-
+  }, [userData.username, dataCheckpoint.username, editingStates]);
+  // Form validation when user change their phone number in edit mode
   useEffect(() => {
-    if (viewOnly || userData.noTelp.trim().length === 0) {
+    //If not in edit mode or phone is empty do nothing
+    if (editingStates !== "editing" || userData.noTelp.trim().length === 0) {
       return;
     }
     const timeoutId = setTimeout(() => {
+      // Phone must be between 11 or 12 characters
       if (
         userData.noTelp.trim().length < 11 ||
         userData.noTelp.trim().length > 12
@@ -191,29 +229,93 @@ const ProfilePage = () => {
         changeErrorState("phone", "Phone number must be 11 or 12 characters");
         return;
       }
+      //If phone valid, clear error
       changeErrorState("phone", "");
       return () => {
         clearTimeout(timeoutId);
       };
     }, 600);
-  }, [userData.noTelp, dataCheckpoint.username, viewOnly]);
-
+  }, [userData.noTelp, editingStates]);
+  //Form validation when user change their birth date in edit mode
   useEffect(() => {
-    if (dataChanged) {
+    if (editingStates !== "editing") {
+      return;
+    }
+    const dobParsed = dayjs(userData.dob);
+    if (!dobParsed.isValid()) {
+      changeErrorState("dob", "Please enter a valid date");
+      return;
+    }
+    changeErrorState("dob", "");
+  }, [userData.dob, editingStates]);
+
+  //Functions to run when user edit states changed
+  useEffect(() => {
+    //When user save data changes, check the errors, if no errors present, fetch edit api
+    if (editingStates === "submitting") {
+      if (Object.values(errorStates).every((field) => field === "")) {
+        fetchEditProfileApi(userData);
+        return;
+      }
+      //Recheck errors, if error presents run animation
+      if (errorStates.username) {
+        startAnimation("username", true);
+        setEditingStates("editing");
+      }
+      if (errorStates.phone) {
+        startAnimation("noTelp", true);
+        setEditingStates("editing");
+      }
+      if (errorStates.dob) {
+        startAnimation("dob", true);
+        setEditingStates("editing");
+      }
+    }
+    //If api call to edit success
+    if (editingStates === "success") {
+      //Change the username shown in navbar
+      authCtx.changeLoginUser(dataCheckpoint.username);
+
+      //Set countdown to auto close success message
       setCountdown(10);
-      // window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
+      //Count down the countdown variable
       const intervalId = setInterval(() => {
         setCountdown((prev) => prev - 1);
       }, 1000);
+
+      //Close success message when 10 seconds have passed
       const timeoutId = setTimeout(() => {
-        setDataChanged(false);
+        setEditingStates("");
       }, 10000);
+
+      //Clean up timeout and interval
       return () => {
         clearTimeout(timeoutId);
         clearInterval(intervalId);
       };
     }
-  }, [dataChanged]);
+  }, [editingStates, authCtx, dataCheckpoint.username, errorStates, userData]);
+
+  const editFunctionality = {
+    revertEditChanges: () => {
+      setEditingStates("");
+      setUserData(dataCheckpoint);
+      setErrorStates({});
+    },
+    submitEdit: () => {
+      setEditingStates("submitting");
+    },
+    enterEditMode: () => {
+      setEditingStates("editing");
+    },
+    verifyingCancel: () => {
+      setEditingStates("verifyingCancel");
+    },
+    verifyingSave: () => {
+      setEditingStates("verifyingSave");
+    },
+  };
 
   if (loading) {
     return (
@@ -224,101 +326,11 @@ const ProfilePage = () => {
   } else {
     return (
       <>
-        <Backdrop
-          open={submitingNewData}
-          sx={{
-            color: "#ffff",
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-          }}
-        >
-          <CircularProgress />
-        </Backdrop>
-
-        <VerifyDialog
-          open={verifyCancelDialog}
-          onClose={() => {
-            setVerifyCancelDialog(false);
-          }}
-          title={"Discard Change"}
-          content={
-            <Box sx={{ mx: 5, textAlign: "center" }}>
-              <Typography variant="subtitle1" component="p" fontWeight={400}>
-                Are you sure you want to discard the changes?
-              </Typography>
-              <Typography variant="subtitle1" component="p" fontWeight={400}>
-                Any unsaved data will be lost.
-              </Typography>
-            </Box>
-          }
-          actions={
-            <Box>
-              <Button
-                onClick={() => {
-                  setVerifyCancelDialog(false);
-                }}
-                size="small"
-                sx={{ width: "auto", mx: 1 }}
-              >
-                No
-              </Button>
-              <Button
-                onClick={() => {
-                  setViewOnly(true);
-                  setUserData(dataCheckpoint);
-                  setErrorStates({});
-                  setVerifyCancelDialog(false);
-                }}
-                variant="primary"
-                size="small"
-                sx={{ width: "auto", mx: 1 }}
-              >
-                Yes
-              </Button>
-            </Box>
-          }
+        <ProfileFeedbacks
+          editingStates={editingStates}
+          editFunctionality={editFunctionality}
         />
-        <VerifyDialog
-          open={verifySaveDialog}
-          onClose={() => {
-            setVerifySaveDialog(false);
-          }}
-          title={"Save Changes"}
-          content={
-            <Box sx={{ mx: 5, textAlign: "center" }}>
-              <Typography variant="subtitle1" component="p" fontWeight={400}>
-                Are you sure you want to save the changes?
-              </Typography>
-            </Box>
-          }
-          actions={
-            <Box>
-              <Button
-                onClick={() => {
-                  setVerifySaveDialog(false);
-                }}
-                size="small"
-                sx={{ width: "auto", mx: 1 }}
-              >
-                No
-              </Button>
-              <Button
-                onClick={() => {
-                  setSubmittingNewData(true);
-                  fetchEditProfileApi(userData);
-                  setVerifySaveDialog(false);
-                }}
-                variant="primary"
-                size="small"
-                sx={{ width: "auto", mx: 1 }}
-              >
-                Yes
-              </Button>
-            </Box>
-          }
-        />
-
         <CustomAppbar position="static" />
-
         <Box
           sx={{
             display: "flex",
@@ -329,86 +341,21 @@ const ProfilePage = () => {
             mt: 5,
           }}
         >
-          {/* My Profile Section */}
-          <Box sx={{ width: "90%", borderBottom: "1px solid black" }}>
-            <Box sx={{ px: 4, py: 3 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Paper component="span" sx={{ mr: 2, py: 1, px: 2 }}>
-                  <Icon icon="icon-park-solid:back" width={24} />
-                </Paper>
-                <Typography variant="h4" component="h4" fontWeight={400}>
-                  My Profile
-                </Typography>
-              </Box>
-              <Box
-                sx={{ mt: 1, display: "flex", justifyContent: "space-between" }}
-              >
-                <Typography>Home / Profile</Typography>
-                {viewOnly ? (
-                  <Button
-                    onClick={() => {
-                      setViewOnly(false);
-                    }}
-                    sx={{ width: "auto", color: colorPalette.info.light }}
-                  >
-                    <Icon icon="bxs:edit" width={24} />
-                    <Box sx={{ ml: 1 }} component="span">
-                      Edit Profile
-                    </Box>
-                  </Button>
-                ) : (
-                  <Box>
-                    <Button
-                      onClick={() => {
-                        setVerifyCancelDialog(true);
-                      }}
-                      sx={{
-                        width: "auto",
-                        color: colorPalette.danger.main,
-                        mx: 1,
-                      }}
-                    >
-                      <Icon icon="mdi:forbid" width={24} />
-                      <Box sx={{ ml: 1 }} component="span">
-                        Cancel
-                      </Box>
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setVerifySaveDialog(true);
-                      }}
-                      sx={{
-                        width: "auto",
-                        color: colorPalette.info.light,
-                        mx: 1,
-                      }}
-                    >
-                      <Icon icon="bxs:edit" width={24} />
-                      <Box sx={{ ml: 1 }} component="span">
-                        Save
-                      </Box>
-                    </Button>
-                  </Box>
-                )}
-              </Box>
-            </Box>
-          </Box>
-
+          <MyProfile
+            colorPalette={colorPalette}
+            editFunctionality={editFunctionality}
+            editingStates={editingStates}
+          />
           {/* Account Data Section */}
           <Box sx={{ width: "90%" }}>
-            {dataChanged && (
+            {editingStates === "success" && (
               <Alert
                 severity="success"
                 action={
                   <Button
                     sx={{ width: "auto", my: 3 }}
                     onClick={() => {
-                      setDataChanged(false);
+                      setEditingStates("");
                     }}
                   >
                     <Icon icon="carbon:close-outline" width={32} />
@@ -459,32 +406,40 @@ const ProfilePage = () => {
                   <Typography variant="h5" component="h5" fontWeight={400}>
                     Account Data
                   </Typography>
-                  <CustomTextField
-                    disabled={viewOnly}
-                    inputRef={usernameRef}
-                    sx={{ mt: 3 }}
-                    color={errorStates.username && "error"}
-                    error={errorStates.username ? true : false}
-                    helperText={errorStates.username && errorStates.username}
-                    leftIcon={
-                      <Icon icon="ic:round-person" color="black" width="26" />
-                    }
-                    rightIcon={
-                      errorStates.username && (
-                        <Icon
-                          icon="ep:warning-filled"
-                          color={colorPalette.danger.main}
-                          width="24"
-                        />
-                      )
-                    }
-                    label="Username"
-                    value={userData.username}
-                    onChange={(event) => {
-                      onDataChange("username", event.target.value);
+                  <ErrorVibrateAnimation
+                    showAnimation={animationRun.username}
+                    onAnimationComplete={() => {
+                      startAnimation("username", false);
                     }}
-                    variant="outlined"
-                  />
+                  >
+                    <CustomTextField
+                      fullWidth
+                      disabled={!editingStates}
+                      inputRef={usernameRef}
+                      sx={{ mt: 3 }}
+                      color={errorStates.username && "error"}
+                      error={errorStates.username ? true : false}
+                      helperText={errorStates.username && errorStates.username}
+                      leftIcon={
+                        <Icon icon="ic:round-person" color="black" width="26" />
+                      }
+                      rightIcon={
+                        errorStates.username && (
+                          <Icon
+                            icon="ep:warning-filled"
+                            color={colorPalette.danger.main}
+                            width="24"
+                          />
+                        )
+                      }
+                      label="Username"
+                      value={userData.username}
+                      onChange={(event) => {
+                        onDataChange("username", event.target.value);
+                      }}
+                      variant="outlined"
+                    />
+                  </ErrorVibrateAnimation>
                   <CustomTextField
                     disabled
                     sx={{ mt: 3 }}
@@ -495,48 +450,80 @@ const ProfilePage = () => {
                     }
                     variant="outlined"
                   />
-                  <CustomTextField
-                    disabled={viewOnly}
-                    sx={{ mt: 3 }}
-                    color={errorStates.phone && "error"}
-                    error={errorStates.phone ? true : false}
-                    helperText={errorStates.phone}
-                    label="Phone Number"
-                    onChange={(event) => {
-                      onDataChange("noTelp", event.target.value);
+                  <ErrorVibrateAnimation
+                    showAnimation={animationRun.username}
+                    onAnimationComplete={() => {
+                      startAnimation("username", false);
                     }}
-                    value={
-                      userData.noTelp ? userData.noTelp : viewOnly ? "None" : ""
-                    }
-                    leftIcon={
-                      <Icon icon="solar:phone-bold" color="black" width="26" />
-                    }
-                    variant="outlined"
-                  />
-                  <CustomDatePicker
-                    disabled={viewOnly}
-                    sx={{ mt: 3 }}
-                    label="Birth Date"
-                    labelDisplay={errorStates.dob && "error"}
-                    value={userData.dob}
-                    display={errorStates.dob && "error"}
-                    message={
-                      errorStates.dob && (
-                        <Typography
-                          sx={{ color: colorPalette.danger.main }}
-                          variant="caption"
-                        >
-                          {errorStates.dob}
-                        </Typography>
-                      )
-                    }
-                    onChange={(newDate) => {
-                      setUserData((prev) => ({
-                        ...prev,
-                        dob: dayjs(newDate).utc(),
-                      }));
+                  >
+                    <CustomTextField
+                      fullWidth
+                      disabled={!editingStates}
+                      sx={{ mt: 3 }}
+                      color={errorStates.phone && "error"}
+                      error={errorStates.phone ? true : false}
+                      helperText={errorStates.phone}
+                      label="Phone Number"
+                      onChange={(event) => {
+                        onDataChange("noTelp", event.target.value);
+                      }}
+                      value={
+                        userData.noTelp
+                          ? userData.noTelp
+                          : !editingStates
+                          ? "None"
+                          : ""
+                      }
+                      leftIcon={
+                        <Icon
+                          icon="solar:phone-bold"
+                          color="black"
+                          width="26"
+                        />
+                      }
+                      rightIcon={
+                        errorStates.phone && (
+                          <Icon
+                            icon="ep:warning-filled"
+                            color={colorPalette.danger.main}
+                            width="24"
+                          />
+                        )
+                      }
+                      variant="outlined"
+                    />
+                  </ErrorVibrateAnimation>
+                  <ErrorVibrateAnimation
+                    showAnimation={animationRun.dob}
+                    onAnimationComplete={() => {
+                      startAnimation("dob", false);
                     }}
-                  />
+                  >
+                    <CustomDatePicker
+                      disabled={!editingStates}
+                      sx={{ mt: 3 }}
+                      label="Birth Date"
+                      labelDisplay={errorStates.dob && "error"}
+                      value={userData.dob}
+                      display={errorStates.dob && "error"}
+                      message={
+                        errorStates.dob && (
+                          <Typography
+                            sx={{ color: colorPalette.danger.main }}
+                            variant="caption"
+                          >
+                            {errorStates.dob}
+                          </Typography>
+                        )
+                      }
+                      onChange={(newDate) => {
+                        setUserData((prev) => ({
+                          ...prev,
+                          dob: dayjs(newDate).utc(),
+                        }));
+                      }}
+                    />
+                  </ErrorVibrateAnimation>
                   <Box sx={{ mt: 3 }}>
                     <Button
                       variant="primary"

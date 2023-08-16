@@ -13,7 +13,7 @@ import { RegisterPages } from "../pages/register-page";
 import { AdminDashboardUsers } from "../pages/AdminDashboard/admin-dashboard-users";
 import AdminDashboardTourism from "../pages/AdminDashboard/admin-dashboard-tourism";
 import EmailVerificationPage from "../pages/email-verification-page";
-import ProfilePage from "../pages/profile-page";
+import ProfilePage from "../pages/Profile/profile-page";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading
