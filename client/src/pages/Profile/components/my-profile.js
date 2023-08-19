@@ -15,9 +15,16 @@ const MyProfile = (props) => {
             alignItems: "center",
           }}
         >
-          <Paper component="span" sx={{ mr: 2, py: 1, px: 2 }}>
+          <Button
+            onClick={() => {
+              window.location.href = "/";
+            }}
+            component={Paper}
+            elevation={1}
+            sx={{ mr: 2, py: 1, px: 2, width: "auto", color: "black" }}
+          >
             <Icon icon="icon-park-solid:back" width={24} />
-          </Paper>
+          </Button>
           <Typography variant="h4" component="h4" fontWeight={400}>
             My Profile
           </Typography>

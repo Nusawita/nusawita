@@ -215,7 +215,7 @@ export const customTheme = createTheme({
               "& > fieldset": { border: "1px solid #79747E" },
             },
 
-            "& .MuiInputBase-input.Mui-disabled": {
+            "& .Mui-disabled": {
               WebkitTextFillColor: "#000000",
             },
           },
