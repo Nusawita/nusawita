@@ -147,7 +147,6 @@ export const ProfileContextProvider = (props) => {
       }
       changeEditingStates("submitting");
       try {
-        console.log(shownProfileData)
         const res = await editProfileData(shownProfileData);
         if (res.status === 200) {
           changeEditingStates("success");
