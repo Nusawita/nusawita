@@ -62,9 +62,7 @@ export const ProfileContextProvider = (props) => {
       value = value.replace(numberRegex, "");
     }
     if (field === "dob") {
-      console.log(value)
       value = dayjs(value).format("YYYY-MM-DD");
-      console.log(value)
     }
     setShownProfileData((prev) => ({
       ...prev,
