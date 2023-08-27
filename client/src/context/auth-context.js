@@ -16,6 +16,7 @@ const AuthContext = React.createContext({
   clearRegisterSession: () => {},
   cancelUserRegistration: () => {},
   emailVerified: "",
+  changeLoginUser:()=>{}
 });
 
 //AuthContextProvider wraps the App.js component in the Index.js file so all children of app have access to the AuthContext
@@ -30,6 +31,10 @@ export const AuthContextProvider = (props) => {
   const [onRegisterSession, setOnRegisterSession] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
 
+  //Function to change login username without calling api
+  const changeLoginUser = (newUsername) =>{
+    setLoginUser(newUsername)
+  }
   // Use useEffect hook on checkLoggedIn to check if the user is loggedIn everytime page refreshes
   useEffect(() => {
     // function to check if user logged in or not
@@ -198,6 +203,7 @@ export const AuthContextProvider = (props) => {
         cancelUserRegistration: cancelUserRegistration,
         clearRegisterSession: clearRegisterSession,
         fetchEmailVerificationSendApi: fetchEmailVerificationSendApi,
+        changeLoginUser:changeLoginUser
       }}
     >
       {props.children}
