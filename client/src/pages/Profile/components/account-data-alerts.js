@@ -1,24 +1,25 @@
 import { Icon } from "@iconify/react";
 import { Alert, AlertTitle, Button, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import ProfileContext from "./context/profile-context";
 
 const AccountDataAlerts = (props) => {
+  const profileCtx = useContext(ProfileContext)
   const closeCountdown = props.closeCountdown;
-  const editFunctionality = props.editFunctionality;
+  const editProfileActions = profileCtx.editProfileActions
   const alertType = props.alertType;
 
   const [countdown, setCountdown] = useState(closeCountdown);
 
   useEffect(() => {
     if (alertType === "success") {
-      console.log('ajsdjaj')
       //Count down the countdown variable
       const intervalId = setInterval(() => {
         setCountdown((prev) => prev - 1);
       }, 1000);
       //Close success message when 10 seconds have passed
       const timeoutId = setTimeout(() => {
-        editFunctionality.exitEditMode();
+        editProfileActions.endEditProfile()
       }, 10000);
       //Clean up timeout and interval
       return () => {
@@ -26,7 +27,7 @@ const AccountDataAlerts = (props) => {
         clearInterval(intervalId);
       };
     }
-  }, [editFunctionality, alertType]);
+  }, [editProfileActions, alertType]);
 
   if (alertType === "success") {
     return (
@@ -35,7 +36,7 @@ const AccountDataAlerts = (props) => {
         action={
           <Button
             sx={{ width: "auto", my: 3 }}
-            onClick={editFunctionality.exitEditMode}
+            onClick={editProfileActions.endEditProfile}
           >
             <Icon icon="carbon:close-outline" width={32} />
           </Button>

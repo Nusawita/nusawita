@@ -1,11 +1,15 @@
 import { Icon } from "@iconify/react";
 import { Box, Button, Paper, Typography } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
+import ProfileContext from "./context/profile-context";
+import { useTheme } from "@emotion/react";
 
 const MyProfile = (props) => {
-  const colorPalette = props.colorPalette;
-  const editingStates = props.editingStates;
-  const editFunctionality = props.editFunctionality;
+  const theme = useTheme();
+  const colorPalette = theme.palette;
+  const profileCtx = useContext(ProfileContext);
+  const editingStates = profileCtx.editingStates;
+  const editProfileActions = profileCtx.editProfileActions;
   return (
     <Box sx={{ width: "90%", borderBottom: "1px solid black" }}>
       <Box sx={{ px: 4, py: 3 }}>
@@ -33,7 +37,7 @@ const MyProfile = (props) => {
           <Typography>Home / Profile</Typography>
           {!editingStates || editingStates === "success" ? (
             <Button
-              onClick={editFunctionality.enterEditMode}
+              onClick={editProfileActions.startEditProfile}
               sx={{ width: "auto", color: colorPalette.info.light }}
             >
               <Icon icon="bxs:edit" width={24} />
@@ -44,7 +48,7 @@ const MyProfile = (props) => {
           ) : (
             <Box>
               <Button
-                onClick={editFunctionality.verifyingCancel}
+                onClick={editProfileActions.verifyCancelEditProfile}
                 sx={{
                   width: "auto",
                   color: colorPalette.danger.main,
@@ -57,7 +61,7 @@ const MyProfile = (props) => {
                 </Box>
               </Button>
               <Button
-                onClick={editFunctionality.verifyingSave}
+                onClick={editProfileActions.verifySaveEditProfile}
                 sx={{
                   width: "auto",
                   color: colorPalette.info.light,
