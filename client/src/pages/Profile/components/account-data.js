@@ -292,7 +292,7 @@ const AccountData = () => {
                       sx={{ mt: 3 }}
                       label="Birth Date"
                       labelDisplay={profileFormErrors.dob && "error"}
-                      value={dayjs(shownProfileData.dob).utc()}
+                      value={dayjs(shownProfileData.dob)}
                       display={profileFormErrors.dob && "error"}
                       message={
                         profileFormErrors.dob && (
