@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { getProfileData, editProfileData } from "../utilities/api-calls";
+import { getProfileData, editProfileData, sendChangePasswordLink } from "../utilities/api-calls";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -20,7 +20,9 @@ const ProfileContext = React.createContext({
   editProfileData: () => {},
   profileFormErrors: {},
   editProfileActions: {},
-  fieldErrorVibrateAnimation:false
+  fieldErrorVibrateAnimation:false,
+  otherSettingsState:'',
+  otherSettingsFunctionality:{}
 });
 
 export const ProfileContextProvider = (props) => {
@@ -53,6 +55,30 @@ export const ProfileContextProvider = (props) => {
       ...prev,
       [field]:boolean,
     }))
+  }
+  // state to control change email or change password
+  // States: unverifiedPassword, unverifiedEmail,verifiedPassword, verifiedEmail
+  const [otherSettingsState, setOtherSettingsState] = useState('')
+  const otherSettingsFunctionality = {
+    //When usr first click change password, a verify dialog will appear
+    requestChangePassword:()=>{
+      setOtherSettingsState('unverifiedPassword')
+    },
+    //when user agree to change their password, start the change password process
+    startChangePassword:async()=>{
+      try{
+        const res = await sendChangePasswordLink(fetchedProfileData.email)
+        if(res.status === 200){
+          setOtherSettingsState('changePasswordLinkSent')
+        }
+      }catch(error){
+        console.log(error)
+
+      }
+    },
+    cancelChanges:()=>{
+      setOtherSettingsState('')
+    }
   }
   //Function to change shown profile data when user edit its value
   const changeShownProfileData = (field, value) => {
@@ -226,7 +252,9 @@ export const ProfileContextProvider = (props) => {
         editProfileActions: editProfileActions,
         profileFormErrors: profileFormErrors,
         fieldErrorVibrateAnimation:fieldErrorVibrateAnimation,
-        startErrorAnimation:startErrorAnimation
+        startErrorAnimation:startErrorAnimation,
+        otherSettingsState:otherSettingsState,
+        otherSettingsFunctionality:otherSettingsFunctionality
       }}
     >
       {props.children}

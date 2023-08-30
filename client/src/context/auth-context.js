@@ -16,7 +16,7 @@ const AuthContext = React.createContext({
   clearRegisterSession: () => {},
   cancelUserRegistration: () => {},
   emailVerified: "",
-  changeLoginUser:()=>{}
+  changeLoginUser: () => {},
 });
 
 //AuthContextProvider wraps the App.js component in the Index.js file so all children of app have access to the AuthContext
@@ -32,9 +32,9 @@ export const AuthContextProvider = (props) => {
   const [emailVerified, setEmailVerified] = useState(false);
 
   //Function to change login username without calling api
-  const changeLoginUser = (newUsername) =>{
-    setLoginUser(newUsername)
-  }
+  const changeLoginUser = (newUsername) => {
+    setLoginUser(newUsername);
+  };
   // Use useEffect hook on checkLoggedIn to check if the user is loggedIn everytime page refreshes
   useEffect(() => {
     // function to check if user logged in or not
@@ -50,7 +50,7 @@ export const AuthContextProvider = (props) => {
         //If temp token exists give user register session
         if (error.response.data.temp_token) {
           //Set session email
-          setVerificationEmail(error.response.data.temp_token);
+          createRegisterSession(error.response.data.temp_token);
           // if have cooldown set cooldown
           if (error.response.data.cooldown) {
             setVerificationCooldown(
@@ -96,6 +96,7 @@ export const AuthContextProvider = (props) => {
     } catch (error) {
       //400 means email is already verified
       if (error.response.status === 400) {
+        console.log(error);
         //Set the email verified state to true to show the success registration message
         setEmailVerified(true);
         //Set the onRegisterSession to false to remove the email verification dialog
@@ -173,10 +174,12 @@ export const AuthContextProvider = (props) => {
           console.log(error);
           //If verified server returns 401
           if (error.response.status === 401) {
-            // show successfully verified dialog
-            setEmailVerified(true)
-            // remove the popup dialog of verification email
-            setOnRegisterSession(false)
+            if (error.response.data.message.verified) {
+              // show successfully verified dialog
+              setEmailVerified(true);
+              // remove the popup dialog of verification email
+              setOnRegisterSession(false);
+            }
             return;
           }
         }
@@ -203,7 +206,7 @@ export const AuthContextProvider = (props) => {
         cancelUserRegistration: cancelUserRegistration,
         clearRegisterSession: clearRegisterSession,
         fetchEmailVerificationSendApi: fetchEmailVerificationSendApi,
-        changeLoginUser:changeLoginUser
+        changeLoginUser: changeLoginUser,
       }}
     >
       {props.children}
