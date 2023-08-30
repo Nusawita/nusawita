@@ -46,6 +46,7 @@ const AccountData = () => {
   // Function that handles error animation state
   const startErrorAnimation = profileCtx.startErrorAnimation;
   //Call auth context, the function changeLoggedInUser is needed when user change their username
+  const otherSettingsFunctionality = profileCtx.otherSettingsFunctionality;
 
   //Dayjs function to handle birth date
   dayjs.extend(utc);
@@ -316,6 +317,7 @@ const AccountData = () => {
                   </Typography>
                   <Box sx={styles.otherSettingsButtonsContainer}>
                     <Button
+                      onClick={otherSettingsFunctionality.requestChangePassword}
                       variant="primary"
                       size="large"
                       sx={styles.changePasswordButton}

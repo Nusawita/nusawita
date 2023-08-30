@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  Link,
   Typography,
 } from "@mui/material";
 import React, { useContext } from "react";
@@ -18,6 +19,14 @@ const ProfileFeedbacks = (props) => {
   const submitting = profileCtx.editingStates === "submitting"; // When user submits their new profile data
   const verifyingCancel = profileCtx.editingStates === "verifyingCancel"; // When user tries to cancel editing profile
   const verifyingSave = profileCtx.editingStates === "verifyingSave"; // When user tries to save their new profile data
+
+  const otherSettingsFunctionality = profileCtx.otherSettingsFunctionality;
+
+  const openPasswordChangeVerifyDialog =
+    profileCtx.otherSettingsState === "unverifiedPassword";
+
+  const openPasswordChangeLinkSentDialog =
+    profileCtx.otherSettingsState === "changePasswordLinkSent";
 
   return (
     <>
@@ -99,6 +108,83 @@ const ProfileFeedbacks = (props) => {
                 Yes
               </Button>
             </Box>
+          }
+        />
+      )}
+
+      {/* Confirm Change Password */}
+      {openPasswordChangeVerifyDialog && (
+        <VerifyDialog
+          open={openPasswordChangeVerifyDialog}
+          title={"Verify Change Password"}
+          content={
+            <Box sx={{ mx: 5, textAlign: "center" }}>
+              <Typography variant="subtitle1" component="p" fontWeight={400}>
+                Are you sure you want to change your password? An email with
+                link to change your password will be sent to your registered
+                email address
+              </Typography>
+            </Box>
+          }
+          actions={
+            <Box>
+              <Button
+                onClick={otherSettingsFunctionality.cancelChanges}
+                size="small"
+                sx={{ width: "auto", mx: 1 }}
+              >
+                No
+              </Button>
+              <Button
+                onClick={otherSettingsFunctionality.startChangePassword}
+                variant="primary"
+                size="small"
+                sx={{ width: "auto", mx: 1 }}
+              >
+                Yes
+              </Button>
+            </Box>
+          }
+        />
+      )}
+
+      {/* Password change sent */}
+      {openPasswordChangeLinkSentDialog && (
+        <VerifyDialog
+          open={openPasswordChangeLinkSentDialog}
+          title={"Change Password Link Sent"}
+          content={
+            <Box sx={{ mx: 5, textAlign: "center" }}>
+              <Typography variant="subtitle1" component="p" fontWeight={400}>
+                We have sent the change password link to your registered email.
+                Kindly check your email to change your password.
+              </Typography>
+              <Typography
+                sx={{ mt: 2 }}
+                variant="subtitle1"
+                component="p"
+                fontWeight={400}
+              >
+                Didn't receive email?{" "}
+                <Link
+                  sx={{ cursor: "pointer" }}
+                  onClick={otherSettingsFunctionality.startChangePassword}
+                >
+                  Click here
+                </Link>{" "}
+                to resend email
+              </Typography>
+            </Box>
+          }
+          actions={
+            <Button
+              onClick={otherSettingsFunctionality.cancelChanges}
+              variant="primary"
+              size="small"
+              sx={{ width: "auto", mx: 1 }}
+            >
+              Close
+            </Button>
           }
         />
       )}

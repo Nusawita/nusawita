@@ -29,3 +29,12 @@ export const checkUsernameDuplicate = async (username) => {
     throw error.response;
   }
 };
+
+export const sendChangePasswordLink = async(email) =>{
+  try{
+    const res = await api.put("/profile/request-edit-password", {email})
+    return res
+  }catch(error){
+    throw error.response
+  }
+}

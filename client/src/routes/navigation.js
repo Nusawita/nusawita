@@ -15,6 +15,7 @@ import AdminDashboardTourism from "../pages/AdminDashboard/admin-dashboard-touri
 import EmailVerificationPage from "../pages/email-verification-page";
 import ProfilePage from "../pages/Profile/profile-page";
 import { ProfileContextProvider } from "../pages/Profile/components/context/profile-context";
+import ChangePasswordPage from "../pages/ChangePassword/change-password-page";
 export const Navigation = () => {
   const ctx = useContext(AuthContext); //call auth context
   // render loading page on loading
@@ -84,6 +85,10 @@ export const Navigation = () => {
                 <Navigate to="/" replace />
               )
             }
+          />
+          <Route
+            path="/edit-password"
+            element={<ChangePasswordPage/> }
           />
         </Routes>
       </Router>
